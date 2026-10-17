@@ -1,0 +1,19 @@
+{
+  "caso_id": "",
+  "elaborado_por": "",
+  "elaborado_em": "",
+  "texto_referencia": "",
+  "campos_esperados": {
+    "protocolo": "",
+    "data": "",
+    "solicitante": "",
+    "assunto": "",
+    "pedido": "",
+    "categoria": ""
+  },
+  "campos_ausentes_esperados": [],
+  "dados_criticos": [],
+  "minuta_deve_conter": [],
+  "minuta_nao_pode_conter": [],
+  "observacoes": ""
+}

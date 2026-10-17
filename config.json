@@ -1,0 +1,60 @@
+{
+  "provedor": "gemini",
+  "modelos": {
+    "texto": "gemini-3.8-flash",
+    "transcricao": "gemini-3.8-flash",
+    "visao": "gemini-3.8-flash",
+    "tts": "gemini-3.8-flash-tts",
+    "imagem": "gemini-3.1-flash-lite-image"
+  },
+  "parametros_geracao": {
+    "max_output_tokens": 4096
+  },
+  "timeout_segundos": 60,
+  "armazenar_no_provedor": false,
+  "precos_usd_por_milhao_tokens": {
+    "gemini-3.8-flash": { "entrada": 0.75, "saida": 3.75 },
+    "gemini-3.8-flash-tts": { "entrada": 0.5, "saida": 9.0 },
+    "gemini-3.1-flash-lite-image": { "entrada": 0.25, "saida": 1.5, "por_imagem_1k": 0.0336 }
+  },
+  "entradas": {
+    "texto": { "extensoes": [".txt"], "tamanho_max_mb": 1 },
+    "audio": { "extensoes": [".mp3", ".wav", ".m4a", ".ogg", ".flac"], "tamanho_max_mb": 20 },
+    "imagem": { "extensoes": [".pdf", ".png", ".jpg", ".jpeg", ".webp"], "tamanho_max_mb": 20 }
+  },
+  "categorias": [],
+  "privacidade": {
+    "mascarar_antes_de_enviar": ["cpf", "rg", "email", "telefone"]
+  },
+  "imagem_institucional": "dados/originais/brasao.png",
+  "caminhos": {
+    "originais": "dados/originais",
+    "gabaritos": "dados/gabaritos",
+    "processados": "dados/processados",
+    "prompts": "prompts",
+    "minutas": "resultados/minutas",
+    "audios": "resultados/audios",
+    "imagens": "resultados/imagens",
+    "logs": "resultados/logs"
+  },
+  "casos": [
+    {
+      "id": "texto-01",
+      "modalidade": "texto",
+      "arquivo": "dados/originais/entrada_texto.txt",
+      "gabarito": "dados/gabaritos/texto-01.json"
+    },
+    {
+      "id": "audio-01",
+      "modalidade": "audio",
+      "arquivo": "dados/originais/entrada_audio.mp3",
+      "gabarito": "dados/gabaritos/audio-01.json"
+    },
+    {
+      "id": "imagem-01",
+      "modalidade": "imagem",
+      "arquivo": "dados/originais/entrada_pdf-imagem.pdf",
+      "gabarito": "dados/gabaritos/imagem-01.json"
+    }
+  ]
+}
