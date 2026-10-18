@@ -49,6 +49,8 @@ Custo estimado pela tabela da camada paga, válida até 31/12/2026 (fonte: docs 
 | `texto-01` (extração + minuta) | 2 | 0,0121 |
 | `texto-injection` (extração + minuta) | 2 | 0,0131 |
 | `imagem-01` (OCR + extração) | 2 | 0,0178 |
+| `audio-01` (transcrição + extração) | 2 | 0,0137 |
+| Síntese de voz (teste técnico, 12,4 s de áudio) | 1 | 0,0028 |
 | Experimento de prompts (A, B, C, rodada final) | 3 | 0,0265 |
 | Peça visual (imagem 1K) | 1 | 0,0337 |
 
@@ -58,7 +60,7 @@ Custo estimado pela tabela da camada paga, válida até 31/12/2026 (fonte: docs 
 |---|---|---|
 | Alucinação | Regra "não invente" e "não localizado" no prompt de sistema; dados de referência da minuta copiados dos campos por código; revisão humana | `avaliacao.md`: campos exatos conferem nos dois casos de texto |
 | Prompt injection | Conteúdo externo delimitado, com a etiqueta de fechamento neutralizada; minuta sem `motivo_revisao`; conferência de `minuta_nao_pode_conter` | Caso `texto-injection`: nada do ataque na minuta, tentativa sinalizada |
-| Erro de leitura (OCR, transcrição) | Texto bruto preservado, trechos incertos, comparação com gabarito, confirmação humana dos dados críticos | `visao_e_imagem.md`: protocolo rasurado lido errado sem aviso do modelo |
+| Erro de leitura (OCR, transcrição) | Texto bruto preservado, trechos incertos, comparação com gabarito, confirmação humana dos dados críticos | `visao_e_imagem.md`: protocolo rasurado lido errado sem aviso do modelo; `audio_e_acessibilidade.md`: números ditados dígito a dígito, juntados na revisão |
 | Exposição de dados | Mascaramento, `store=False`, log sem conteúdo, chave só no `.env` | `lgpd_campos.md` |
 | Dependência de fornecedor | Provedor isolado em um módulo; modelos no config | Trocar de provedor exige reescrever só `llm_client.py` |
 | Serviço indisponível ou cota esgotada | Erros traduzidos em mensagens claras; prazo de relógio por chamada; sem repetição em 429 | Cota zero de imagem retornou "limite de requisições" em menos de 1 s |
@@ -76,3 +78,4 @@ Custo estimado pela tabela da camada paga, válida até 31/12/2026 (fonte: docs 
 - A peça visual exige faturamento ativo: geração de imagem não tem cota gratuita.
 - Gemini 3.6 ou mais recente ignora `temperature`, então o experimento de prompts não controla amostragem (fonte: docs oficiais Gemini API, text-generation, out/2026).
 - Imagem e áudio vão inteiros ao provedor, sem mascaramento possível.
+- Um único áudio de teste: o ruído moderado não foi avaliado à parte, e o gabarito de áudio depende de validação por quem ouviu a gravação.

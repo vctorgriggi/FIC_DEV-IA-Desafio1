@@ -1,9 +1,0 @@
-test_pipeline_real_codigo_sdk_simulado (testes.test_audio.AudioSimuladoTest.test_pipeline_real_codigo_sdk_simulado) ... ok
-test_pipeline_nao_compara_gabarito_nao_validado (testes.test_audio.AudioSimuladoTest.test_pipeline_nao_compara_gabarito_nao_validado) ... ok
-test_rejeitada_nao_sintetiza (testes.test_audio.AudioSimuladoTest.test_rejeitada_nao_sintetiza) ... ok
-test_sintetizador_sem_arquivo_nao_registra_sucesso (testes.test_audio.AudioSimuladoTest.test_sintetizador_sem_arquivo_nao_registra_sucesso) ... ok
-
-----------------------------------------------------------------------
-Ran 4 tests in 0.054s
-
-OK

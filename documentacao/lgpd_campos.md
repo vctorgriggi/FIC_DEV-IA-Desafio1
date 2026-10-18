@@ -22,7 +22,7 @@ Todos os dados do desafio são fictícios. A tabela mostra o que cada campo seri
 
 ## Medidas aplicadas
 
-- **Mascaramento antes do envio:** CPF, RG, e-mail e telefone viram `[CPF removido]` etc. (`privacidade.mascarar_antes_de_enviar` no `config.json`). Na rodada real, `texto-01` teve CPF, RG e e-mail mascarados, e `texto-injection`, CPF e telefone. O texto original fica só na máquina local, em `dados/processados/`.
+- **Mascaramento antes do envio:** CPF, RG, e-mail e telefone viram `[CPF removido]` etc. (`privacidade.mascarar_antes_de_enviar` no `config.json`). Na transcrição, os dígitos ditados um a um são juntados antes, porque separados ("1 2 3 4 5 6 7 8 9 - 0 0") escapavam do padrão: na primeira rodada real do `audio-01`, só o e-mail tinha sido mascarado. Na rodada real, `texto-01` teve CPF, RG e e-mail mascarados, e `texto-injection`, CPF e telefone. O texto original fica só na máquina local, em `dados/processados/`.
 - **Sem armazenamento no provedor:** todas as chamadas usam `store=False`.
 - **Log sem conteúdo:** `resultados/logs/execucoes.jsonl` guarda caminhos, versões e hashes, não o texto.
 - **Sem credenciais:** a chave fica só no `.env`, fora do git. A varredura do repositório, das saídas e do histórico de commits não encontrou a chave nem o `.env`.

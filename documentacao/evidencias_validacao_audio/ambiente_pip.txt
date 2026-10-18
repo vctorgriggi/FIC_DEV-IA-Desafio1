@@ -1,3 +1,0 @@
-WARNING: Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x7d084ee979b0>: Failed to establish a new connection: [Errno -2] Name or service not known')': /simple/google-genai/
-ERROR: Could not find a version that satisfies the requirement google-genai==2.31.0 (from versions: none)
-ERROR: No matching distribution found for google-genai==2.31.0

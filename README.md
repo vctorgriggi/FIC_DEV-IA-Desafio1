@@ -87,7 +87,7 @@ Códigos de saída: `0` sucesso, `1` erro de uso (caso, arquivo ou revisão inv�
 |---|---|---|---|
 | Base | RF01, RF03 (delimitação e prompt de sistema), RF04, RF11, RF12 (mascaramento), RF13 | `config.py`, `llm_client.py`, `prompts.py`, `audit.py`, `privacidade.py`, `entradas.py`, `revisao.py`, `avaliacao.py`, `fluxo.py`, `main.py`, `web.py` | pronta, com testes |
 | Texto | RF02, RF03 (caso de prompt injection), RF05, RF09 | `extracao.py`, `minuta.py`, `experimento.py`, `prompts/` | pronta, com testes |
-| Áudio | RF06, RF07 | `audio.py`, `prompts/transcricao_v1.md` | implementada, com testes simulados; aceite real pendente — [documentação](documentacao/audio_e_acessibilidade.md) |
+| Áudio | RF06, RF07 | `audio.py`, `prompts/transcricao_v1.md` | pronta, com testes; transcrição e voz validadas com a API; gabarito aguardando validação humana |
 | Imagem | RF08, RF10 | `vision.py`, `comparacao.py`, `image_generation.py`, `prompts/ocr_v1.md`, `prompts/peca_visual_v1.json` | pronta, com testes |
 
 As três modalidades terminam na mesma extração de campos e na mesma minuta. O contrato entre elas é o formato de `TextoExtraido` (`tipos.py`) e o esquema de `extracao.py`.
@@ -131,37 +131,10 @@ Cada caso tem um resultado esperado escrito antes da execução (seção 6 do en
 - **Comparação com gabarito (RF06, RF08):** para áudio e imagem, quando o gabarito do caso tem `texto_referencia`, o fluxo grava `comparacao_gabarito.json` com similaridade, acertos por palavra, erros e dados críticos não encontrados.
 - **Resposta vazia (RF04):** a checagem vale para o tipo de saída pedido. TTS sem áudio ou geração sem imagem também é erro, mesmo que venha texto.
 
-## Áudio — RF06 e RF07
+## Áudio (RF06 e RF07)
 
-RF06 requer **FFmpeg/ffprobe no PATH** (Aula 05); a aplicação não instala ferramentas
-nem envia áudio se a inspeção falhar. Formatos: MP3, WAV, M4A, OGG e FLAC,
-com limite configurado de 20 MiB e limite adicional da requisição inline completa.
-Configure voz, estilo e timeout local em `config.json`, seção `audio`.
+Requer o FFmpeg (`ffprobe`), como em Instalação. O arquivo é inspecionado inteiro pelo `ffprobe` antes de qualquer envio. A versão revisada da transcrição só ajusta espaços, inclusive juntando dígitos ditados um a um, para que CPF, RG e protocolo sejam mascarados e comparados.
 
-```bash
-ffprobe -version
-python -m unittest testes.test_audio -v   # testes simulados, sem API
-python -m pytest                         # suíte completa, sem API
-# Com chave, cota/custos autorizados e ffprobe disponível:
-python -m src.main processar audio-01
-python -m src.main revisar <id_execucao>
-python -m src.main audio-minuta <id_execucao>
-```
+A voz sai só de minuta aprovada e inalterada. Se a minuta tem "não localizado", ela já é gerada com o aviso de lacunas, que é revisado e aprovado junto com o texto; sem o aviso, a síntese é bloqueada. Imagens não são lidas. A saída é um WAV validado que nunca sobrescreve áudio anterior.
 
-`dados/gabaritos/audio-01.json` é um modelo **não validado**. Ouça o original,
-preencha referência independente, autoria, data e valores críticos literais;
-marque `validado_por_humano: true` só depois da conferência. A ausência de
-referência válida é registrada como comparação pendente e não impede processar.
-Nomes, protocolos e datas continuam sujeitos à confirmação humana antes da minuta.
-
-Minutas com “não localizado” precisam conter, **antes da aprovação**, o aviso:
-“Os campos identificados como não localizado representam informações ausentes no documento.”
-Se faltar, a síntese é bloqueada: edite a minuta enquanto aguarda revisão e então
-aprove. Se já estiver aprovada, gere/revise outra execução; não edite os metadados
-para contornar o hash. Nenhum aviso é acrescentado automaticamente ao áudio.
-
-O TTS salva WAV PCM validado, não sobrescreve áudio anterior e mantém telemetria
-nos metadados e log. Texto complexo (HTML, tabelas, código, comandos vocais)
-precisa ser preparado como texto simples e revisto. Regras, limites, custos,
-bloqueios do ambiente e resultados em [áudio e acessibilidade](documentacao/audio_e_acessibilidade.md)
-e no [relatório de implementação](documentacao/RELATORIO_IMPLEMENTACAO_AUDIO.md).
+O gabarito `dados/gabaritos/audio-01.json` só vale depois que alguém ouvir o original e marcar `validado_por_humano: true`; até lá, a comparação fica registrada como pendente. Regras, resultados reais e limites em [`documentacao/audio_e_acessibilidade.md`](documentacao/audio_e_acessibilidade.md).
