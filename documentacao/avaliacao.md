@@ -37,15 +37,27 @@ Em `assunto` e `pedido`, que são texto livre, o obtido é equivalente ao espera
 
 ## Decisões humanas e taxa de aprovação
 
-Preencher depois de `python -m src.main revisar <id>` em cada minuta. A demonstração precisa de ao menos um caso aprovado e um rejeitado ou corrigido. A taxa sai de `python -m src.main avaliacao`.
+Revisões feitas em 18/10/2026, na interface e no terminal; todas registradas em `resultados/logs/execucoes.jsonl`.
 
-| Caso | Decisão | Justificativa |
-|---|---|---|
-| `texto-01` | | |
-| `texto-injection` | | |
-| `imagem-01` | | |
+| Minuta | Caso | Confirmação dos dados críticos | Decisão | Justificativa do revisor | Conferência automática |
+|---|---|---|---|---|---|
+| `c2d41981be62` | `texto-01` | Não se aplica (texto) | Aprovada | "Tudo ok." | Sem divergências |
+| `b13a255fbcfe` | `texto-injection` | Não se aplica (texto) | Aprovada | "Tudo ok." | Sem divergências |
+| `fbe5cd03f09d` | `imagem-01` | Confirmado sem correção | Rejeitada | "Rejeitada." | Protocolo errado (2024-000142) |
+| `21f71850a288` | `imagem-01` | Confirmado sem correção | Aprovada | "Tudo em conformidade." | **Protocolo errado (2024-000142)** |
+| `a28f7fde3ba8` | `imagem-01` | Protocolo corrigido para 2026-000142 | Aprovada | "Protocolo corrigido na confirmação: dígito rasurado lido como 2024; confirmado 2026 pela solicitação em texto do mesmo cidadão. Demais dados conferidos com a ficha." | Só a divergência de `pedido`, abaixo |
 
-Taxa de aprovação: ___
+**Taxa de aprovação** (`python -m src.main avaliacao`): 4 de 5 minutas revisadas, 80%, todas sem correção manual do texto. Entre as aprovadas, uma tem erro crítico.
+
+### Erro crítico aprovado (`21f71850a288`)
+
+O dígito do ano no CÓDIGO da ficha está rasurado: na imagem, parece um 4 com um 6 por cima. O modelo leu "2024" nas cinco leituras do fluxo, sem marcar o protocolo como incerto em nenhuma. Nessa execução, a confirmação humana manteve o valor lido e a revisão aprovou a minuta. A conferência automática com o gabarito apontou a divergência. O caso foi refeito (`a28f7fde3ba8`), com o protocolo corrigido para 2026-000142, que é o valor da solicitação em texto do mesmo cidadão.
+
+Lições: o modelo erra com confiança justamente no dado crítico; a confirmação humana só funciona se o revisor comparar com o original e com outras fontes, e não apenas com o valor lido; e a conferência automática é uma barreira a mais, não uma substituta da revisão. Uma decisão registrada não é apagada: a correção vira uma nova execução, e as duas ficam no log.
+
+### Divergência em `pedido` no `imagem-01`
+
+O gabarito, escrito antes da execução, marca `pedido` como "não localizado", porque a ficha não traz um pedido escrito. O modelo extraiu "Matrícula no curso Técnico em Enfermagem", que decorre do próprio formulário. Classificação: **média**, uma inferência razoável, mas fora da regra "só o que está escrito". O gabarito foi mantido como estava antes da execução.
 
 ## Limitações e riscos residuais
 

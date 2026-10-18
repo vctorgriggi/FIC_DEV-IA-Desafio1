@@ -56,5 +56,5 @@ O caso mostra o motivo da confirmação humana: o modelo errou o protocolo sem m
 
 | Item | Resultado |
 |---|---|
-| Confirmação humana dos dados críticos | Preencher após `python -m src.main processar imagem-01` |
-| Decisão sobre a peça e justificativa | Preencher após `python -m src.main revisar-peca <id>` |
+| Confirmação humana dos dados críticos | Em `a28f7fde3ba8`, protocolo corrigido de 2024-000142 para 2026-000142. Em duas execuções anteriores, o valor lido foi confirmado sem correção; ver `avaliacao.md` |
+| Decisão sobre a peça e justificativa | Aprovada, com os cinco itens do checklist marcados como conferidos (`882e9080c8c0.json`) |
