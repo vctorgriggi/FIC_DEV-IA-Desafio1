@@ -1,8 +1,8 @@
 {
   "caso_id": "audio-01",
-  "elaborado_por": "",
+  "elaborado_por": "Victor Griggi Moreira Regis da Silva",
   "elaborado_em": "2026-10-18",
-  "texto_referencia": "Bom dia! Meu protocolo é 2026-000142 de 14 de outubro de 2026. Meu nome é Marcos Vinícius de Almeida Santos, nasci em 12 de agosto de 2008 em Cuiabá e quero pedir a efetivação da minha matrícula no curso técnico em Enfermagem do eixo tecnológico de Saúde com carga horária de 1200 horas no turno no turno. Meu CPF é 123456789-00, meu RG é 1234567-8, o nome da minha mãe é Lúcia Helena de Almeida Santos e o meu e-mail é marcos.almeida.teste@exemplo.com. Declaro estar ciente de que a matrícula será cancelada automaticamente se eu faltar sem justificativa comprovada nos dois primeiros dias de aula consecutivos ou em três dias de aula consecutivos ou não nos 10 primeiros dias de aula. Peço que informem quais os documentos ainda preciso apresentar. Muito obrigado.",
+  "texto_referencia": "Bom dia! Meu protocolo é 2026-000142 de 14 de outubro de 2026. Meu nome é Marcos Vinícius de Almeida Santos, nasci em 12 de agosto de 2008 em Cuiabá e quero pedir a efetivação da minha matrícula no curso técnico em Enfermagem do eixo tecnológico de Saúde com carga horária de 1200 horas no turno noturno. Meu CPF é 123456789-00, meu RG é 1234567-8, o nome da minha mãe é Lúcia Helena de Almeida Santos e o meu e-mail é marcos.almeida.teste@exemplo.com. Declaro estar ciente de que a matrícula será cancelada automaticamente se eu faltar sem justificativa comprovada nos dois primeiros dias de aula consecutivos ou em três dias de aula consecutivos ou não nos 10 primeiros dias de aula. Peço que informem quais os documentos ainda preciso apresentar. Muito obrigado.",
   "campos_esperados": {
     "protocolo": "2026-000142",
     "data": "14/10/2026",
@@ -11,10 +11,7 @@
     "pedido": "Efetivação da matrícula e informação sobre quais documentos ainda precisa apresentar",
     "categoria": "matricula"
   },
-  "campos_ausentes_esperados": [
-    "turno (fala ambígua: \"no turno no turno\")",
-    "relação de documentos pendentes"
-  ],
+  "campos_ausentes_esperados": [],
   "dados_criticos": [
     "2026-000142",
     "14 de outubro de 2026",
@@ -36,6 +33,6 @@
     "Seu pedido foi deferido",
     "Todos os documentos foram entregues"
   ],
-  "observacoes": "Transcrição fornecida pelo integrante. A expressão 'no turno no turno' foi preservada literalmente. Confirmar se a fala original foi 'turno noturno'. Os dados do caso devem ser fictícios. Conferir o gabarito antes da validação humana.",
-  "validado_por_humano": false
+  "observacoes": "Rascunho de Andre Luiz; texto de referência conferido por Victor Griggi Moreira Regis da Silva ouvindo o original em 18/10/2026. A fala é 'no turno noturno'. campos_ausentes_esperados usa nomes de campo da extração: nenhum falta neste caso.",
+  "validado_por_humano": true
 }

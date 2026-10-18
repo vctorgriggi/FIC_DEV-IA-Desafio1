@@ -231,9 +231,11 @@ class AudioSimuladoTest(unittest.TestCase):
         self.assertNotIn('credencial-ficticia', str(erro.exception))
         self.assertFalse((self.raiz / 'resultados/audios/voz.wav').exists())
 
-    def test_gabarito_modelo_nao_validado(self):
+    def test_gabarito_so_vale_validado_por_humano(self):
         dados = json.loads((RAIZ / 'dados/gabaritos/audio-01.json').read_text())
-        self.assertFalse(audio.gabarito_validado(dados))
+        self.assertTrue(audio.gabarito_validado(dados))  # conferido por quem ouviu o original
+        self.assertFalse(audio.gabarito_validado({**dados, 'validado_por_humano': False}))
+        self.assertFalse(audio.gabarito_validado({**dados, 'elaborado_por': ' '}))
         self.assertFalse(audio.gabarito_validado(None))
         self.assertFalse(audio.gabarito_validado({'validado_por_humano': True}))
 
