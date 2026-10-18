@@ -13,9 +13,9 @@
   },
   "campos_ausentes_esperados": [],
   "dados_criticos": [
-    "protocolo",
-    "data",
-    "solicitante"
+    "2026-000999",
+    "15/10/2026",
+    "Carlos Eduardo da Silva"
   ],
   "minuta_deve_conter": [
     "2026-000999",

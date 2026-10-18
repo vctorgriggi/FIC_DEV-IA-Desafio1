@@ -41,6 +41,7 @@
     "minutas": "resultados/minutas",
     "audios": "resultados/audios",
     "imagens": "resultados/imagens",
+    "experimentos": "resultados/experimentos",
     "logs": "resultados/logs"
   },
   "casos": [

@@ -277,3 +277,27 @@ Matrícula: não localizado
 1. **Atendimento Integral aos Requisitos Oficiais (RF09 e Seção 6):** O Prompt B foi o único que incorporou com perfeição todas as exigências institucionais simultaneamente: inserção correta do elemento visual (`![Brasão Oficial](dados/originais/brasao.png)`), identificação inequívoca da administração estadual de Mato Grosso, seção dedicada para sinalização de informações ausentes (`não localizado`) e listagem transparente de fontes consultadas.
 2. **Equilíbrio de Tom Institucional:** Enquanto o Prompt A gerou uma resposta excessivamente enxuta e sem elementos oficiais essenciais, e o Prompt C produziu um tom excessivamente mecanicista, o Prompt B atingiu o tom ideal de serviço público: cortês, impessoal, acolhedor e juridicamente prudente.
 3. **Segurança e Anti-Alucinação:** A delimitação por Persona e Critérios de Sucesso impediu taxativamente qualquer invenção de prazos ou legislações fantasmas, encaminhando a resposta de forma segura para a revisão humana obrigatória.
+
+---
+
+## 7. Como reproduzir
+
+```bash
+python -m src.main experimento-prompts --entrada dados/experimento_rf02/entrada_texto-01.json
+```
+
+Roda A, B e C com o mesmo modelo, os mesmos parâmetros e o mesmo prompt de sistema, sobre a entrada da seção 3 (campos, fontes e imagem institucional), que vai dentro de `<conteudo_externo>`. Saídas, duração, tokens e custo de cada prompt ficam em `resultados/experimentos/<id>/metricas.json`, e cada chamada vira um evento no log.
+
+### Rodada medida (18/10/2026)
+
+Executada com o comando acima; `gemini-3.8-flash`, mesmos parâmetros e prompt de sistema nos três. Custo pela tabela da camada paga.
+
+| Prompt | Duração | Tokens de entrada | Tokens de saída (incl. raciocínio) | Custo estimado (USD) | Brasão e fontes |
+|---|---:|---:|---:|---:|---|
+| A | 14,3 s | 493 | 2.085 | 0,00819 | omitiu os dois |
+| B | 8,9 s | 1.022 | 1.398 | 0,00601 | incluiu os dois |
+| C | 8,7 s | 816 | 1.179 | 0,00503 | incluiu os dois |
+
+## 8. Do experimento à produção
+
+O Prompt B foi incorporado como `prompts/minuta_v2.md`, sem o cabeçalho, os dados de referência e as fontes, que o sistema passou a inserir por código: no experimento, o Prompt A omitiu brasão e fontes, e o caminho do brasão escrito pelo modelo não abria a partir de `resultados/minutas/`.

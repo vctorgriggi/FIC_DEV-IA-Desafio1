@@ -7,7 +7,7 @@ import json
 import sys
 from pathlib import Path
 
-from . import fluxo
+from . import experimento, fluxo
 from .audit import Auditoria, agora_iso
 from .config import CasoInexistente, Config, carregar_chave, carregar_config, versoes
 from .entradas import ArquivoInvalido, validar_arquivo
@@ -89,17 +89,29 @@ def cmd_avaliacao(config: Config, args: argparse.Namespace) -> None:
     print(f"Taxa de aprovação com correção: {resumo['taxa_aprovacao_com_correcao']:.1%}")
 
 
-def ler_especificacao(caminho: str) -> dict:
+def ler_arquivo_json(caminho: str) -> dict:
     try:
         return json.loads(Path(caminho).read_text(encoding="utf-8"))
     except FileNotFoundError:
-        raise ArquivoInvalido(f"Especificação não encontrada: {caminho}.") from None
+        raise ArquivoInvalido(f"Arquivo não encontrado: {caminho}.") from None
     except json.JSONDecodeError as erro:
-        raise ArquivoInvalido(f"Especificação não é JSON válido: {caminho} ({erro}).") from None
+        raise ArquivoInvalido(f"Arquivo não é JSON válido: {caminho} ({erro}).") from None
+
+
+def cmd_experimento_prompts(config: Config, args: argparse.Namespace) -> None:
+    entrada = ler_arquivo_json(args.entrada)
+    metricas = experimento.executar_experimento(
+        entrada, origem=config.relativo(Path(args.entrada)), config=config, cliente=ClienteLLM(config), auditoria=Auditoria(config)
+    )
+    print(f"Modelo: {metricas['modelo']}  (mesmos parâmetros e prompt de sistema nos três)")
+    for rotulo, r in metricas["resultados"].items():
+        custo = f"US$ {r['custo_estimado_usd']:.5f}" if r["custo_estimado_usd"] is not None else "custo n/d"
+        print(f"Prompt {rotulo}: {r['duracao_s']:.1f}s  {r['tokens_entrada']} → {r['tokens_saida']} tokens  {custo}  {r['saida']}")
+    print(f"Métricas em {config.relativo(config.caminho('experimentos') / metricas['id_execucao'] / 'metricas.json')}")
 
 
 def cmd_peca_visual(config: Config, args: argparse.Namespace) -> None:
-    especificacao = ler_especificacao(args.especificacao)
+    especificacao = ler_arquivo_json(args.especificacao)
     imagem_base = validar_arquivo(Path(args.imagem_base), "imagem", config).caminho if args.imagem_base else None
     peca = fluxo.gerar_peca_visual(
         args.caso,
@@ -160,6 +172,10 @@ def montar_parser() -> argparse.ArgumentParser:
     peca.add_argument("--especificacao", required=True, help="JSON com sujeito, composição, estilo, iluminação, proporção e restrições")
     peca.add_argument("--imagem-base", help="imagem a editar; sem ela, gera uma nova")
     peca.set_defaults(funcao=cmd_peca_visual)
+
+    experimento_prompts = sub.add_parser("experimento-prompts", help="roda os prompts A, B e C do RF02 com a mesma entrada")
+    experimento_prompts.add_argument("--entrada", required=True, help="JSON com campos, fontes e imagem institucional")
+    experimento_prompts.set_defaults(funcao=cmd_experimento_prompts)
 
     revisar_peca = sub.add_parser("revisar-peca", help="checklist e decisão sobre uma peça visual (RF10)")
     revisar_peca.add_argument("id_execucao")
