@@ -15,8 +15,9 @@ from typing import Callable, Iterator
 
 from . import audio, image_generation, vision
 from .audit import Auditoria, Evento, agora_iso, novo_id
+from .comparacao import comparar_com_gabarito
 from .config import Config
-from .entradas import validar_arquivo
+from .entradas import ArquivoInvalido, validar_arquivo
 from .extracao import extrair_campos, normalizar_extracao
 from .llm_client import ClienteLLM, RespostaLLM
 from .minuta import gerar_minuta
@@ -61,6 +62,16 @@ def _gravar_json(caminho: Path, dados: dict) -> None:
     caminho.write_text(json.dumps(dados, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
+def _ler_gabarito(config: Config, caso: dict) -> dict | None:
+    caminho = config.raiz / caso["gabarito"]
+    if not caminho.is_file():
+        return None
+    try:
+        return json.loads(caminho.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as erro:
+        raise ArquivoInvalido(f"Gabarito {caso['gabarito']} não é JSON válido ({erro}).") from None
+
+
 def processar_caso(
     caso_id: str,
     *,
@@ -93,6 +104,21 @@ def processar_caso(
             _anotar(evento, extraido.resposta, extraido.prompt)
             evento.saida = config.relativo(pasta)
             texto = extraido.texto_revisado
+
+    # RF06 e RF08: comparação com o gabarito, quando o caso já tem um.
+    if modalidade != "texto" and (gabarito := _ler_gabarito(config, caso)) is not None:
+        with _etapa(auditoria, base, "comparacao_gabarito") as evento:
+            comparacao = comparar_com_gabarito(extraido.texto_bruto, extraido.texto_revisado, gabarito)
+            if comparacao is None:
+                evento.extra = {"aviso": "gabarito sem texto_referencia"}
+            else:
+                _gravar_json(pasta / "comparacao_gabarito.json", comparacao)
+                evento.saida = config.relativo(pasta / "comparacao_gabarito.json")
+                evento.extra = {
+                    "similaridade_bruto": comparacao["bruto"]["similaridade"],
+                    "similaridade_revisado": comparacao["revisado"]["similaridade"],
+                    "dados_criticos_nao_encontrados": comparacao["dados_criticos"]["nao_encontrados"],
+                }
 
     with _etapa(auditoria, base, "compreensao") as evento:
         enviado, mascarados = mascarar(texto, config.dados["privacidade"]["mascarar_antes_de_enviar"])
@@ -191,12 +217,14 @@ def gerar_peca_visual(
                 "id_execucao": id_execucao,
                 "caso_id": caso_id,
                 "imagem": config.relativo(peca.caminho),
+                "ilustracao_original": peca.ilustracao_original and config.relativo(peca.ilustracao_original),
                 "prompt": peca.prompt,
                 "especificacao": especificacao,
                 "imagem_base": imagem_base and config.relativo(imagem_base),
                 "modelo": peca.modelo,
                 "data_geracao": peca.data_geracao,
                 "nota_proveniencia": peca.nota_proveniencia,
+                "status": AGUARDANDO,
             },
         )
         evento.extra = {"metadados": config.relativo(destino.with_suffix(".json"))}

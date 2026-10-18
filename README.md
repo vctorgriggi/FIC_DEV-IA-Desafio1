@@ -25,7 +25,8 @@ python -m src.main processar texto-01         # entrada -> extração -> compree
 python -m src.main revisar <id_execucao>      # aprovar, aprovar com correção, rejeitar ou pedir nova geração
 python -m src.main audio-minuta <id_execucao>  # áudio da minuta aprovada (RF07)
 python -m src.main avaliacao                  # contagem por status e taxa de aprovação (RF13)
-python -m src.main peca-visual texto-01 --especificacao <arquivo.json> [--imagem-base <imagem>]  # RF10
+python -m src.main peca-visual imagem-01 --especificacao prompts/peca_visual_v1.json [--imagem-base <imagem>]  # RF10
+python -m src.main revisar-peca <id_execucao>  # checklist e decisão sobre a peça (RF10)
 python -m pytest                              # testes; não chamam a API
 ```
 
@@ -40,7 +41,7 @@ Cada integrante implementa uma modalidade. As funções pendentes levantam `Pend
 | Base compartilhada | RF01, RF03 (delimitação e prompt de sistema), RF04, RF11, RF12 (mascaramento), RF13 (revisão e taxa de aprovação) | `config.py`, `llm_client.py`, `prompts.py`, `audit.py`, `privacidade.py`, `entradas.py`, `revisao.py`, `fluxo.py`, `main.py` | pronta, com testes |
 | Texto | RF02, RF03 (caso de teste com prompt injection), RF05 (incluindo a lista de `categorias` no config), RF09 | `extracao.py` (`extrair_campos`), `minuta.py` (`gerar_minuta`), `prompts/` | contrato pronto: esquema JSON e `normalizar_extracao` |
 | Áudio | RF06, RF07 | `audio.py` (`transcrever`, `sintetizar`) | pendente |
-| Imagem | RF08, RF10 | `vision.py` (`extrair_texto`), `image_generation.py` (`gerar_peca`) | pendente |
+| Imagem | RF08, RF10 | `vision.py`, `comparacao.py`, `image_generation.py`, `prompts/ocr_v1.md`, `prompts/peca_visual_v1.json` | pronta, com testes; decisões em `documentacao/visao_e_imagem.md` |
 | Todos | RF12 (matriz de dados pessoais), RF13, entregáveis | `documentacao/`, `dados/gabaritos/` | pendente |
 
 Áudio e imagem desembocam em `extrair_campos` e `gerar_minuta`: enquanto a parte de texto não estiver pronta, o fluxo dessas modalidades para na etapa de compreensão. Cada parte pode ser testada isoladamente substituindo as outras, como em `testes/test_fluxo_e_revisao.py`.
@@ -62,5 +63,6 @@ Cada caso precisa de um resultado esperado escrito antes da execução (seção 
 - **Chave inválida** chega como HTTP 400 com `API_KEY_INVALID`, não como 401.
 - **Rastreabilidade:** `resultados/logs/execucoes.jsonl` guarda referências (arquivo de origem, versão e hash do prompt, parâmetros, caminho da saída), não o conteúdo. Prompt alterado é arquivo novo em `prompts/` (`<nome>_v<N>.md`).
 - **Revisão:** o áudio (RF07) só é gerado de minuta aprovada e com o mesmo hash registrado na aprovação. Dados críticos de áudio e imagem (protocolo, data, solicitante) passam por confirmação humana antes da minuta.
-- **Peça visual (RF10):** cada imagem em `resultados/imagens/` tem ao lado um `.json` com prompt, especificação, modelo, data de geração e nota de proveniência.
+- **Peça visual (RF10):** o modelo gera só a ilustração; o texto e o selo de conteúdo sintético são aplicados com Pillow, para o texto sair exato. Cada peça em `resultados/imagens/` tem ao lado a ilustração original do modelo e um `.json` com prompt, especificação, modelo, data, nota de proveniência e revisão. A composição usa Arial ou DejaVu Sans; sem nenhuma das duas, a peça não é gerada (a fonte embutida do Pillow não tem acentos).
+- **Comparação com gabarito (RF06, RF08):** para áudio e imagem, quando o gabarito do caso tem `texto_referencia`, o fluxo grava `comparacao_gabarito.json` com similaridade, acertos por palavra, erros e dados críticos não encontrados.
 - **Resposta vazia (RF04):** a checagem vale para o tipo de saída pedido. TTS sem áudio ou geração sem imagem também é erro, mesmo que venha texto.

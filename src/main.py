@@ -12,7 +12,17 @@ from .audit import Auditoria, agora_iso
 from .config import CasoInexistente, Config, carregar_chave, carregar_config, versoes
 from .entradas import ArquivoInvalido, validar_arquivo
 from .llm_client import ClienteLLM, ErroLLM
-from .revisao import RevisaoInvalida, ler_metadados, perguntar_decisao, registrar_decisao, resumo_revisoes
+from .image_generation import ErroPeca
+from .revisao import (
+    ATALHOS_PECA,
+    RevisaoInvalida,
+    ler_metadados,
+    perguntar_checklist_peca,
+    perguntar_decisao,
+    registrar_decisao,
+    registrar_revisao_peca,
+    resumo_revisoes,
+)
 from .tipos import PendenteDeImplementacao
 
 SAIDA_ERRO_USO = 1
@@ -99,7 +109,26 @@ def cmd_peca_visual(config: Config, args: argparse.Namespace) -> None:
         cliente=ClienteLLM(config),
         auditoria=Auditoria(config),
     )
+    id_execucao = peca.caminho.stem
     print(f"Peça gerada: {config.relativo(peca.caminho)}")
+    print(f"Ilustração original do modelo: {config.relativo(peca.ilustracao_original)}")
+    print(f"Revise com: python -m src.main revisar-peca {id_execucao}")
+
+
+def cmd_revisar_peca(config: Config, args: argparse.Namespace) -> None:
+    caminho = config.caminho("imagens") / f"{args.id_execucao}.json"
+    if not caminho.exists():
+        raise RevisaoInvalida(f"Nenhuma peça visual com id de execução {args.id_execucao}.")
+    metadados = json.loads(caminho.read_text(encoding="utf-8"))
+    print(f"Abra e confira: {metadados['imagem']}")
+    print(f"Proveniência: {metadados['nota_proveniencia']}\n")
+    checklist = perguntar_checklist_peca()
+    decisao, justificativa, revisor = perguntar_decisao(atalhos=ATALHOS_PECA)
+    metadados = registrar_revisao_peca(
+        config, Auditoria(config), args.id_execucao,
+        checklist=checklist, decisao=decisao, justificativa=justificativa, revisor=revisor,
+    )
+    print(f"Status da peça: {metadados['status']}.")
 
 
 def montar_parser() -> argparse.ArgumentParser:
@@ -131,6 +160,10 @@ def montar_parser() -> argparse.ArgumentParser:
     peca.add_argument("--especificacao", required=True, help="JSON com sujeito, composição, estilo, iluminação, proporção e restrições")
     peca.add_argument("--imagem-base", help="imagem a editar; sem ela, gera uma nova")
     peca.set_defaults(funcao=cmd_peca_visual)
+
+    revisar_peca = sub.add_parser("revisar-peca", help="checklist e decisão sobre uma peça visual (RF10)")
+    revisar_peca.add_argument("id_execucao")
+    revisar_peca.set_defaults(funcao=cmd_revisar_peca)
     return parser
 
 
@@ -144,7 +177,7 @@ def main(argv: list[str] | None = None) -> int:
     except ErroLLM as erro:
         print(f"Erro do provedor: {erro}", file=sys.stderr)
         return SAIDA_ERRO_PROVEDOR
-    except (ArquivoInvalido, CasoInexistente, RevisaoInvalida) as erro:
+    except (ArquivoInvalido, CasoInexistente, ErroPeca, RevisaoInvalida) as erro:
         print(f"Erro: {erro}", file=sys.stderr)
         return SAIDA_ERRO_USO
     except (KeyboardInterrupt, EOFError):

@@ -6,6 +6,7 @@ armazenamento no provedor vêm do config.json; a chave vem do .env.
 
 from __future__ import annotations
 
+import json
 import time
 from dataclasses import dataclass, field
 from typing import Any
@@ -55,6 +56,10 @@ class RequisicaoInvalida(ErroLLM):
 
 class RespostaVazia(ErroLLM):
     mensagem_padrao = "O modelo devolveu uma resposta vazia."
+
+
+class RespostaMalformada(ErroLLM):
+    mensagem_padrao = "O modelo devolveu uma resposta fora do formato pedido."
 
 
 @dataclass
@@ -173,6 +178,17 @@ class ClienteLLM:
         if status >= 500:
             return ServicoIndisponivel(status=status, detalhe=detalhe)
         return RequisicaoInvalida(status=status, detalhe=detalhe)
+
+
+def ler_json(resposta: RespostaLLM) -> dict:
+    """JSON de uma resposta pedida com formato_json; fora do formato, RespostaMalformada."""
+    try:
+        dados = json.loads(resposta.texto)
+    except json.JSONDecodeError:
+        raise RespostaMalformada() from None
+    if not isinstance(dados, dict):
+        raise RespostaMalformada()
+    return dados
 
 
 def formato_json(esquema: dict) -> dict:

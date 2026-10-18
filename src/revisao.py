@@ -25,6 +25,15 @@ ATALHOS = {"a": "aprovar", "c": "aprovar_com_correcao", "r": "rejeitar", "n": "n
 STATUS_APROVADOS = ("aprovada", "aprovada_com_correcao")
 # RF06 e RF08: conferidos por uma pessoa antes da minuta quando vêm de áudio ou imagem.
 CAMPOS_CRITICOS = ("protocolo", "data", "solicitante")
+# RF10: o que conferir na peça visual antes de aprová-la.
+CHECKLIST_PECA = {
+    "textos": "Textos corretos, completos e legíveis?",
+    "simbolos_objetos": "Símbolos e objetos coerentes, sem deformação?",
+    "pessoas_maos": "Sem pessoa real e sem rosto ou mão deformados?",
+    "coerencia": "Coerente com o caso e com a orientação?",
+    "proveniencia": "Selo de conteúdo gerado por IA visível?",
+}
+ATALHOS_PECA = {"a": "aprovar", "r": "rejeitar", "n": "nova_geracao"}
 
 
 class RevisaoInvalida(ValueError):
@@ -115,10 +124,12 @@ def resumo_revisoes(config: Config) -> dict:
     }
 
 
-def perguntar_decisao(perguntar: Callable[[str], str] | None = None) -> tuple[str, str, str]:
+def perguntar_decisao(
+    perguntar: Callable[[str], str] | None = None, atalhos: dict[str, str] = ATALHOS
+) -> tuple[str, str, str]:
     perguntar = perguntar or input
-    opcoes = "  ".join(f"[{atalho}] {nome}" for atalho, nome in ATALHOS.items())
-    while (decisao := ATALHOS.get(perguntar(f"Decisão — {opcoes}: ").strip().lower())) is None:
+    opcoes = "  ".join(f"[{atalho}] {nome}" for atalho, nome in atalhos.items())
+    while (decisao := atalhos.get(perguntar(f"Decisão — {opcoes}: ").strip().lower())) is None:
         pass
     while not (justificativa := perguntar("Justificativa: ").strip()):
         pass
@@ -144,3 +155,68 @@ def confirmar_campos_criticos(
             confirmados[campo] = resposta
             corrigidos.append(campo)
     return confirmados, corrigidos
+
+
+def perguntar_checklist_peca(perguntar: Callable[[str], str] | None = None) -> dict[str, bool]:
+    perguntar = perguntar or input
+    respostas = {}
+    for chave, pergunta in CHECKLIST_PECA.items():
+        while (resposta := perguntar(f"  {pergunta} [s/n] ").strip().lower()) not in ("s", "n"):
+            pass
+        respostas[chave] = resposta == "s"
+    return respostas
+
+
+def registrar_revisao_peca(
+    config: Config,
+    auditoria: Auditoria,
+    id_execucao: str,
+    *,
+    checklist: dict[str, bool],
+    decisao: str,
+    justificativa: str,
+    revisor: str,
+) -> dict:
+    """RF10: a peça só é aprovada com todos os itens do checklist conferidos."""
+    if set(checklist) != set(CHECKLIST_PECA):
+        raise RevisaoInvalida(f"O checklist precisa ter exatamente: {', '.join(CHECKLIST_PECA)}.")
+    if decisao not in ATALHOS_PECA.values():
+        raise RevisaoInvalida(f"Decisão desconhecida: {decisao}. Opções: {', '.join(ATALHOS_PECA.values())}.")
+    if decisao == "aprovar" and not all(checklist.values()):
+        reprovados = ", ".join(c for c, ok in checklist.items() if not ok)
+        raise RevisaoInvalida(f"Peça com item reprovado ({reprovados}) não pode ser aprovada; rejeite ou peça nova geração.")
+    if not justificativa.strip():
+        raise RevisaoInvalida("A justificativa é obrigatória.")
+    if not revisor.strip():
+        raise RevisaoInvalida("Informe quem revisou.")
+
+    caminho = config.caminho("imagens") / f"{id_execucao}.json"
+    if not caminho.exists():
+        raise RevisaoInvalida(f"Nenhuma peça visual com id de execução {id_execucao}.")
+    metadados = json.loads(caminho.read_text(encoding="utf-8"))
+    if metadados["status"] != AGUARDANDO:
+        raise RevisaoInvalida(f"Esta peça já foi revisada (status: {metadados['status']}).")
+
+    metadados["status"] = DECISOES[decisao]
+    metadados["revisao"] = {
+        "checklist": checklist,
+        "decisao": decisao,
+        "justificativa": justificativa.strip(),
+        "revisor": revisor.strip(),
+        "data_hora": agora_iso(),
+        "sha256_peca": hash_arquivo(config.raiz / metadados["imagem"]),
+    }
+    caminho.write_text(json.dumps(metadados, ensure_ascii=False, indent=2), encoding="utf-8")
+    auditoria.registrar(
+        Evento(
+            id_execucao=id_execucao,
+            caso_id=metadados["caso_id"],
+            etapa="revisao_peca",
+            saida=metadados["imagem"],
+            decisao_humana=decisao,
+            justificativa=justificativa.strip(),
+            revisor=revisor.strip(),
+            extra={"checklist": checklist},
+        )
+    )
+    return metadados
