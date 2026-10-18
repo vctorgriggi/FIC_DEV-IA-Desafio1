@@ -44,12 +44,13 @@ Formatos aceitos: MP3, WAV, M4A, OGG e FLAC, até 20 MiB e dentro do limite de 2
 | Texto transcrito | Nomes, datas, curso, e-mail e declaração corretos. Protocolo, CPF e RG vieram dígito a dígito, o que motivou a junção na versão revisada |
 | Mascaramento antes da extração | Na primeira rodada, só o e-mail foi mascarado; com a junção dos dígitos, CPF, RG e e-mail passam a ser mascarados |
 | Campos extraídos | Protocolo 2026-000142, data 14 de outubro de 2026, solicitante Marcos Vinícius de Almeida Santos, categoria `matricula` |
-| Comparação com o gabarito | Pendente: o `audio-01.json` ainda não foi validado por quem ouviu o áudio |
-| Síntese de voz (teste técnico) | WAV PCM de 12,4 s, 24 kHz, mono, 16 bits; 6,1 s de chamada; US$ 0,0028 estimado |
+| Comparação com o gabarito validado (`f9b9fbd082d8`) | 97,7% das palavras certas na versão revisada (127 de 130) e 95,4% no bruto; 6 de 6 dados críticos; erros apontados: "no turno noturno" transcrito como "noturno" e "10" como "dez" |
+| Mascaramento com a correção (`f9b9fbd082d8`) | CPF, RG e e-mail mascarados antes da extração |
+| Voz da minuta aprovada (`cffa7dabbe55`) | WAV PCM de 107,7 s, 24 kHz, mono, voz Kore; 32,0 s de chamada; US$ 0,0244 estimado; a minuta trazia o aviso de lacunas |
 
 ## Gabarito
 
-`dados/gabaritos/audio-01.json` só vale depois que alguém **ouvir o original** e registrar o texto literal, a autoria, a data e os dados críticos como valores. O texto de referência atual coincide palavra por palavra com a transcrição do modelo, inclusive em "no turno no turno", e por isso não serve como referência independente até ser conferido. A saída do modelo nunca deve ser usada como gabarito.
+`dados/gabaritos/audio-01.json` foi validado por Victor Griggi Moreira Regis da Silva ouvindo o original: a fala é "no turno noturno", e o rascunho anterior repetia o erro da transcrição ("no turno no turno"). O gabarito só vale com `validado_por_humano: true`, autoria, data e dados críticos como valores; a saída do modelo nunca deve ser usada como gabarito.
 
 ## Segurança e privacidade
 

@@ -88,7 +88,7 @@ Códigos de saída: `0` sucesso, `1` erro de uso (caso, arquivo ou revisão inv�
 |---|---|---|---|
 | Base | RF01, RF03 (delimitação e prompt de sistema), RF04, RF11, RF12 (mascaramento), RF13 | `config.py`, `llm_client.py`, `prompts.py`, `audit.py`, `privacidade.py`, `entradas.py`, `revisao.py`, `avaliacao.py`, `fluxo.py`, `main.py`, `web.py` | pronta, com testes |
 | Texto | RF02, RF03 (caso de prompt injection), RF05, RF09 | `extracao.py`, `minuta.py`, `experimento.py`, `prompts/` | pronta, com testes |
-| Áudio | RF06, RF07 | `audio.py`, `prompts/transcricao_v1.md` | pronta, com testes; transcrição e voz validadas com a API; gabarito aguardando validação humana |
+| Áudio | RF06, RF07 | `audio.py`, `prompts/transcricao_v1.md` | pronta, com testes; transcrição e voz validadas com a API |
 | Imagem | RF08, RF10 | `vision.py`, `comparacao.py`, `image_generation.py`, `prompts/ocr_v1.md`, `prompts/peca_visual_v1.json` | pronta, com testes |
 
 As três modalidades terminam na mesma extração de campos e na mesma minuta. O contrato entre elas é o formato de `TextoExtraido` (`tipos.py`) e o esquema de `extracao.py`.
@@ -138,4 +138,4 @@ Requer o FFmpeg (`ffprobe`), como em Instalação. O arquivo é inspecionado int
 
 A voz sai só de minuta aprovada e inalterada. Se a minuta tem "não localizado", ela já é gerada com o aviso de lacunas, que é revisado e aprovado junto com o texto; sem o aviso, a síntese é bloqueada. Imagens não são lidas. A saída é um WAV validado que nunca sobrescreve áudio anterior.
 
-O gabarito `dados/gabaritos/audio-01.json` só vale depois que alguém ouvir o original e marcar `validado_por_humano: true`; até lá, a comparação fica registrada como pendente. Regras, resultados reais e limites em [`documentacao/audio_e_acessibilidade.md`](documentacao/audio_e_acessibilidade.md).
+O gabarito `dados/gabaritos/audio-01.json` foi validado por quem ouviu o original (`validado_por_humano: true`); sem essa marca, a comparação fica registrada como pendente. Regras, resultados reais e limites em [`documentacao/audio_e_acessibilidade.md`](documentacao/audio_e_acessibilidade.md).

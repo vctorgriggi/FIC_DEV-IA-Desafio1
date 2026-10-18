@@ -51,6 +51,7 @@ Custo estimado pela tabela da camada paga, válida até 31/12/2026 (fonte: docs 
 | `imagem-01` (OCR + extração) | 2 | 0,0178 |
 | `audio-01` (transcrição + extração) | 2 | 0,0137 |
 | Síntese de voz (teste técnico, 12,4 s de áudio) | 1 | 0,0028 |
+| Voz da minuta aprovada do `audio-01` (107,7 s de áudio) | 1 | 0,0244 |
 | Experimento de prompts (A, B, C, rodada final) | 3 | 0,0265 |
 | Peça visual (imagem 1K) | 1 | 0,0337 |
 
@@ -78,4 +79,4 @@ Custo estimado pela tabela da camada paga, válida até 31/12/2026 (fonte: docs 
 - A peça visual exige faturamento ativo: geração de imagem não tem cota gratuita.
 - Gemini 3.6 ou mais recente ignora `temperature`, então o experimento de prompts não controla amostragem (fonte: docs oficiais Gemini API, text-generation, out/2026).
 - Imagem e áudio vão inteiros ao provedor, sem mascaramento possível.
-- Um único áudio de teste: o ruído moderado não foi avaliado à parte, e o gabarito de áudio depende de validação por quem ouviu a gravação.
+- Um único áudio de teste: o ruído moderado não foi avaliado à parte.
