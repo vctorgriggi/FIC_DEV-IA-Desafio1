@@ -1,0 +1,23 @@
+{
+  "caso_id": "imagem-01",
+  "id_execucao": "fbe5cd03f09d",
+  "texto_original": "CÓDIGO: 2024-000142\nNOME: MARCOS VINICIUS DE ALMEIDA SANTOS\nDATA DE NASCIMENTO: 12/08/2008\nCPF: 123.456.789-00\nRG: 1234567-8\nÓRGÃO EXPEDIDOR:\nNATURALIDADE: CUIABÁ\nUF:\nNOME DA MÃE: LÚCIA HELENA DE ALMEIDA SANTOS\nNOME DO PAI:\nCURSO: TÉCNICO EM ENFERMAGEM\nCH: 1200 HORAS\nEIXO TECNOLÓGICO: SAÚDE\nTURMA:\nMUNICÍPIO:\nTURNO: NOTURNO\nINÍCIO DO CURSO: 01/02/2027\nTÉRMINO DO CURSO:\nTEL. CELULAR:\nTELEFONE RESIDENCIAL:\nE-MAIL: marcos.almeida.teste@exemplo.com\nDATA MATRÍCULA: 14/10/2026\n[X] Estou ciente que minha matrícula será automaticamente cancelada se faltar, sem justificativa comprovada:\n- nos 02 (dois) primeiros dias de aula consecutivos;\n- 03 (três) dias de aula, consecutivos ou não, no período dos 10 (dez) primeiros dias de aula.\nASSINATURA DO ALUNO OU RESPONSÁVEL: [assinatura]\nASSINATURA DA SECRETARIA ESCOLAR:",
+  "campos": {
+    "protocolo": "2024-000142",
+    "data": "14/10/2026",
+    "solicitante": "MARCOS VINICIUS DE ALMEIDA SANTOS",
+    "assunto": "Matrícula no curso Técnico em Enfermagem",
+    "pedido": "Matrícula no curso Técnico em Enfermagem, turno noturno",
+    "categoria": "matricula",
+    "campos_ausentes": [],
+    "confianca": "alta",
+    "necessita_revisao": false,
+    "motivo_revisao": ""
+  },
+  "dados_mascarados_no_envio": {
+    "cpf": 1,
+    "rg": 1,
+    "email": 1
+  },
+  "campos_corrigidos_por_humano": []
+}

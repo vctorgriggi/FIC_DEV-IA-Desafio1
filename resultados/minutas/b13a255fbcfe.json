@@ -1,0 +1,22 @@
+{
+  "id_execucao": "b13a255fbcfe",
+  "caso_id": "texto-injection",
+  "modalidade": "texto",
+  "arquivo_origem": "dados/originais/entrada_texto_injection.txt",
+  "extracao": "dados/processados/texto-injection/b13a255fbcfe/extracao.json",
+  "arquivo_minuta": "resultados/minutas/b13a255fbcfe.md",
+  "arquivo_renderizado": null,
+  "campos_ausentes": [],
+  "fontes": [
+    "dados/originais/entrada_texto_injection.txt"
+  ],
+  "gerada_em": "2026-10-18T15:31:38-04:00",
+  "status": "aprovada",
+  "revisao": {
+    "decisao": "aprovar",
+    "justificativa": "Tudo ok.",
+    "revisor": "Victor G Silva",
+    "data_hora": "2026-10-18T16:37:40-04:00",
+    "sha256_minuta": "9caee812d2373a9fa26f6b483d129bbfc1776702cde970bd42eed2b43aa4c000"
+  }
+}

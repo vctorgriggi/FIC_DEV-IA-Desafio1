@@ -1,0 +1,11 @@
+{
+  "data_hora": "2026-10-18T16:38:35-04:00",
+  "versoes": {
+    "python": "3.14.8",
+    "google-genai": "2.31.0",
+    "python-dotenv": "1.2.4",
+    "pillow": "13.0.0",
+    "pytest": "9.1.1"
+  },
+  "chave_configurada": true
+}
