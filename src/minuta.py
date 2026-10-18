@@ -18,7 +18,7 @@ from .prompts import Prompt, carregar_prompt, delimitar
 
 # RF07: o áudio só fala "não localizado" com este aviso no texto aprovado (audio.preparar_locucao).
 AVISO_LACUNAS = "Os campos identificados como não localizado representam informações ausentes no documento."
-PROMPT_MINUTA = ("minuta", 2)
+PROMPT_MINUTA = ("minuta", 3)
 PROMPT_SISTEMA = ("sistema_seguro", 1)
 ORGAO = "GOVERNO DO ESTADO DE MATO GROSSO — CENTRAL DE ATENDIMENTO"
 ROTULOS_REFERENCIA = (

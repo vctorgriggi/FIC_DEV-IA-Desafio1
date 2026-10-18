@@ -42,7 +42,7 @@ Formatos aceitos: MP3, WAV, M4A, OGG e FLAC, até 20 MiB e dentro do limite de 2
 | Inspeção do `entrada_audio.mp3` | MP3 mono, 48 kHz, 89,16 s |
 | Transcrição (`838ebbb718e7`) | 11,0 s; 2.685 tokens de entrada e 717 de saída; US$ 0,0047 estimado; idioma `pt`; nenhum trecho incerto apontado |
 | Texto transcrito | Nomes, datas, curso, e-mail e declaração corretos. Protocolo, CPF e RG vieram dígito a dígito, o que motivou a junção na versão revisada |
-| Mascaramento antes da extração | Na primeira rodada, só o e-mail foi mascarado; com a junção dos dígitos, CPF, RG e e-mail passam a ser mascarados |
+| Mascaramento antes da extração | Nas duas execuções aprovadas (`838ebbb718e7` e `cffa7dabbe55`), processadas antes da junção dos dígitos, o CPF foi sem máscara, e na primeira também o RG; com a junção, CPF, RG e e-mail passam a ser mascarados |
 | Campos extraídos | Protocolo 2026-000142, data 14 de outubro de 2026, solicitante Marcos Vinícius de Almeida Santos, categoria `matricula` |
 | Comparação com o gabarito validado (`f9b9fbd082d8`) | 97,7% das palavras certas na versão revisada (127 de 130) e 95,4% no bruto; 6 de 6 dados críticos; erros apontados: "no turno noturno" transcrito como "noturno" e "10" como "dez" |
 | Mascaramento com a correção (`f9b9fbd082d8`) | CPF, RG e e-mail mascarados antes da extração |

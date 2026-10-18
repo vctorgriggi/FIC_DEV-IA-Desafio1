@@ -19,9 +19,10 @@ from .llm_client import ClienteLLM
 from .minuta import PROMPT_SISTEMA
 from .prompts import carregar_prompt, delimitar
 
-METAPROMPT = ("metaprompt", 1)
+METAPROMPT = ("metaprompt", 2)
 # minuta_c_v1 foi escrito pelo assistente de codificação sem metaprompt escrito;
-# o C do experimento é o v2, gerado por gerar_prompt_c a partir de METAPROMPT.
+# o C do experimento é o v2, gerado por gerar_prompt_c a partir de metaprompt_v2 (o v1 deixava
+# um bloco de dados de exemplo no prompt gerado).
 PROMPTS = {"A": ("minuta_a", 1), "B": ("minuta_b", 1), "C": ("minuta_c", 2)}
 _CERCA = re.compile(r"^```[a-zA-Z]*\n(.*)\n```$", re.DOTALL)
 

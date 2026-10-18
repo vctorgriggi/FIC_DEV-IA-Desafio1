@@ -13,6 +13,7 @@ import re
 
 from .comparacao import tokens
 from .config import Config
+from .revisao import AGUARDANDO, STATUS_APROVADOS
 
 CAMPOS_EXATOS = ("protocolo", "data", "solicitante", "categoria")
 CAMPOS_LIVRES = ("assunto", "pedido")
@@ -88,3 +89,23 @@ def avaliar_todas(config: Config) -> list[dict]:
         if avaliacao is not None:
             avaliacoes.append(avaliacao)
     return avaliacoes
+
+
+def taxa_por_caso(config: Config) -> dict:
+    """RF13 pede a taxa "dos casos": vale a decisão mais recente de cada caso, não cada minuta."""
+    finais: dict[str, tuple[str, str]] = {}
+    for caminho in config.caminho("minutas").glob("*.json"):
+        meta = json.loads(caminho.read_text(encoding="utf-8"))
+        if meta["status"] == AGUARDANDO:
+            continue
+        quando = meta["revisao"]["data_hora"]
+        if meta["caso_id"] not in finais or quando > finais[meta["caso_id"]][0]:
+            finais[meta["caso_id"]] = (quando, meta["status"])
+    decisao = {caso: status for caso, (_, status) in sorted(finais.items())}
+    aprovados = sum(status in STATUS_APROVADOS for status in decisao.values())
+    return {
+        "decisao_final": decisao,
+        "aprovados": aprovados,
+        "casos_revisados": len(decisao),
+        "taxa": round(aprovados / len(decisao), 3) if decisao else None,
+    }

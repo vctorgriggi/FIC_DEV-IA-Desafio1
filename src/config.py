@@ -13,7 +13,7 @@ from dotenv import load_dotenv
 
 RAIZ = Path(__file__).resolve().parent.parent
 VARIAVEL_CHAVE = "GEMINI_API_KEY"
-BIBLIOTECAS_PRINCIPAIS = ("google-genai", "python-dotenv", "pillow", "pytest")
+BIBLIOTECAS_PRINCIPAIS = ("google-genai", "python-dotenv", "pillow", "fastapi", "uvicorn", "pytest")
 
 
 class CasoInexistente(LookupError):

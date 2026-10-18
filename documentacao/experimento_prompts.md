@@ -66,7 +66,7 @@ Elaborar a minuta oficial de resposta à solicitação do cidadão, baseando-se 
 
 ### Prompt C — produzido com metaprompt (`prompts/minuta_c_v2.md`)
 
-O metaprompt (`prompts/metaprompt_v1.md`) descreve a tarefa, a entrada e os requisitos, e pede ao modelo que escreva o prompt. O C é gerado com `python -m src.main gerar-prompt-c`, no mesmo `gemini-3.8-flash`, e a chamada fica no log.
+O metaprompt (`prompts/metaprompt_v2.md`) descreve a tarefa, a entrada e os requisitos, e pede ao modelo que escreva o prompt. O C é gerado com `python -m src.main gerar-prompt-c`, no mesmo `gemini-3.8-flash`, e a chamada fica no log.
 
 ```markdown
 Você é especialista em engenharia de prompts para modelos de linguagem. Escreva um prompt de tarefa para outro modelo executar.
@@ -90,7 +90,7 @@ Redigir a minuta de resposta institucional de uma secretaria pública fictícia 
 Responda apenas com o texto do prompt, em português, em Markdown, pronto para uso. Sem explicação antes ou depois e sem cercas de código. Não inclua o bloco <conteudo_externo> nem exemplo de dados: o sistema anexa o bloco real logo depois do seu prompt.
 ```
 
-A primeira geração trouxe, no fim do prompt, um bloco `<conteudo_externo>` de exemplo com campos `null`. Somado ao bloco real que o sistema anexa, o modelo veria dois blocos. O metaprompt passou a proibir isso, e o C foi gerado de novo. Prompt C resultante:
+A primeira geração trouxe, no fim do prompt, um bloco `<conteudo_externo>` de exemplo com campos `null`. Somado ao bloco real que o sistema anexa, o modelo veria dois blocos. Essa primeira versão do metaprompt está em `prompts/metaprompt_v1.md`. A `metaprompt_v2` passou a proibir o bloco de exemplo, e o C foi gerado de novo. As duas chamadas estão no log com os hashes `ec619662d814` (v1) e `2d7e0600a516` (v2); ambas aparecem registradas com o rótulo `metaprompt_v1`, porque a versão nova foi criada depois das chamadas, e o hash identifica qual texto foi usado. Prompt C resultante:
 
 ```markdown
 Você é um redator institucional especializado em comunicação oficial da administração pública do Governo do Estado de Mato Grosso (GOV.MT). Sua função é redigir a minuta de uma resposta formal a um cidadão com base estrita e exclusiva nos dados fornecidos no bloco `<conteudo_externo origem="campos_extraidos">`.
@@ -316,7 +316,7 @@ Governo do Estado de Mato Grosso
 **Prompt selecionado: B.**
 
 1. **Requisitos institucionais (RF09 e seção 6):** B e C trouxeram brasão, órgão e fontes; A não trouxe nenhum dos três.
-2. **Lacunas:** só o B respondeu às duas partes do pedido. Confirmou a efetivação e disse que os documentos pendentes "dependem da análise do setor competente", em vez de afirmar que não há pendências, como o C, ou de marcar tudo como "não localizado", como o A.
+2. **Lacunas:** só o B respondeu às duas partes do pedido. Confirmou o recebimento do pedido de efetivação e disse que os documentos pendentes "dependem da análise do setor competente", em vez de afirmar que não há pendências, como o C, ou de marcar tudo como "não localizado", como o A.
 3. **Custo e tempo:** o B foi o mais barato e o mais rápido desta rodada.
 
 ---
@@ -332,4 +332,4 @@ Saídas, duração, tokens e custo de cada prompt ficam em `resultados/experimen
 
 ## 8. Do experimento à produção
 
-O Prompt B foi incorporado como `prompts/minuta_v2.md`, sem o cabeçalho, os dados de referência e as fontes, que o sistema passou a inserir por código. No experimento, o Prompt A omitiu brasão e fontes, e o caminho do brasão escrito pelo modelo não abria a partir de `resultados/minutas/`.
+O Prompt B foi incorporado como `prompts/minuta_v2.md`, sem o cabeçalho, os dados de referência e as fontes, que o sistema passou a inserir por código. A `minuta_v3`, prompt de produção atual, acrescenta a proibição de afirmar ações que não constam dos dados (encaminhamento, cadastro, análise, deferimento): minutas aprovadas com o v2 afirmavam que a solicitação tinha sido "direcionada" ao setor responsável. No experimento, o Prompt A omitiu brasão e fontes, e o caminho do brasão escrito pelo modelo não abria a partir de `resultados/minutas/`.

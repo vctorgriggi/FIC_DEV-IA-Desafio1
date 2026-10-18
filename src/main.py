@@ -125,6 +125,8 @@ def cmd_avaliacao(config: Config, args: argparse.Namespace) -> None:
         return
     print(f"Taxa de aprovação sem correção: {resumo['taxa_aprovacao_sem_correcao']:.1%} de {resumo['revisadas']} revisadas")
     print(f"Taxa de aprovação com correção: {resumo['taxa_aprovacao_com_correcao']:.1%}")
+    casos = avaliacao.taxa_por_caso(config)
+    print(f"Taxa por caso (decisão mais recente de cada um): {casos['taxa']:.1%} ({casos['aprovados']} de {casos['casos_revisados']} casos)")
 
 
 def ler_arquivo_json(caminho: str) -> dict:
@@ -239,7 +241,7 @@ def montar_parser() -> argparse.ArgumentParser:
     experimento_prompts.add_argument("--entrada", required=True, help="JSON com campos, fontes e imagem institucional")
     experimento_prompts.set_defaults(funcao=cmd_experimento_prompts)
 
-    sub.add_parser("gerar-prompt-c", help="gera o Prompt C do RF02 a partir de prompts/metaprompt_v1.md").set_defaults(
+    sub.add_parser("gerar-prompt-c", help="gera o Prompt C do RF02 a partir de prompts/metaprompt_v2.md").set_defaults(
         funcao=cmd_gerar_prompt_c
     )
 

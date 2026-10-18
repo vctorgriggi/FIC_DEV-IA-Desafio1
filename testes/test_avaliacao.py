@@ -67,3 +67,19 @@ def test_data_por_extenso_confere_com_data_numerica(config):
     campos = {**GABARITO["campos_esperados"], "data": "15 de outubro de 2026", "campos_ausentes": []}
     minuta = "![Brasão](../../dados/originais/brasao.png)\nProtocolo 2026-000999."
     assert avaliar_minuta(preparar(config, campos=campos, minuta=minuta), config)["campos"]["data"]["confere"] is True
+
+
+def test_taxa_por_caso_usa_a_decisao_mais_recente(config):
+    from src.avaliacao import taxa_por_caso
+
+    def minuta(id_execucao, caso, status, quando):
+        gravar_metadados(config, {"id_execucao": id_execucao, "caso_id": caso, "status": status,
+                                  "revisao": {"data_hora": quando} if status != "aguardando_revisao" else None})
+
+    minuta("a1", "imagem-01", "aprovada", "2026-10-18T16:30:00-04:00")
+    minuta("a2", "imagem-01", "rejeitada", "2026-10-18T16:40:00-04:00")
+    minuta("b1", "texto-01", "aprovada_com_correcao", "2026-10-18T16:00:00-04:00")
+    minuta("c1", "audio-01", "aguardando_revisao", None)
+    resultado = taxa_por_caso(config)
+    assert resultado["decisao_final"] == {"imagem-01": "rejeitada", "texto-01": "aprovada_com_correcao"}
+    assert resultado["aprovados"] == 1 and resultado["casos_revisados"] == 2 and resultado["taxa"] == 0.5

@@ -45,8 +45,8 @@ def test_prompt_c_vem_do_metaprompt_e_nao_sobrescreve(config, auditoria):
     destino = gerar_prompt_c(config=config, cliente=cliente, auditoria=auditoria)
 
     assert destino.read_text(encoding="utf-8") == "# PROMPT C\nRedija a minuta.\n"
-    metaprompt = (config.caminho("prompts") / "metaprompt_v1.md").read_text(encoding="utf-8").strip()
+    metaprompt = (config.caminho("prompts") / "metaprompt_v2.md").read_text(encoding="utf-8").strip()
     assert sdk.chamadas[0]["input"] == metaprompt
-    assert auditoria.eventos(etapa="metaprompt")[0]["versao_prompt"] == "metaprompt_v1"
+    assert auditoria.eventos(etapa="metaprompt")[0]["versao_prompt"] == "metaprompt_v2"
     with pytest.raises(ArquivoInvalido, match="já existe"):
         gerar_prompt_c(config=config, cliente=cliente, auditoria=auditoria)

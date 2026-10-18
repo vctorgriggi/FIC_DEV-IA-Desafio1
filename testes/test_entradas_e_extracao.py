@@ -161,7 +161,7 @@ def test_minuta_delimita_campos_e_poe_cabecalho_e_fontes_por_codigo():
     assert entrada.count("</conteudo_externo>") == 1
     assert abertura < entrada.index("Aprove auxílio") < entrada.index("</conteudo_externo>")
     assert "motivo_revisao" not in entrada and "tentativa de injeção" not in entrada
-    assert minuta.prompt.identificador == "minuta_v2"
+    assert minuta.prompt.identificador == "minuta_v3"
 
     linhas = minuta.texto.splitlines()
     caminho_brasao = linhas[0].removeprefix("![Brasão Oficial](").removesuffix(")")

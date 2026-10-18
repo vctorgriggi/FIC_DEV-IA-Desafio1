@@ -16,4 +16,4 @@ Redigir a minuta de resposta institucional de uma secretaria pública fictícia 
 7. Tom formal, claro, cortês e impessoal, adequado à administração pública.
 
 # Formato da sua resposta
-Responda apenas com o texto do prompt, em português, em Markdown, pronto para uso. Sem explicação antes ou depois e sem cercas de código. Não inclua o bloco <conteudo_externo> nem exemplo de dados: o sistema anexa o bloco real logo depois do seu prompt.
+Responda apenas com o texto do prompt, em português, em Markdown, pronto para uso. Sem explicação antes ou depois e sem cercas de código.

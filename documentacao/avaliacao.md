@@ -2,7 +2,7 @@
 
 ## Protocolo
 
-Cada caso tem um gabarito em `dados/gabaritos/`, escrito antes da execução. `python -m src.main avaliacao` confere automaticamente o que tem resposta exata e grava o resultado em `resultados/logs/avaliacao.json`. O resto é julgado pelo revisor em `python -m src.main revisar <id>`.
+Cada caso tem um gabarito em `dados/gabaritos/`, escrito antes da execução; a exceção é o do áudio, corrigido depois (ver "Gabarito do áudio corrigido depois da execução"). `python -m src.main avaliacao` confere automaticamente o que tem resposta exata e grava o resultado em `resultados/logs/avaliacao.json`. O resto é julgado pelo revisor em `python -m src.main revisar <id>`.
 
 | Critério | Como é verificado |
 |---|---|
@@ -51,7 +51,10 @@ Revisões feitas em 18/10/2026, na interface e no terminal; todas registradas em
 | `838ebbb718e7` | `audio-01` | Confirmado sem correção | Aprovada | "OK" | Sem divergências |
 | `cffa7dabbe55` | `audio-01` | Confirmado sem correção | Aprovada; áudio gerado (107,7 s) | "OK" | Sem divergências |
 
-**Taxa de aprovação** (`python -m src.main avaliacao`): 6 de 7 minutas revisadas, 85,7%, todas sem correção manual do texto. Entre as aprovadas, uma tem erro crítico.
+**Taxa de aprovação** (`python -m src.main avaliacao`):
+
+- **Por caso**, que é o que o RF13 pede (decisão mais recente de cada caso): 4 de 4 casos aprovados, 100%.
+- **Por minuta:** 6 de 7 revisadas, 85,7%, todas sem correção manual do texto. Essa conta inclui como aprovada a `21f71850a288`, que tem erro crítico; pelo próprio protocolo, ela deveria ter sido rejeitada.
 
 As duas execuções de áudio aprovadas foram processadas antes de a revisão da transcrição juntar os dígitos ditados um a um: nelas, o CPF foi ao provedor sem máscara (dado fictício). A execução `f9b9fbd082d8`, já com a correção, mascarou CPF, RG e e-mail e é a usada na comparação acima; ela aguarda a confirmação humana.
 
@@ -64,6 +67,16 @@ Lições: o modelo erra com confiança justamente no dado crítico; a confirmaç
 ### Divergência em `pedido` no `imagem-01`
 
 O gabarito, escrito antes da execução, marca `pedido` como "não localizado", porque a ficha não traz um pedido escrito. O modelo extraiu "Matrícula no curso Técnico em Enfermagem", que decorre do próprio formulário. Classificação: **média**, uma inferência razoável, mas fora da regra "só o que está escrito". O gabarito foi mantido como estava antes da execução.
+
+### Gabarito do áudio corrigido depois da execução
+
+O rascunho de `dados/gabaritos/audio-01.json` (de Andre Luiz) foi escrito antes da execução, mas copiava um erro da transcrição ("no turno no turno") e listava em `campos_ausentes_esperados` itens que não são campos da extração ("turno", "relação de documentos pendentes"). Depois das execuções, Victor Griggi Moreira Regis da Silva ouviu o original e corrigiu: a fala é "no turno noturno", e nenhum campo falta. Com o rascunho original, as duas minutas de áudio aprovadas teriam acusado divergência em campos ausentes. A comparação da transcrição acima (`f9b9fbd082d8`) usa o gabarito corrigido.
+
+### Outros achados da revisão
+
+- **`texto-01`:** o gabarito pede, nas observações, que a minuta alerte sobre as regras de frequência; a minuta aprovada não alerta. A conferência automática não cobre esse critério (não está em `minuta_deve_conter`), e o revisor não apontou.
+- **Ações afirmadas sem base:** as minutas `a28f7fde3ba8` e `cffa7dabbe55` dizem que a solicitação foi "direcionada" ao setor responsável, ação que não consta da entrada, e foram aprovadas. O prompt de produção passou a ser `minuta_v3`, que proíbe afirmar encaminhamento, cadastro, análise ou deferimento.
+- **Duas aprovações para o mesmo caso de áudio:** `838ebbb718e7` e `cffa7dabbe55`, aprovadas 6 s e 3 s depois de geradas.
 
 ## Limitações e riscos residuais
 
