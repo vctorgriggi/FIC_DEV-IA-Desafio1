@@ -111,11 +111,16 @@ def preparar_caso(caso_id: str, *, config: Config, cliente: ClienteLLM, auditori
             trechos_incertos = extraido.trechos_incertos
 
     # RF06 e RF08: comparação com o gabarito, quando o caso já tem um.
-    if modalidade != "texto" and (gabarito := _ler_gabarito(config, caso)) is not None:
+    gabarito = _ler_gabarito(config, caso) if modalidade != "texto" else None
+    if modalidade == "audio" or (modalidade != "texto" and gabarito is not None):
         with _etapa(auditoria, base, "comparacao_gabarito") as evento:
-            comparacao = comparar_com_gabarito(extraido.texto_bruto, extraido.texto_revisado, gabarito)
+            if modalidade == "audio" and not audio.gabarito_validado(gabarito):
+                comparacao = None
+                evento.extra = {"aviso": "comparação pendente: referência humana de áudio não validada"}
+            else:
+                comparacao = comparar_com_gabarito(extraido.texto_bruto, extraido.texto_revisado, gabarito)
             if comparacao is None:
-                evento.extra = {"aviso": "gabarito sem texto_referencia"}
+                evento.extra = evento.extra or {"aviso": "gabarito sem texto_referencia"}
             else:
                 _gravar_json(pasta / "comparacao_gabarito.json", comparacao)
                 evento.saida = config.relativo(pasta / "comparacao_gabarito.json")
@@ -258,11 +263,20 @@ def sintetizar_minuta(id_execucao: str, *, config: Config, cliente: ClienteLLM, 
     destino = config.caminho("audios") / f"{id_execucao}.wav"
     with _etapa(auditoria, base, "sintese_voz") as evento:
         configuracao = audio.sintetizar(arquivo_minuta.read_text(encoding="utf-8"), destino, cliente=cliente, config=config)
+        if not destino.is_file():
+            raise ArquivoInvalido("A síntese não gravou o arquivo WAV esperado.")
+        audio.validar_wav(destino.read_bytes())
         evento.modelo = config.modelo("tts")
-        evento.parametros = configuracao
+        evento.parametros = configuracao.get("parametros", {})
+        evento.extra = configuracao
+        evento.duracao_s = configuracao.get("duracao_requisicao_s")
+        evento.tokens_entrada = configuracao.get("tokens_entrada")
+        evento.tokens_saida = configuracao.get("tokens_saida")
+        evento.custo_estimado_usd = configuracao.get("custo_estimado_usd")
         evento.saida = config.relativo(destino)
 
     metadados["audio"] = config.relativo(destino)
+    metadados["sintese"] = configuracao
     gravar_metadados(config, metadados)
     return metadados
 

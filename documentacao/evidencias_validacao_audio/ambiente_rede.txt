@@ -1,0 +1,13 @@
+Diagnóstico local em 18/10/2026
+DNS pypi.org, files.pythonhosted.org, archive.ubuntu.com e ai.google.dev: gaierror -2
+Criação de socket AF_INET/SOCK_STREAM: PermissionError errno=1
+Criação de socket AF_INET/SOCK_DGRAM: PermissionError errno=1
+resolvectl status: sd_bus_open_system: Operation not permitted
+/etc/resolv.conf: stub systemd-resolved em 127.0.0.53
+HTTP_PROXY, HTTPS_PROXY, ALL_PROXY, NO_PROXY, PIP_INDEX_URL, PIP_EXTRA_INDEX_URL, PIP_NO_INDEX: ausentes no ambiente
+HTTPS público PyPI: URLError; pip falha antes de consultar versões
+Não foram modificados DNS, rede ou proxy
+APT: ffmpeg não instalado; candidato local 7:6.1.1-3ubuntu5
+apt-get --simulate install ffmpeg: 1 pacote novo, 0 atualizados, nenhuma instalação executada
+/var/cache/apt/archives: sem pacote .deb disponível para extração offline
+xdg-open disponível em /usr/bin/xdg-open; reprodução não executada

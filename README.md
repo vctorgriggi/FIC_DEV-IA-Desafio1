@@ -8,6 +8,8 @@ Protótipo local que recebe solicitações fictícias em texto, áudio e imagem,
 
 Requer Python 3.10 ou mais recente (exigência do SDK `google-genai`). Testado com Python 3.14.8. Confira com `python3 --version`; o Python que vem com o macOS é 3.9 e não serve. Nesse caso, use o executável de uma versão nova no primeiro comando (por exemplo `python3.14 -m venv .venv`, com Python instalado pelo Homebrew ou por python.org).
 
+O caso de áudio também precisa do FFmpeg (`ffprobe` no PATH): `brew install ffmpeg` no macOS, `sudo apt install ffmpeg` no Linux ou o instalador de ffmpeg.org no Windows. Confira com `ffprobe -version`.
+
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate          # Windows: .venv\Scripts\activate
@@ -75,6 +77,7 @@ Códigos de saída: `0` sucesso, `1` erro de uso (caso, arquivo ou revisão inv�
 | "Limite de requisições ou cota do provedor atingido" ao gerar a peça visual | Geração de imagem não tem cota gratuita: no Google AI Studio, abra o projeto da chave e use **Set up billing**. Nas outras etapas, aguarde alguns minutos. |
 | "A resposta do modelo foi cortada pelo limite de tokens" | Aumente `max_output_tokens` em `parametros_geracao` no `config.json`. |
 | "Pendente: RF06 ainda não implementado" | Parte que ainda levanta `PendenteDeImplementacao` (código de saída 3). |
+| "ffprobe não encontrado" ao processar áudio | Falta o FFmpeg: instale como em Instalação e confira com `ffprobe -version`. |
 | A interface não abre porque a porta está em uso | `python -m src.main interface --porta 8001`. |
 | O navegador mostra "Interface não compilada" | `interface/dist` foi apagado: rode `npm install && npm run build` em `interface/`. |
 
@@ -84,7 +87,7 @@ Códigos de saída: `0` sucesso, `1` erro de uso (caso, arquivo ou revisão inv�
 |---|---|---|---|
 | Base | RF01, RF03 (delimitação e prompt de sistema), RF04, RF11, RF12 (mascaramento), RF13 | `config.py`, `llm_client.py`, `prompts.py`, `audit.py`, `privacidade.py`, `entradas.py`, `revisao.py`, `avaliacao.py`, `fluxo.py`, `main.py`, `web.py` | pronta, com testes |
 | Texto | RF02, RF03 (caso de prompt injection), RF05, RF09 | `extracao.py`, `minuta.py`, `experimento.py`, `prompts/` | pronta, com testes |
-| Áudio | RF06, RF07 | `audio.py` (`transcrever`, `sintetizar`) | pendente |
+| Áudio | RF06, RF07 | `audio.py`, `prompts/transcricao_v1.md` | implementada, com testes simulados; aceite real pendente — [documentação](documentacao/audio_e_acessibilidade.md) |
 | Imagem | RF08, RF10 | `vision.py`, `comparacao.py`, `image_generation.py`, `prompts/ocr_v1.md`, `prompts/peca_visual_v1.json` | pronta, com testes |
 
 As três modalidades terminam na mesma extração de campos e na mesma minuta. O contrato entre elas é o formato de `TextoExtraido` (`tipos.py`) e o esquema de `extracao.py`.
@@ -127,3 +130,38 @@ Cada caso tem um resultado esperado escrito antes da execução (seção 6 do en
 - **Peça visual (RF10):** o modelo gera só a ilustração; o texto e o selo de conteúdo sintético são aplicados com Pillow, para o texto sair exato. Cada peça em `resultados/imagens/` tem ao lado a ilustração original do modelo e um `.json` com prompt, especificação, modelo, data, nota de proveniência e revisão. A composição usa Arial ou DejaVu Sans; sem nenhuma das duas, a peça não é gerada (a fonte embutida do Pillow não tem acentos).
 - **Comparação com gabarito (RF06, RF08):** para áudio e imagem, quando o gabarito do caso tem `texto_referencia`, o fluxo grava `comparacao_gabarito.json` com similaridade, acertos por palavra, erros e dados críticos não encontrados.
 - **Resposta vazia (RF04):** a checagem vale para o tipo de saída pedido. TTS sem áudio ou geração sem imagem também é erro, mesmo que venha texto.
+
+## Áudio — RF06 e RF07
+
+RF06 requer **FFmpeg/ffprobe no PATH** (Aula 05); a aplicação não instala ferramentas
+nem envia áudio se a inspeção falhar. Formatos: MP3, WAV, M4A, OGG e FLAC,
+com limite configurado de 20 MiB e limite adicional da requisição inline completa.
+Configure voz, estilo e timeout local em `config.json`, seção `audio`.
+
+```bash
+ffprobe -version
+python -m unittest testes.test_audio -v   # testes simulados, sem API
+python -m pytest                         # suíte completa, sem API
+# Com chave, cota/custos autorizados e ffprobe disponível:
+python -m src.main processar audio-01
+python -m src.main revisar <id_execucao>
+python -m src.main audio-minuta <id_execucao>
+```
+
+`dados/gabaritos/audio-01.json` é um modelo **não validado**. Ouça o original,
+preencha referência independente, autoria, data e valores críticos literais;
+marque `validado_por_humano: true` só depois da conferência. A ausência de
+referência válida é registrada como comparação pendente e não impede processar.
+Nomes, protocolos e datas continuam sujeitos à confirmação humana antes da minuta.
+
+Minutas com “não localizado” precisam conter, **antes da aprovação**, o aviso:
+“Os campos identificados como não localizado representam informações ausentes no documento.”
+Se faltar, a síntese é bloqueada: edite a minuta enquanto aguarda revisão e então
+aprove. Se já estiver aprovada, gere/revise outra execução; não edite os metadados
+para contornar o hash. Nenhum aviso é acrescentado automaticamente ao áudio.
+
+O TTS salva WAV PCM validado, não sobrescreve áudio anterior e mantém telemetria
+nos metadados e log. Texto complexo (HTML, tabelas, código, comandos vocais)
+precisa ser preparado como texto simples e revisto. Regras, limites, custos,
+bloqueios do ambiente e resultados em [áudio e acessibilidade](documentacao/audio_e_acessibilidade.md)
+e no [relatório de implementação](documentacao/RELATORIO_IMPLEMENTACAO_AUDIO.md).

@@ -56,8 +56,13 @@ def test_codigos_de_saida(cli_isolada, argumentos, codigo):
 
 def test_parte_pendente_tem_codigo_proprio(cli_isolada, monkeypatch):
     from testes.falsos import SDKFalso
+    from src.tipos import PendenteDeImplementacao
+
+    def pendente(*args, **kwargs):
+        raise PendenteDeImplementacao("RF06", "teste simulado")
 
     monkeypatch.setattr(cli, "ClienteLLM", lambda config: SDKFalso())
+    monkeypatch.setattr(cli.fluxo.audio, "transcrever", pendente)
     assert cli.main(["processar", "audio-01"]) == cli.SAIDA_PENDENTE
 
 

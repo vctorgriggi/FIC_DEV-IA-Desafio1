@@ -10,6 +10,11 @@
   "parametros_geracao": {
     "max_output_tokens": 8192
   },
+  "audio": {
+    "timeout_inspecao_s": 30,
+    "voz": "Kore",
+    "estilo": "Fale em português brasileiro, com tom institucional, claro, sério e acolhedor, em ritmo pausado. Articule nomes, datas e protocolos com clareza. Leia somente o texto fornecido, sem comentários ou acréscimos."
+  },
   "timeout_segundos": 180,
   "armazenar_no_provedor": false,
   "precos_usd_por_milhao_tokens": {
