@@ -52,7 +52,7 @@ Neste desafio, a nuvem é aceitável porque os dados são fictícios e as chamad
 
 O caso mostra o motivo da confirmação humana: o modelo errou o protocolo sem marcá-lo como incerto e marcou como incertas duas datas corretas. A comparação com o gabarito pegou os dois erros críticos.
 
-**Peça visual:** não gerada. O modelo `gemini-3.1-flash-lite-image` respondeu "limit: 0 requests per day on Free Tier": geração de imagem não tem cota gratuita. Gerar exige faturamento ativo (US$ 0,0336 por imagem 1K) ou um modelo aberto equivalente, documentado como substituição (seção 7 do enunciado).
+**Peça visual** (`gemini-3.1-flash-lite-image`, 3,9 s, US$ 0,0337 estimado): `resultados/imagens/882e9080c8c0.png`, com a ilustração original do modelo ao lado (`882e9080c8c0_ilustracao_ia.jpg`) e prompt, especificação, modelo, data e nota de proveniência em `882e9080c8c0.json`. Na camada gratuita, a primeira tentativa recebeu "limit: 0 requests per day on Free Tier"; a peça foi gerada depois que o faturamento do projeto foi ativado.
 
 | Item | Resultado |
 |---|---|

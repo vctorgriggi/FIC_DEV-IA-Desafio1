@@ -41,7 +41,7 @@ Provedor único (Google Gemini, SDK `google-genai` 2.31.0, Interactions API), pa
 
 ## Custos medidos
 
-Custo estimado pela tabela da camada paga, válida até 31/12/2026 (fonte: docs oficiais Gemini API, pricing, out/2026); na camada gratuita, o custo efetivo foi zero.
+Custo estimado pela tabela da camada paga, válida até 31/12/2026 (fonte: docs oficiais Gemini API, pricing, out/2026). As rodadas de texto, OCR e experimento usaram a camada gratuita, sem custo efetivo; a peça visual foi gerada já na camada paga.
 
 | Execução | Chamadas | Custo estimado (USD) |
 |---|---|---|
@@ -49,7 +49,7 @@ Custo estimado pela tabela da camada paga, válida até 31/12/2026 (fonte: docs 
 | `texto-injection` (extração + minuta) | 2 | 0,0131 |
 | `imagem-01` (OCR + extração) | 2 | 0,0178 |
 | Experimento de prompts (A, B, C, rodada final) | 3 | 0,0265 |
-| Peça visual | 1 | 0,0336 por imagem 1K (não executada: sem cota gratuita) |
+| Peça visual (imagem 1K) | 1 | 0,0337 |
 
 ## Riscos e mitigações
 
@@ -72,6 +72,6 @@ Custo estimado pela tabela da camada paga, válida até 31/12/2026 (fonte: docs 
 ## Limitações
 
 - Um caso por modalidade, mais o caso de injeção: os resultados mostram comportamento, não estatística.
-- A peça visual depende de faturamento ativo ou de um modelo aberto substituto.
+- A peça visual exige faturamento ativo: geração de imagem não tem cota gratuita.
 - Gemini 3.6 ou mais recente ignora `temperature`, então o experimento de prompts não controla amostragem (fonte: docs oficiais Gemini API, text-generation, out/2026).
 - Imagem e áudio vão inteiros ao provedor, sem mascaramento possível.
