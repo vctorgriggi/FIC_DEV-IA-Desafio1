@@ -56,3 +56,14 @@ def test_caso_sem_gabarito_fica_de_fora(config):
     preparar(config, campos={}, minuta="x")
     (config.raiz / "dados/gabaritos/texto-01.json").unlink()
     assert avaliar_todas(config) == []
+
+
+def test_data_por_extenso_confere_com_data_numerica(config):
+    from src.avaliacao import data_canonica
+
+    assert data_canonica("14 de outubro de 2026") == data_canonica("14/10/2026") == "14/10/2026"
+    assert data_canonica("1º de março de 2027") == "01/03/2027"
+    assert data_canonica("não localizado") == "não localizado"
+    campos = {**GABARITO["campos_esperados"], "data": "15 de outubro de 2026", "campos_ausentes": []}
+    minuta = "![Brasão](../../dados/originais/brasao.png)\nProtocolo 2026-000999."
+    assert avaliar_minuta(preparar(config, campos=campos, minuta=minuta), config)["campos"]["data"]["confere"] is True

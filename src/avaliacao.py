@@ -9,6 +9,7 @@ minuta_nao_pode_conter.
 from __future__ import annotations
 
 import json
+import re
 
 from .comparacao import tokens
 from .config import Config
@@ -17,8 +18,27 @@ CAMPOS_EXATOS = ("protocolo", "data", "solicitante", "categoria")
 CAMPOS_LIVRES = ("assunto", "pedido")
 
 
+MESES = ("janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro")
+_DATA_EXTENSO = re.compile(r"^(\d{1,2})º? de (" + "|".join(MESES) + r") de (\d{4})$")
+
+
 def _normal(texto: object) -> str:
     return " ".join(tokens(str(texto)))
+
+
+def data_canonica(valor: str) -> str:
+    """Data falada ("14 de outubro de 2026") e numérica ("14/10/2026") são o mesmo dado."""
+    achado = _DATA_EXTENSO.match(valor.strip().casefold())
+    if not achado:
+        return valor.strip()
+    dia, mes, ano = achado.groups()
+    return f"{int(dia):02d}/{MESES.index(mes) + 1:02d}/{ano}"
+
+
+def _confere(campo: str, esperado: object, obtido: object) -> bool:
+    if campo == "data":
+        return data_canonica(str(esperado)) == data_canonica(str(obtido))
+    return _normal(esperado) == _normal(obtido)
 
 
 def avaliar_minuta(metadados: dict, config: Config) -> dict | None:
@@ -32,7 +52,7 @@ def avaliar_minuta(metadados: dict, config: Config) -> dict | None:
     esperados = gabarito.get("campos_esperados", {})
 
     campos = {
-        campo: {"esperado": esperados[campo], "obtido": obtidos.get(campo), "confere": _normal(esperados[campo]) == _normal(obtidos.get(campo, ""))}
+        campo: {"esperado": esperados[campo], "obtido": obtidos.get(campo), "confere": _confere(campo, esperados[campo], obtidos.get(campo, ""))}
         for campo in CAMPOS_EXATOS
         if esperados.get(campo)
     }

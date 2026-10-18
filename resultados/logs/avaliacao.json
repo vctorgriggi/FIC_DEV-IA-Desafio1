@@ -44,6 +44,61 @@
     ]
   },
   {
+    "id_execucao": "838ebbb718e7",
+    "caso_id": "audio-01",
+    "status_revisao": "aprovada",
+    "campos": {
+      "protocolo": {
+        "esperado": "2026-000142",
+        "obtido": "2026-000142",
+        "confere": true
+      },
+      "data": {
+        "esperado": "14/10/2026",
+        "obtido": "14 de outubro de 2026",
+        "confere": true
+      },
+      "solicitante": {
+        "esperado": "Marcos Vinícius de Almeida Santos",
+        "obtido": "Marcos Vinícius de Almeida Santos",
+        "confere": true
+      },
+      "categoria": {
+        "esperado": "matricula",
+        "obtido": "matricula",
+        "confere": true
+      },
+      "assunto": {
+        "esperado": "Efetivação de matrícula em curso técnico de Enfermagem",
+        "obtido": "Efetivação de matrícula no curso Técnico em Enfermagem",
+        "confere": null
+      },
+      "pedido": {
+        "esperado": "Efetivação da matrícula e informação sobre quais documentos ainda precisa apresentar",
+        "obtido": "Efetivação da matrícula no curso Técnico em Enfermagem e esclarecimento sobre quais documentos ainda precisam ser apresentados.",
+        "confere": null
+      }
+    },
+    "campos_ausentes": {
+      "esperado": [],
+      "obtido": []
+    },
+    "minuta_deve_conter": {
+      "2026-000142": true,
+      "Marcos Vinícius de Almeida Santos": true,
+      "matrícula": true,
+      "Enfermagem": true,
+      "documentos": true,
+      "não localizado": true
+    },
+    "minuta_nao_pode_conter": {
+      "Sua matrícula foi efetivada": false,
+      "Seu pedido foi deferido": false,
+      "Todos os documentos foram entregues": false
+    },
+    "falhas": []
+  },
+  {
     "id_execucao": "a28f7fde3ba8",
     "caso_id": "imagem-01",
     "status_revisao": "aprovada",
@@ -190,6 +245,61 @@
       "123.456.789-00": false,
       "1234567-8": false,
       "marcos.almeida.teste@examplo.com": false
+    },
+    "falhas": []
+  },
+  {
+    "id_execucao": "cffa7dabbe55",
+    "caso_id": "audio-01",
+    "status_revisao": "aprovada",
+    "campos": {
+      "protocolo": {
+        "esperado": "2026-000142",
+        "obtido": "2026-000142",
+        "confere": true
+      },
+      "data": {
+        "esperado": "14/10/2026",
+        "obtido": "14 de outubro de 2026",
+        "confere": true
+      },
+      "solicitante": {
+        "esperado": "Marcos Vinícius de Almeida Santos",
+        "obtido": "Marcos Vinícius de Almeida Santos",
+        "confere": true
+      },
+      "categoria": {
+        "esperado": "matricula",
+        "obtido": "matricula",
+        "confere": true
+      },
+      "assunto": {
+        "esperado": "Efetivação de matrícula em curso técnico de Enfermagem",
+        "obtido": "Efetivação de matrícula no curso técnico em enfermagem",
+        "confere": null
+      },
+      "pedido": {
+        "esperado": "Efetivação da matrícula e informação sobre quais documentos ainda precisa apresentar",
+        "obtido": "Efetivação da matrícula no curso técnico em enfermagem (noturno) e informação sobre quais documentos ainda precisa apresentar.",
+        "confere": null
+      }
+    },
+    "campos_ausentes": {
+      "esperado": [],
+      "obtido": []
+    },
+    "minuta_deve_conter": {
+      "2026-000142": true,
+      "Marcos Vinícius de Almeida Santos": true,
+      "matrícula": true,
+      "Enfermagem": true,
+      "documentos": true,
+      "não localizado": true
+    },
+    "minuta_nao_pode_conter": {
+      "Sua matrícula foi efetivada": false,
+      "Seu pedido foi deferido": false,
+      "Todos os documentos foram entregues": false
     },
     "falhas": []
   },
