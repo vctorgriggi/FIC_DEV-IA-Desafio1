@@ -170,3 +170,13 @@ def test_prazo_de_relogio_independe_do_sdk(config):
         cliente.gerar(modelo="gemini-3.8-flash", entrada="oi")
     assert __import__("time").perf_counter() - inicio < 1
     liberar.set()
+
+
+@pytest.mark.parametrize("status", ["incomplete", "budget_exceeded"])
+def test_resposta_cortada_pelo_limite_tem_erro_proprio(config, status):
+    from src.llm_client import RespostaIncompleta
+
+    cortada = interacao('{"texto_bruto": "CÓDIGO: 20')
+    cortada.status = status
+    with pytest.raises(RespostaIncompleta, match="max_output_tokens"):
+        ClienteLLM(config, chave=CHAVE_FALSA, sdk=SDKFalso(resposta=cortada)).gerar(modelo="gemini-3.8-flash", entrada="oi")

@@ -17,11 +17,20 @@ python -m src.main verificar       # mostra e registra versões, chave e arquivo
 python -m src.main verificar --chamar-api   # opcional: uma chamada curta para testar a chave
 ```
 
+## Interface gráfica
+
+```bash
+python -m src.main interface        # abre em http://127.0.0.1:8000
+```
+
+Painel com casos, minutas, peças e taxa de aprovação. Processa um caso, mostra o **original ao lado** dos dados críticos para a confirmação humana, e registra a revisão da minuta e da peça visual. Usa as mesmas funções e o mesmo log da linha de comando, e só escuta em `127.0.0.1`. A interface compilada fica em `interface/dist`, então não precisa de Node para usar. Para alterar a tela: `cd interface && npm install && npm run dev` (Node 20 ou mais recente), com a API rodando em outro terminal, e `npm run build` antes de commitar.
+
 ## Execução
 
 ```bash
 python -m src.main casos                      # lista os casos do config.json
 python -m src.main processar texto-01         # entrada -> extração -> compreensão -> minuta
+python -m src.main confirmar <id_execucao>    # retoma uma execução parada na confirmação dos dados críticos
 python -m src.main revisar <id_execucao>      # aprovar, aprovar com correção, rejeitar ou pedir nova geração
 python -m src.main audio-minuta <id_execucao>  # áudio da minuta aprovada (RF07)
 python -m src.main avaliacao                  # contagem por status e taxa de aprovação (RF13)

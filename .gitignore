@@ -26,3 +26,6 @@ dados/processados/*
 resultados/*/*
 !dados/processados/.gitkeep
 !resultados/*/.gitkeep
+
+# Interface: dependências do Node; o build (interface/dist) é versionado
+interface/node_modules/

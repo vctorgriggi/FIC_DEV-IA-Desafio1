@@ -11,7 +11,7 @@
 Três estratégias de prompt para a mesma tarefa: redigir a minuta institucional de resposta ao cidadão, com fidelidade aos dados, sem invenção, no padrão formal do GOV.MT e marcando o que falta.
 
 **Mantidos constantes nos três:**
-- Modelo `gemini-3.8-flash` e os mesmos parâmetros (`max_output_tokens: 4096`, `store=False`, mesmo timeout). O modelo ignora `temperature`, `top_p` e `top_k` (fonte: docs oficiais Gemini API, text-generation, out/2026), então a amostragem não é controlável.
+- Modelo `gemini-3.8-flash` e os mesmos parâmetros (nesta rodada, `max_output_tokens: 4096`; `store=False`; mesmo timeout). O modelo ignora `temperature`, `top_p` e `top_k` (fonte: docs oficiais Gemini API, text-generation, out/2026), então a amostragem não é controlável.
 - Prompt de sistema `prompts/sistema_seguro_v1.md`.
 - A mesma entrada (seção 3), dentro de `<conteudo_externo origem="campos_extraidos">`.
 

@@ -27,7 +27,8 @@ entrada ─► extração do texto ─► comparação ─► compreensão ─�
 | `image_generation.py` | Peça visual com texto aplicado por código e selo de IA (RF10) |
 | `revisao.py` | Decisões humanas, checklist da peça e taxa de aprovação (RF13) |
 | `audit.py` | Um evento JSON por etapa, sem conteúdo nem segredos (RF11) |
-| `fluxo.py`, `main.py` | Orquestração e linha de comando (RF01) |
+| `fluxo.py`, `main.py` | Orquestração em duas fases (preparar, concluir após a confirmação humana) e linha de comando (RF01) |
+| `web.py` + `interface/` | Interface local (FastAPI + Vite/React): original ao lado dos dados na confirmação e na revisão |
 
 ## Modelos e ferramentas
 

@@ -25,6 +25,7 @@ from .privacidade import mascarar
 from .prompts import Prompt
 from .revisao import (
     AGUARDANDO,
+    CAMPOS_CRITICOS,
     STATUS_APROVADOS,
     RevisaoInvalida,
     confirmar_campos_criticos,
@@ -32,6 +33,11 @@ from .revisao import (
     hash_arquivo,
     ler_metadados,
 )
+
+
+ARQUIVO_ESTADO = "estado.json"
+AGUARDANDO_CONFIRMACAO = "aguardando_confirmacao"
+CONCLUIDO = "concluido"
 
 
 @contextmanager
@@ -72,15 +78,12 @@ def _ler_gabarito(config: Config, caso: dict) -> dict | None:
         raise ArquivoInvalido(f"Gabarito {caso['gabarito']} não é JSON válido ({erro}).") from None
 
 
-def processar_caso(
-    caso_id: str,
-    *,
-    config: Config,
-    cliente: ClienteLLM,
-    auditoria: Auditoria,
-    confirmar: Callable[[dict, list[str]], tuple[dict, list[str]]] = confirmar_campos_criticos,
-) -> dict:
-    """Processa um caso do config.json até a minuta aguardando revisão; devolve os metadados."""
+def preparar_caso(caso_id: str, *, config: Config, cliente: ClienteLLM, auditoria: Auditoria) -> dict:
+    """Primeira fase: entrada, extração do texto, comparação com gabarito e compreensão.
+
+    Grava estado.json na pasta da execução; concluir_caso continua dali, depois
+    da confirmação humana (terminal ou interface).
+    """
     caso = config.caso(caso_id)
     modalidade = caso["modalidade"]
     id_execucao = novo_id()
@@ -92,6 +95,7 @@ def processar_caso(
         arquivo = validar_arquivo(config.raiz / caso["arquivo"], modalidade, config)
         evento.extra = {"sha256": arquivo.sha256, "tamanho_bytes": arquivo.tamanho_bytes, "mime_type": arquivo.mime_type}
 
+    trechos_incertos: list[str] = []
     with _etapa(auditoria, base, "extracao_texto") as evento:
         if modalidade == "texto":
             texto = arquivo.caminho.read_text(encoding="utf-8")
@@ -104,6 +108,7 @@ def processar_caso(
             _anotar(evento, extraido.resposta, extraido.prompt)
             evento.saida = config.relativo(pasta)
             texto = extraido.texto_revisado
+            trechos_incertos = extraido.trechos_incertos
 
     # RF06 e RF08: comparação com o gabarito, quando o caso já tem um.
     if modalidade != "texto" and (gabarito := _ler_gabarito(config, caso)) is not None:
@@ -128,37 +133,87 @@ def processar_caso(
         evento.saida = config.relativo(pasta / "extracao.json")
         evento.extra = {"dados_mascarados": mascarados}
 
+    estado = {
+        **base,
+        "texto_original": texto,
+        "campos": campos,
+        "dados_mascarados_no_envio": mascarados,
+        "trechos_incertos": trechos_incertos,
+        # RF06 e RF08: dados críticos de áudio e imagem passam por uma pessoa antes da minuta.
+        "exige_confirmacao": modalidade != "texto",
+        "preparado_em": agora_iso(),
+        "status": AGUARDANDO_CONFIRMACAO,
+    }
+    _gravar_json(pasta / ARQUIVO_ESTADO, estado)
+    return estado
+
+
+def ler_estado(config: Config, id_execucao: str) -> tuple[dict, Path]:
+    for caminho in config.caminho("processados").glob(f"*/{id_execucao}/{ARQUIVO_ESTADO}"):
+        return json.loads(caminho.read_text(encoding="utf-8")), caminho.parent
+    raise RevisaoInvalida(f"Nenhuma execução preparada com id {id_execucao}.")
+
+
+def pendentes_de_confirmacao(config: Config) -> list[dict]:
+    pendentes = []
+    for caminho in sorted(config.caminho("processados").glob(f"*/*/{ARQUIVO_ESTADO}")):
+        estado = json.loads(caminho.read_text(encoding="utf-8"))
+        if estado["status"] == AGUARDANDO_CONFIRMACAO and estado["exige_confirmacao"]:
+            pendentes.append(estado)
+    return sorted(pendentes, key=lambda e: e["preparado_em"], reverse=True)
+
+
+def concluir_caso(
+    id_execucao: str,
+    *,
+    campos_confirmados: dict | None,
+    revisor: str | None = None,
+    config: Config,
+    cliente: ClienteLLM,
+    auditoria: Auditoria,
+) -> dict:
+    """Segunda fase: registra a confirmação humana (áudio e imagem) e gera a minuta."""
+    estado, pasta = ler_estado(config, id_execucao)
+    if estado["status"] != AGUARDANDO_CONFIRMACAO:
+        raise RevisaoInvalida(f"A execução {id_execucao} já foi concluída.")
+    base = {k: estado[k] for k in ("id_execucao", "caso_id", "modalidade", "arquivo_origem")}
+    campos = dict(estado["campos"])
     corrigidos: list[str] = []
-    if modalidade != "texto":
+
+    if estado["exige_confirmacao"]:
+        if campos_confirmados is None:
+            raise RevisaoInvalida("Confirme os dados críticos antes de gerar a minuta.")
         with _etapa(auditoria, base, "confirmacao_campos_criticos") as evento:
-            campos, corrigidos = confirmar(campos, extraido.trechos_incertos)
+            for campo in CAMPOS_CRITICOS:
+                valor = str(campos_confirmados.get(campo) or "").strip()
+                if valor and valor != campos.get(campo):
+                    campos[campo] = valor
+                    corrigidos.append(campo)
             evento.decisao_humana = "corrigido" if corrigidos else "confirmado"
-            evento.extra = {"campos_corrigidos": corrigidos, "trechos_incertos_exibidos": extraido.trechos_incertos}
+            evento.revisor = revisor
+            evento.extra = {"campos_corrigidos": corrigidos, "trechos_incertos_exibidos": estado["trechos_incertos"]}
 
     _gravar_json(
         pasta / "extracao.json",
         {
-            "caso_id": caso_id,
+            "caso_id": estado["caso_id"],
             "id_execucao": id_execucao,
-            "texto_original": texto,
+            "texto_original": estado["texto_original"],
             "campos": campos,
-            "dados_mascarados_no_envio": mascarados,
+            "dados_mascarados_no_envio": estado["dados_mascarados_no_envio"],
             "campos_corrigidos_por_humano": corrigidos,
         },
     )
 
     with _etapa(auditoria, base, "geracao_minuta") as evento:
-        minuta = gerar_minuta(campos, fontes=[caso["arquivo"]], cliente=cliente, config=config)
+        minuta = gerar_minuta(campos, fontes=[estado["arquivo_origem"]], cliente=cliente, config=config)
         arquivo_minuta = config.caminho("minutas") / f"{id_execucao}.md"
         arquivo_minuta.write_text(minuta.texto, encoding="utf-8")
         _anotar(evento, minuta.resposta, minuta.prompt)
         evento.saida = config.relativo(arquivo_minuta)
 
     metadados = {
-        "id_execucao": id_execucao,
-        "caso_id": caso_id,
-        "modalidade": modalidade,
-        "arquivo_origem": caso["arquivo"],
+        **base,
         "extracao": config.relativo(pasta / "extracao.json"),
         "arquivo_minuta": config.relativo(arquivo_minuta),
         "arquivo_renderizado": minuta.arquivo_renderizado,
@@ -168,7 +223,26 @@ def processar_caso(
         "status": AGUARDANDO,
     }
     gravar_metadados(config, metadados)
+    _gravar_json(pasta / ARQUIVO_ESTADO, {**estado, "status": CONCLUIDO})
     return metadados
+
+
+def processar_caso(
+    caso_id: str,
+    *,
+    config: Config,
+    cliente: ClienteLLM,
+    auditoria: Auditoria,
+    confirmar: Callable[[dict, list[str]], tuple[dict, list[str]]] = confirmar_campos_criticos,
+) -> dict:
+    """As duas fases em sequência, com a confirmação pelo terminal; devolve os metadados da minuta."""
+    estado = preparar_caso(caso_id, config=config, cliente=cliente, auditoria=auditoria)
+    confirmados = None
+    if estado["exige_confirmacao"]:
+        confirmados, _ = confirmar(estado["campos"], estado["trechos_incertos"])
+    return concluir_caso(
+        estado["id_execucao"], campos_confirmados=confirmados, config=config, cliente=cliente, auditoria=auditoria
+    )
 
 
 def sintetizar_minuta(id_execucao: str, *, config: Config, cliente: ClienteLLM, auditoria: Auditoria) -> dict:

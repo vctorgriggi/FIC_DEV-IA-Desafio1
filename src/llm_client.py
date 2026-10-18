@@ -61,6 +61,10 @@ class RespostaVazia(ErroLLM):
     mensagem_padrao = "O modelo devolveu uma resposta vazia."
 
 
+class RespostaIncompleta(ErroLLM):
+    mensagem_padrao = "A resposta do modelo foi cortada pelo limite de tokens (max_output_tokens no config.json)."
+
+
 class RespostaMalformada(ErroLLM):
     mensagem_padrao = "O modelo devolveu uma resposta fora do formato pedido."
 
@@ -140,6 +144,9 @@ class ClienteLLM:
             raise convertido from None
         duracao = time.perf_counter() - inicio
 
+        # O raciocínio conta no max_output_tokens; quando ele estoura, o JSON chega cortado.
+        if getattr(interacao, "status", "completed") in ("incomplete", "budget_exceeded"):
+            raise RespostaIncompleta()
         texto = (getattr(interacao, "output_text", None) or "").strip()
         if not _tem_saida(interacao, saida):
             raise RespostaVazia()

@@ -16,6 +16,7 @@ from .image_generation import ErroPeca
 from .revisao import (
     ATALHOS_PECA,
     RevisaoInvalida,
+    confirmar_campos_criticos,
     ler_metadados,
     perguntar_checklist_peca,
     perguntar_decisao,
@@ -56,8 +57,27 @@ def cmd_casos(config: Config, args: argparse.Namespace) -> None:
 
 
 def cmd_processar(config: Config, args: argparse.Namespace) -> None:
-    config.caso(args.caso)  # caso inexistente falha antes de exigir a chave
-    metadados = fluxo.processar_caso(args.caso, config=config, cliente=ClienteLLM(config), auditoria=Auditoria(config))
+    caso = config.caso(args.caso)  # caso inexistente falha antes de exigir a chave
+    cliente, auditoria = ClienteLLM(config), Auditoria(config)
+    print(f"Processando {args.caso} ({caso['modalidade']}): leitura e extração dos campos, cerca de 30 s…", flush=True)
+    estado = fluxo.preparar_caso(args.caso, config=config, cliente=cliente, auditoria=auditoria)
+    _concluir(config, estado, cliente, auditoria)
+
+
+def cmd_confirmar(config: Config, args: argparse.Namespace) -> None:
+    estado, _ = fluxo.ler_estado(config, args.id_execucao)
+    _concluir(config, estado, ClienteLLM(config), Auditoria(config))
+
+
+def _concluir(config: Config, estado: dict, cliente: ClienteLLM, auditoria: Auditoria) -> None:
+    confirmados = None
+    if estado["exige_confirmacao"] and estado["status"] == fluxo.AGUARDANDO_CONFIRMACAO:
+        print(f"\nAbra o original e compare antes de confirmar: {estado['arquivo_origem']}")
+        confirmados, _ = confirmar_campos_criticos(estado["campos"], estado["trechos_incertos"])
+    print("Gerando a minuta…", flush=True)
+    metadados = fluxo.concluir_caso(
+        estado["id_execucao"], campos_confirmados=confirmados, config=config, cliente=cliente, auditoria=auditoria
+    )
     print(f"Minuta gerada: {metadados['arquivo_minuta']}")
     print(f"Revise com: python -m src.main revisar {metadados['id_execucao']}")
 
@@ -160,6 +180,15 @@ def cmd_revisar_peca(config: Config, args: argparse.Namespace) -> None:
     print(f"Status da peça: {metadados['status']}.")
 
 
+def cmd_interface(config: Config, args: argparse.Namespace) -> None:
+    import uvicorn
+
+    from .web import criar_app
+
+    print(f"Interface em http://127.0.0.1:{args.porta}  (Ctrl+C para encerrar)", flush=True)
+    uvicorn.run(criar_app(config), host="127.0.0.1", port=args.porta, log_level="warning")
+
+
 def montar_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="python -m src.main", description="Central Inteligente de Atendimento — Desafio 1")
     sub = parser.add_subparsers(dest="comando", required=True)
@@ -173,6 +202,10 @@ def montar_parser() -> argparse.ArgumentParser:
     processar = sub.add_parser("processar", help="processa um caso até a minuta aguardando revisão")
     processar.add_argument("caso")
     processar.set_defaults(funcao=cmd_processar)
+
+    confirmar = sub.add_parser("confirmar", help="retoma uma execução parada na confirmação dos dados críticos")
+    confirmar.add_argument("id_execucao")
+    confirmar.set_defaults(funcao=cmd_confirmar)
 
     revisar = sub.add_parser("revisar", help="aprova, rejeita ou pede nova geração de uma minuta")
     revisar.add_argument("id_execucao")
@@ -197,6 +230,10 @@ def montar_parser() -> argparse.ArgumentParser:
     sub.add_parser("gerar-prompt-c", help="gera o Prompt C do RF02 a partir de prompts/metaprompt_v1.md").set_defaults(
         funcao=cmd_gerar_prompt_c
     )
+
+    interface = sub.add_parser("interface", help="abre a interface gráfica local no navegador")
+    interface.add_argument("--porta", type=int, default=8000)
+    interface.set_defaults(funcao=cmd_interface)
 
     revisar_peca = sub.add_parser("revisar-peca", help="checklist e decisão sobre uma peça visual (RF10)")
     revisar_peca.add_argument("id_execucao")
