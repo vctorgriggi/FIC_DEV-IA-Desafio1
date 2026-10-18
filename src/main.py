@@ -69,6 +69,12 @@ def cmd_confirmar(config: Config, args: argparse.Namespace) -> None:
     _concluir(config, estado, ClienteLLM(config), Auditoria(config))
 
 
+def cmd_descartar(config: Config, args: argparse.Namespace) -> None:
+    fluxo.descartar_execucao(args.id_execucao, justificativa=args.justificativa, revisor=args.revisor,
+                             config=config, auditoria=Auditoria(config))
+    print(f"Execução {args.id_execucao} descartada; o registro fica no log.")
+
+
 def _concluir(config: Config, estado: dict, cliente: ClienteLLM, auditoria: Auditoria) -> None:
     confirmados = None
     if estado["exige_confirmacao"] and estado["status"] == fluxo.AGUARDANDO_CONFIRMACAO:
@@ -206,6 +212,12 @@ def montar_parser() -> argparse.ArgumentParser:
     confirmar = sub.add_parser("confirmar", help="retoma uma execução parada na confirmação dos dados críticos")
     confirmar.add_argument("id_execucao")
     confirmar.set_defaults(funcao=cmd_confirmar)
+
+    descartar = sub.add_parser("descartar", help="tira da fila uma execução parada na confirmação, com justificativa")
+    descartar.add_argument("id_execucao")
+    descartar.add_argument("--justificativa", required=True)
+    descartar.add_argument("--revisor", required=True)
+    descartar.set_defaults(funcao=cmd_descartar)
 
     revisar = sub.add_parser("revisar", help="aprova, rejeita ou pede nova geração de uma minuta")
     revisar.add_argument("id_execucao")

@@ -32,6 +32,21 @@ export function Confirmacao({ id, ir }: { id: string; ir: (rota: string) => void
     }
   }
 
+  async function descartar() {
+    const justificativa = window.prompt("Por que descartar esta execução? Ela sai da fila, mas o registro fica no log.");
+    if (!justificativa?.trim()) return;
+    if (!revisor.trim()) {
+      setErro("Preencha \"Quem conferiu\" antes de descartar.");
+      return;
+    }
+    try {
+      await api.descartar(id, justificativa, revisor);
+      ir("/");
+    } catch (e) {
+      setErro((e as Error).message);
+    }
+  }
+
   if (!execucao) return erro ? <Erro mensagem={erro} /> : <Carregando texto="Carregando…" />;
   if (execucao.status !== "aguardando_confirmacao") {
     return <div className="aviso">Esta execução já foi confirmada. Veja a minuta no painel.</div>;
@@ -104,9 +119,14 @@ export function Confirmacao({ id, ir }: { id: string; ir: (rota: string) => void
           {enviando ? (
             <Carregando texto="Gerando a minuta, cerca de 15 s…" />
           ) : (
-            <button className="botao botao--primario botao--largo" type="submit">
-              Confirmar e gerar minuta
-            </button>
+            <>
+              <button className="botao botao--primario botao--largo" type="submit">
+                Confirmar e gerar minuta
+              </button>
+              <button className="botao botao--largo" type="button" onClick={descartar}>
+                Descartar esta execução
+              </button>
+            </>
           )}
         </form>
       </div>

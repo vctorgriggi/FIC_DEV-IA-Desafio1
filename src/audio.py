@@ -84,12 +84,15 @@ def inspecionar_audio(caminho: Path, config: Config) -> dict:
 # O modelo transcreve protocolo, CPF e RG dígito a dígito ("1 2 3 4 5 6 7 8 9 - 0 0"); separados,
 # eles escapam do mascaramento (privacidade.py) e da comparação com o gabarito.
 _DIGITOS_DITADOS = re.compile(r'(?<!\w)\d(?: \d){2,}(?: ?- ?\d(?: \d)*)*(?!\w)')
+# A mesma transcrição às vezes agrupa os dígitos e separa só o hífen ("123456789 - 00").
+_HIFEN_ENTRE_DIGITOS = re.compile(r'(?<=\d) ?- ?(?=\d)')
 
 
 def revisar_transcricao(bruto: str) -> str:
     """Normaliza apresentação: só espaços e quebras, preservando todos os caracteres."""
     linhas = [re.sub(r'[^\S\n]+', ' ', l).strip() for l in bruto.splitlines()]
     linhas = [_DIGITOS_DITADOS.sub(lambda m: m.group(0).replace(' ', ''), l) for l in linhas]
+    linhas = [_HIFEN_ENTRE_DIGITOS.sub('-', l) for l in linhas]
     return re.sub(r'\n{3,}', '\n\n', '\n'.join(linhas)).strip()
 
 

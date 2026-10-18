@@ -127,3 +127,11 @@ def test_peca_gerada_e_revisada_pela_api(config):
     corpo = {"checklist": tudo_ok, "decisao": "aprovar", "justificativa": "Conferida", "revisor": "Servidor A"}
     assert api.post(f"/api/pecas/{id_peca}/decisao", json=corpo).json()["status"] == "aprovada"
     assert api.get("/api/painel").json()["pecas"][0]["status"] == "aprovada"
+
+
+def test_descartar_pela_api(api):
+    id_execucao = api.post("/api/casos/imagem-01/processar").json()["confirmacao"]
+    corpo = {"justificativa": "Execução de teste", "revisor": "Servidor A"}
+    assert api.post(f"/api/execucoes/{id_execucao}/descartar", json=corpo).status_code == 200
+    assert api.get("/api/painel").json()["pendentes"] == []
+    assert api.post(f"/api/execucoes/{id_execucao}/descartar", json=corpo).status_code == 400

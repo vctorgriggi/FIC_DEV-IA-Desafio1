@@ -45,6 +45,11 @@ class Confirmacao(BaseModel):
     revisor: str
 
 
+class Descarte(BaseModel):
+    justificativa: str
+    revisor: str
+
+
 class Decisao(BaseModel):
     decisao: str
     justificativa: str
@@ -137,6 +142,13 @@ def criar_app(config: Config, *, fabrica_cliente: Callable[[], ClienteLLM] | Non
             auditoria=Auditoria(config),
         )
         return {"minuta": metadados["id_execucao"]}
+
+    @app.post("/api/execucoes/{id_execucao}/descartar")
+    def descartar(id_execucao: str, corpo: Descarte) -> dict:
+        fluxo.descartar_execucao(
+            id_execucao, justificativa=corpo.justificativa, revisor=corpo.revisor, config=config, auditoria=Auditoria(config)
+        )
+        return {"descartada": id_execucao}
 
     @app.get("/api/minutas/{id_execucao}")
     def minuta(id_execucao: str) -> dict:

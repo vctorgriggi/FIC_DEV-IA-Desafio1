@@ -226,3 +226,18 @@ def test_texto_conclui_sem_confirmacao(config, auditoria, partes_falsas):
     assert not estado["exige_confirmacao"] and fluxo.pendentes_de_confirmacao(config) == []
     meta = fluxo.concluir_caso(estado["id_execucao"], campos_confirmados=None, config=config, cliente=None, auditoria=auditoria)
     assert meta["status"] == "aguardando_revisao"
+
+
+def test_execucao_pendente_pode_ser_descartada_com_registro(config, auditoria, partes_falsas, monkeypatch):
+    monkeypatch.setattr(fluxo.vision, "extrair_texto", lambda arquivo, **_: TextoExtraido(texto_bruto="b", texto_revisado="r"))
+    estado = fluxo.preparar_caso("imagem-01", config=config, cliente=None, auditoria=auditoria)
+    with pytest.raises(RevisaoInvalida, match="justificativa"):
+        fluxo.descartar_execucao(estado["id_execucao"], justificativa=" ", revisor="Servidor A", config=config, auditoria=auditoria)
+
+    fluxo.descartar_execucao(estado["id_execucao"], justificativa="Leitura feita antes da correção", revisor="Servidor A",
+                             config=config, auditoria=auditoria)
+    assert fluxo.pendentes_de_confirmacao(config) == []
+    descarte = auditoria.eventos(etapa="descarte")[0]
+    assert descarte["decisao_humana"] == "descartada" and descarte["revisor"] == "Servidor A"
+    with pytest.raises(RevisaoInvalida):
+        fluxo.concluir_caso(estado["id_execucao"], campos_confirmados={}, config=config, cliente=None, auditoria=auditoria)

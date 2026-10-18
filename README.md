@@ -55,6 +55,7 @@ Tudo o que é gerado fica em `resultados/` (minutas, áudios, imagens, logs) e e
 python -m src.main casos                      # lista os casos do config.json
 python -m src.main processar texto-01         # entrada -> extração -> compreensão -> minuta
 python -m src.main confirmar <id_execucao>    # retoma uma execução parada na confirmação dos dados críticos
+python -m src.main descartar <id_execucao> --justificativa "..." --revisor "..."  # tira da fila uma execução parada, com registro no log
 python -m src.main revisar <id_execucao>      # aprovar, aprovar com correção, rejeitar ou pedir nova geração
 python -m src.main audio-minuta <id_execucao>  # áudio da minuta aprovada (RF07)
 python -m src.main avaliacao                  # esperado contra obtido por caso e taxa de aprovação (RF13)

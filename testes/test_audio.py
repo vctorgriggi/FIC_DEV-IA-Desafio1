@@ -164,6 +164,11 @@ class AudioSimuladoTest(unittest.TestCase):
             'Protocolo 2026-000142, CPF 123456789-00, RG 1234567-8; nasci em 12 de agosto, 1200 horas.',
         )
 
+    def test_revisao_cola_hifen_entre_grupos_de_digitos(self):
+        bruto = 'CPF é 123456789 - 00, RG 1234567 -8 e protocolo 2026- 000142; turno - noturno.'
+        self.assertEqual(audio.revisar_transcricao(bruto),
+                         'CPF é 123456789-00, RG 1234567-8 e protocolo 2026-000142; turno - noturno.')
+
     def test_digitos_juntados_permitem_mascarar_cpf_e_rg(self):
         from src.privacidade import mascarar
         revisado = audio.revisar_transcricao('CPF 1 2 3 4 5 6 7 8 9 - 0 0 e RG 1 2 3 4 5 6 7 - 8')

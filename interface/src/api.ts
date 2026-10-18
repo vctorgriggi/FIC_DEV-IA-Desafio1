@@ -107,6 +107,8 @@ export const api = {
   execucao: (id: string) => chamar<Execucao>(`/api/execucoes/${id}`),
   confirmar: (id: string, campos: Record<string, string>, revisor: string) =>
     chamar<{ minuta: string }>(`/api/execucoes/${id}/confirmar`, { campos, revisor }),
+  descartar: (id: string, justificativa: string, revisor: string) =>
+    chamar<{ descartada: string }>(`/api/execucoes/${id}/descartar`, { justificativa, revisor }),
   minuta: (id: string) => chamar<MinutaDetalhe>(`/api/minutas/${id}`),
   decidirMinuta: (id: string, corpo: { decisao: string; justificativa: string; revisor: string; texto_corrigido?: string }) =>
     chamar<MinutaResumo>(`/api/minutas/${id}/decisao`, corpo),

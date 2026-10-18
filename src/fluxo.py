@@ -38,6 +38,7 @@ from .revisao import (
 ARQUIVO_ESTADO = "estado.json"
 AGUARDANDO_CONFIRMACAO = "aguardando_confirmacao"
 CONCLUIDO = "concluido"
+DESCARTADA = "descartada"
 
 
 @contextmanager
@@ -166,6 +167,31 @@ def pendentes_de_confirmacao(config: Config) -> list[dict]:
         if estado["status"] == AGUARDANDO_CONFIRMACAO and estado["exige_confirmacao"]:
             pendentes.append(estado)
     return sorted(pendentes, key=lambda e: e["preparado_em"], reverse=True)
+
+
+def descartar_execucao(
+    id_execucao: str, *, justificativa: str, revisor: str, config: Config, auditoria: Auditoria
+) -> dict:
+    """Tira da fila uma execução que não deve virar minuta; nada é apagado, o descarte fica no log."""
+    if not justificativa.strip():
+        raise RevisaoInvalida("A justificativa é obrigatória.")
+    if not revisor.strip():
+        raise RevisaoInvalida("Informe quem descartou.")
+    estado, pasta = ler_estado(config, id_execucao)
+    if estado["status"] != AGUARDANDO_CONFIRMACAO:
+        raise RevisaoInvalida(f"A execução {id_execucao} não está aguardando confirmação (status: {estado['status']}).")
+    estado = {**estado, "status": DESCARTADA, "descarte": {"justificativa": justificativa.strip(), "revisor": revisor.strip(), "data_hora": agora_iso()}}
+    _gravar_json(pasta / ARQUIVO_ESTADO, estado)
+    auditoria.registrar(
+        Evento(
+            **{k: estado[k] for k in ("id_execucao", "caso_id", "modalidade", "arquivo_origem")},
+            etapa="descarte",
+            decisao_humana=DESCARTADA,
+            justificativa=justificativa.strip(),
+            revisor=revisor.strip(),
+        )
+    )
+    return estado
 
 
 def concluir_caso(
