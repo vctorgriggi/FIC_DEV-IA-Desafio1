@@ -1,0 +1,1 @@
+/home/andre/estudos/ficdev2026/Desafio modulo 3/FIC_DEV-IA-Desafio1/.venv/bin/python: No module named pytest

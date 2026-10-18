@@ -45,3 +45,25 @@ Documento exigido pela Seção 10 do enunciado para assegurar transparência, ra
 ## 6. Declaração de Responsabilidade
 
 A equipe revisou linha por linha o código-fonte, os prompts, as saídas produzidas e a documentação técnica, atestando a compreensão plena de todos os módulos e assumindo responsabilidade integral sobre a solução entregue.
+
+
+## Complemento — RF06/RF07 com Codex (18/10/2026)
+
+Esta seção complementa os registros anteriores, sem substituir as contribuições
+ali descritas. Ferramenta: Codex nesta sessão; o identificador exato do modelo
+não foi exposto ao agente e não é presumido. SDK/modelos da aplicação permanecem
+os declarados no projeto, distintos do assistente de programação.
+
+Solicitações relevantes: (1) auditar aulas/enunciado/contratos; (2) consolidar
+relatório técnico; (3) implementar áudio com contratos preservados, testes sem
+API e documentação de bloqueios. Foram aceitas reutilização do cliente único,
+ffprobe da Aula 05 e WAV; a revisão foi limitada a espaços/quebras em vez de
+reescrever fatos. Foi rejeitado acrescentar aviso após aprovação: o texto já
+aprovado deve contê-lo. Um teste detectou remoção indevida de underscores em
+caminhos na preparação Markdown; a expressão foi corrigida e retestada.
+
+Validação nesta etapa: 30 testes unittest com SDK/ffprobe simulados; não houve
+inferência real nem audição. A suíte pytest e a checagem executável do SDK fixado
+ficaram bloqueadas pela falta de dependências e por DNS indisponível no download.
+Detalhes e evidências no relatório de implementação. A equipe ainda precisa
+revisar código e conteúdo e comprovar os critérios acadêmicos reais.

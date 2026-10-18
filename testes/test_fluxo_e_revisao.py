@@ -77,14 +77,18 @@ def test_audio_passa_por_confirmacao_humana_antes_da_minuta(config, auditoria, p
     )
     assert exibidos == ["0001 — ruído"]
     assert etapas(auditoria, meta["id_execucao"]) == [
-        "entrada", "extracao_texto", "compreensao", "confirmacao_campos_criticos", "geracao_minuta"
+        "entrada", "extracao_texto", "comparacao_gabarito", "compreensao", "confirmacao_campos_criticos", "geracao_minuta"
     ]
     assert "2026-000002" in (config.raiz / meta["arquivo_minuta"]).read_text(encoding="utf-8")
     pasta = config.raiz / meta["extracao"].rsplit("/", 1)[0]
     assert (pasta / "texto_bruto.txt").read_text(encoding="utf-8") == "bruto"
 
 
-def test_parte_pendente_fica_registrada_como_erro(config, auditoria):
+def test_parte_pendente_fica_registrada_como_erro(config, auditoria, monkeypatch):
+    # Exercita a infraestrutura de erros, não pressupõe RF06 ainda ausente.
+    def pendente(*args, **kwargs):
+        raise PendenteDeImplementacao("RF06", "teste simulado")
+    monkeypatch.setattr(fluxo.audio, "transcrever", pendente)
     with pytest.raises(PendenteDeImplementacao, match="RF06"):
         fluxo.processar_caso("audio-01", config=config, cliente=None, auditoria=auditoria)
     ultimo = auditoria.eventos()[-1]
@@ -110,7 +114,10 @@ def test_audio_so_de_minuta_aprovada_e_inalterada(config, auditoria, partes_fals
     sintetizados = []
 
     def sintetizar(texto, destino, **_):
+        from testes.test_audio import wav_teste
+
         sintetizados.append(texto)
+        destino.write_bytes(wav_teste())
         return {"voz": "Kore"}
 
     monkeypatch.setattr(fluxo.audio, "sintetizar", sintetizar)

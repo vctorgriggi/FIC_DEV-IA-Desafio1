@@ -39,12 +39,12 @@ Cada integrante implementa uma modalidade. As funções pendentes levantam `Pend
 | Parte | Requisitos | Onde | Situação |
 |---|---|---|---|
 | Base compartilhada | RF01, RF03 (delimitação e prompt de sistema), RF04, RF11, RF12 (mascaramento), RF13 (revisão e taxa de aprovação) | `config.py`, `llm_client.py`, `prompts.py`, `audit.py`, `privacidade.py`, `entradas.py`, `revisao.py`, `fluxo.py`, `main.py` | pronta, com testes |
-| Texto | RF02, RF03 (caso de teste com prompt injection), RF05 (incluindo a lista de `categorias` no config), RF09 | `extracao.py` (`extrair_campos`), `minuta.py` (`gerar_minuta`), `prompts/` | contrato pronto: esquema JSON e `normalizar_extracao` |
-| Áudio | RF06, RF07 | `audio.py` (`transcrever`, `sintetizar`) | pendente |
+| Texto | RF02, RF03 (caso de teste com prompt injection), RF05 (incluindo a lista de `categorias` no config), RF09 | `extracao.py` (`extrair_campos`), `minuta.py` (`gerar_minuta`), `prompts/` | implementada; esquema JSON e `normalizar_extracao` preservados |
+| Áudio | RF06, RF07 | `audio.py` (`transcrever`, `sintetizar`) | implementada com testes simulados; aceite real pendente — [documentação](documentacao/audio_e_acessibilidade.md) |
 | Imagem | RF08, RF10 | `vision.py`, `comparacao.py`, `image_generation.py`, `prompts/ocr_v1.md`, `prompts/peca_visual_v1.json` | pronta, com testes; decisões em `documentacao/visao_e_imagem.md` |
 | Todos | RF12 (matriz de dados pessoais), RF13, entregáveis | `documentacao/`, `dados/gabaritos/` | pendente |
 
-Áudio e imagem desembocam em `extrair_campos` e `gerar_minuta`: enquanto a parte de texto não estiver pronta, o fluxo dessas modalidades para na etapa de compreensão. Cada parte pode ser testada isoladamente substituindo as outras, como em `testes/test_fluxo_e_revisao.py`.
+Áudio e imagem desembocam em `extrair_campos` e `gerar_minuta`, já implementados. Cada parte pode ser testada isoladamente substituindo as outras, como em `testes/test_fluxo_e_revisao.py`.
 
 O contrato entre as partes é o formato de `TextoExtraido` (`tipos.py`) e o esquema de `extracao.py`. Mudança neles afeta as três modalidades: combinem antes.
 
@@ -66,3 +66,38 @@ Cada caso precisa de um resultado esperado escrito antes da execução (seção 
 - **Peça visual (RF10):** o modelo gera só a ilustração; o texto e o selo de conteúdo sintético são aplicados com Pillow, para o texto sair exato. Cada peça em `resultados/imagens/` tem ao lado a ilustração original do modelo e um `.json` com prompt, especificação, modelo, data, nota de proveniência e revisão. A composição usa Arial ou DejaVu Sans; sem nenhuma das duas, a peça não é gerada (a fonte embutida do Pillow não tem acentos).
 - **Comparação com gabarito (RF06, RF08):** para áudio e imagem, quando o gabarito do caso tem `texto_referencia`, o fluxo grava `comparacao_gabarito.json` com similaridade, acertos por palavra, erros e dados críticos não encontrados.
 - **Resposta vazia (RF04):** a checagem vale para o tipo de saída pedido. TTS sem áudio ou geração sem imagem também é erro, mesmo que venha texto.
+
+## Áudio — RF06 e RF07
+
+RF06 requer **FFmpeg/ffprobe no PATH** (Aula 05); a aplicação não instala ferramentas
+nem envia áudio se a inspeção falhar. Formatos: MP3, WAV, M4A, OGG e FLAC,
+com limite configurado de 20 MiB e limite adicional da requisição inline completa.
+Configure voz, estilo e timeout local em `config.json`, seção `audio`.
+
+```bash
+ffprobe -version
+python -m unittest testes.test_audio -v   # testes simulados, sem API
+python -m pytest                         # suíte completa, sem API
+# Com chave, cota/custos autorizados e ffprobe disponível:
+python -m src.main processar audio-01
+python -m src.main revisar <id_execucao>
+python -m src.main audio-minuta <id_execucao>
+```
+
+`dados/gabaritos/audio-01.json` é um modelo **não validado**. Ouça o original,
+preencha referência independente, autoria, data e valores críticos literais;
+marque `validado_por_humano: true` só depois da conferência. A ausência de
+referência válida é registrada como comparação pendente e não impede processar.
+Nomes, protocolos e datas continuam sujeitos à confirmação humana antes da minuta.
+
+Minutas com “não localizado” precisam conter, **antes da aprovação**, o aviso:
+“Os campos identificados como não localizado representam informações ausentes no documento.”
+Se faltar, a síntese é bloqueada: edite a minuta enquanto aguarda revisão e então
+aprove. Se já estiver aprovada, gere/revise outra execução; não edite os metadados
+para contornar o hash. Nenhum aviso é acrescentado automaticamente ao áudio.
+
+O TTS salva WAV PCM validado, não sobrescreve áudio anterior e mantém telemetria
+nos metadados e log. Texto complexo (HTML, tabelas, código, comandos vocais)
+precisa ser preparado como texto simples e revisto. Regras, limites, custos,
+bloqueios do ambiente e resultados em [áudio e acessibilidade](documentacao/audio_e_acessibilidade.md)
+e no [relatório de implementação](documentacao/RELATORIO_IMPLEMENTACAO_AUDIO.md).
