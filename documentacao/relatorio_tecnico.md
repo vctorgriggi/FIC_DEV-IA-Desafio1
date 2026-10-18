@@ -20,7 +20,7 @@ entrada ─► extração do texto ─► comparação ─► compreensão ─�
 | `entradas.py` | Validação de extensão, tamanho e codificação; hash do original |
 | `privacidade.py` | Mascaramento antes do envio e ocultação de segredos (RF12) |
 | `extracao.py` | Campos estruturados com esquema JSON e "não localizado" (RF05) |
-| `audio.py` | Transcrição e síntese de voz (RF06, RF07) |
+| `audio.py` | Transcrição e síntese de voz (RF06, RF07); situação na tabela "Requisitos e onde estão" do README |
 | `vision.py` | OCR por visão multimodal (RF08) |
 | `comparacao.py`, `avaliacao.py` | Esperado contra obtido (RF06, RF08, RF13) |
 | `minuta.py` | Minuta institucional; cabeçalho e fontes por código (RF09) |
@@ -42,7 +42,7 @@ Provedor único (Google Gemini, SDK `google-genai` 2.31.0, Interactions API), pa
 
 ## Custos medidos
 
-Custo estimado pela tabela da camada paga, válida até 31/12/2026 (fonte: docs oficiais Gemini API, pricing, out/2026). As rodadas de texto, OCR e experimento usaram a camada gratuita, sem custo efetivo; a peça visual foi gerada já na camada paga.
+Custo estimado pela tabela da camada paga, válida até 31/12/2026 (fonte: docs oficiais Gemini API, pricing, out/2026). Até as 16h06 de 18/10/2026 (casos de texto, primeira leitura do `imagem-01` e experimento de prompts), as chamadas usaram a camada gratuita, sem custo efetivo. A partir da peça visual, às 16h10, o projeto estava na camada paga, inclusive as execuções finais do `imagem-01`.
 
 | Execução | Chamadas | Custo estimado (USD) |
 |---|---|---|

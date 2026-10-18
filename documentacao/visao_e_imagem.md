@@ -31,14 +31,14 @@ Neste desafio, a nuvem é aceitável porque os dados são fictícios e as chamad
 - **Proveniência:**
   - selo visível na peça ("Ilustração gerada por IA (modelo) — conteúdo sintético, material fictício");
   - nota de proveniência, prompt, especificação, modelo e data no `.json` ao lado da imagem;
-  - ilustração original do modelo preservada como `<id>_ilustracao_ia.png`;
+  - ilustração original do modelo preservada como `<id>_ilustracao_ia`, no formato em que o modelo devolve (nesta rodada, `.jpg`);
   - marca d'água SynthID, que o Gemini aplica em toda imagem gerada (fonte: docs oficiais Gemini API, image-generation, out/2026).
 - **Revisão:** `python -m src.main revisar-peca <id>` passa por um checklist com cinco itens (textos; símbolos e objetos; pessoas e mãos; coerência com o caso; selo visível). Aprovar exige todos os itens conferidos.
 - **Custo:** geração de imagem não tem cota gratuita. Custa US$ 0,0336 por imagem 1K (fonte: docs oficiais Gemini API, pricing, out/2026).
 
 ## Resultados (rodada de 18/10/2026)
 
-**OCR de `imagem-01`** (`gemini-3.8-flash`, 22 s, 1.124 tokens de entrada e 2.843 de saída, US$ 0,0115 estimado):
+**OCR de `imagem-01`**, primeira leitura (execução `4e54dbcf2418`, `dados/processados/imagem-01/4e54dbcf2418/`; `gemini-3.8-flash`, 22 s, 1.124 tokens de entrada e 2.843 de saída, US$ 0,0115 estimado). As quatro leituras seguintes também deram 2024-000142 no protocolo:
 
 | Item | Resultado |
 |---|---|

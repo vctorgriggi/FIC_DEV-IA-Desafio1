@@ -25,7 +25,29 @@ python -m src.main interface        # abre em http://127.0.0.1:8000
 
 Painel com casos, minutas, peças e taxa de aprovação. Processa um caso, mostra o **original ao lado** dos dados críticos para a confirmação humana, e registra a revisão da minuta e da peça visual. Usa as mesmas funções e o mesmo log da linha de comando, e só escuta em `127.0.0.1`. A interface compilada fica em `interface/dist`, então não precisa de Node para usar. Para alterar a tela: `cd interface && npm install && npm run dev` (Node 20 ou mais recente), com a API rodando em outro terminal, e `npm run build` antes de commitar.
 
-## Execução
+## Como usar, passo a passo
+
+Pela interface (`python -m src.main interface`, em http://127.0.0.1:8000):
+
+1. **Processar um caso.** No painel, clique em **Processar** no cartão do caso. Leva cerca de 30 s.
+2. **Conferir os dados críticos** (só áudio e imagem). Compare protocolo, data e solicitante com o original exibido ao lado, corrija o que estiver errado, informe quem conferiu e clique em **Confirmar e gerar minuta**. O modelo pode errar sem marcar dúvida: confira olhando o original.
+3. **Revisar a minuta.** Leia a minuta ao lado do original, veja a conferência automática com o gabarito e escolha **Aprovar**, **Aprovar com correção** (abre um editor do texto), **Rejeitar** ou **Pedir nova geração**, com justificativa e revisor. Nada é enviado ao cidadão.
+4. **Áudio da minuta** (só minuta aprovada). Botão **Gerar áudio** na página da minuta (RF07).
+5. **Peça visual.** **Gerar peça visual** no cartão do caso (modelo pago, cerca de US$ 0,03); depois responda ao checklist e registre a decisão.
+6. **Indicadores.** O painel mostra a taxa de aprovação; `python -m src.main avaliacao` grava o esperado contra obtido em `resultados/logs/avaliacao.json`.
+
+O mesmo fluxo pelo terminal:
+
+```bash
+python -m src.main processar imagem-01        # lê, extrai, pergunta os dados críticos e gera a minuta
+python -m src.main revisar <id_execucao>      # o id aparece no fim do comando anterior
+python -m src.main audio-minuta <id_execucao>
+python -m src.main avaliacao
+```
+
+Tudo o que é gerado fica em `resultados/` (minutas, áudios, imagens, logs) e em `dados/processados/<caso>/<id_execucao>/` (texto lido, campos extraídos, comparação com o gabarito).
+
+## Referência de comandos
 
 ```bash
 python -m src.main casos                      # lista os casos do config.json
@@ -42,6 +64,19 @@ python -m pytest                              # testes; não chamam a API
 ```
 
 Códigos de saída: `0` sucesso, `1` erro de uso (caso, arquivo ou revisão inválidos), `2` erro do provedor (chave, cota, indisponibilidade, timeout), `3` parte ainda não implementada, `130` operação cancelada no terminal.
+
+## Problemas comuns
+
+| Sintoma | Causa e solução |
+|---|---|
+| `pip install` falha no `google-genai` | Python abaixo de 3.10 (o do macOS é 3.9). Crie o `.venv` com um Python novo, como em Instalação. |
+| "Chave da API não configurada" | Falta o `.env`. Copie o `.env.example` e preencha `GEMINI_API_KEY` com uma chave criada em https://aistudio.google.com/api-keys. |
+| "O provedor recusou a chave da API" | Chave errada ou revogada no `.env`. |
+| "Limite de requisições ou cota do provedor atingido" ao gerar a peça visual | Geração de imagem não tem cota gratuita: no Google AI Studio, abra o projeto da chave e use **Set up billing**. Nas outras etapas, aguarde alguns minutos. |
+| "A resposta do modelo foi cortada pelo limite de tokens" | Aumente `max_output_tokens` em `parametros_geracao` no `config.json`. |
+| "Pendente: RF06 ainda não implementado" | Parte que ainda levanta `PendenteDeImplementacao` (código de saída 3). |
+| A interface não abre porque a porta está em uso | `python -m src.main interface --porta 8001`. |
+| O navegador mostra "Interface não compilada" | `interface/dist` foi apagado: rode `npm install && npm run build` em `interface/`. |
 
 ## Requisitos e onde estão
 
