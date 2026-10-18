@@ -36,15 +36,25 @@ Neste desafio, a nuvem é aceitável porque os dados são fictícios e as chamad
 - **Revisão:** `python -m src.main revisar-peca <id>` passa por um checklist com cinco itens (textos; símbolos e objetos; pessoas e mãos; coerência com o caso; selo visível). Aprovar exige todos os itens conferidos.
 - **Custo:** geração de imagem não tem cota gratuita. Custa US$ 0,0336 por imagem 1K (fonte: docs oficiais Gemini API, pricing, out/2026).
 
-## Resultados
+## Resultados (rodada de 18/10/2026)
 
-Preencher após a execução real.
+**OCR de `imagem-01`** (`gemini-3.8-flash`, 22 s, 1.124 tokens de entrada e 2.843 de saída, US$ 0,0115 estimado):
 
 | Item | Resultado |
 |---|---|
-| Similaridade com o gabarito (bruto / revisado) | |
-| Taxa de acerto por palavra (bruto / revisado) | |
-| Dados críticos não encontrados | |
-| Trechos incertos apontados pelo modelo | |
-| Erros relevantes | |
-| Decisão sobre a peça e justificativa | |
+| Similaridade com o gabarito (bruto / revisado) | 0,952 / 0,970 |
+| Palavras corretas (bruto / revisado) | 97% / 97% (128 de 132) |
+| Dados críticos encontrados | 12/08/2008, 123.456.789-00, 1234567-8, 01/02/2027, 14/10/2026 |
+| Dados críticos não encontrados | 2026-000142 (lido 2024-000142) e MARCOS VINICIUS DE ALMEIDA SANTOS (lido MARCUS) |
+| Trechos incertos apontados pelo modelo | 01/02/2027 e 14/10/2026, ambos lidos corretamente |
+| Erros relevantes | Protocolo com dígito rasurado lido como 4; "MARCOS" lido como "MARCUS"; e-mail com "exemplo" no lugar de "examplo" |
+| Correção do texto revisado | Só acento e formato (CUIABA → CUIABÁ, e-mail juntado); nenhum número ou nome trocado, como o prompt exige |
+
+O caso mostra o motivo da confirmação humana: o modelo errou o protocolo sem marcá-lo como incerto e marcou como incertas duas datas corretas. A comparação com o gabarito pegou os dois erros críticos.
+
+**Peça visual:** não gerada. O modelo `gemini-3.1-flash-lite-image` respondeu "limit: 0 requests per day on Free Tier": geração de imagem não tem cota gratuita. Gerar exige faturamento ativo (US$ 0,0336 por imagem 1K) ou um modelo aberto equivalente, documentado como substituição (seção 7 do enunciado).
+
+| Item | Resultado |
+|---|---|
+| Confirmação humana dos dados críticos | Preencher após `python -m src.main processar imagem-01` |
+| Decisão sobre a peça e justificativa | Preencher após `python -m src.main revisar-peca <id>` |
