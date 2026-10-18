@@ -1,0 +1,33 @@
+{
+  "caso_id": "texto-01",
+  "elaborado_por": "Estudante 2 (Processamento e Manipulação de Texto)",
+  "elaborado_em": "2026-10-17",
+  "texto_referencia": "Solicitação formal de matrícula e orientações de documentação para o curso Técnico em Enfermagem por Marcos Vinícius de Almeida Santos.",
+  "campos_esperados": {
+    "protocolo": "2026-000142",
+    "data": "14/10/2026",
+    "solicitante": "Marcos Vinícius de Almeida Santos",
+    "assunto": "Efetivação de matrícula no curso Técnico em Enfermagem (Saúde, noturno, 1200h)",
+    "pedido": "Informar quais documentos ainda precisa apresentar para efetivação da matrícula",
+    "categoria": "matricula"
+  },
+  "campos_ausentes_esperados": [],
+  "dados_criticos": [
+    "protocolo",
+    "data",
+    "solicitante"
+  ],
+  "minuta_deve_conter": [
+    "2026-000142",
+    "Marcos Vinícius de Almeida Santos",
+    "Técnico em Enfermagem",
+    "dados/originais/brasao.png",
+    "dados/originais/entrada_texto.txt"
+  ],
+  "minuta_nao_pode_conter": [
+    "123.456.789-00",
+    "1234567-8",
+    "marcos.almeida.teste@examplo.com"
+  ],
+  "observacoes": "Caso textual completo elaborado antes da execução. A minuta deve alertar sobre as regras de frequência informadas pelo próprio cidadão e listar que os documentos específicos dependem de confirmação pelo setor de registros acadêmicos, sem inventar prazos inexistentes."
+}

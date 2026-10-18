@@ -85,3 +85,71 @@ def test_esquema_exige_todos_os_campos_e_limita_categorias():
     esquema = esquema_extracao(["matricula"])
     assert set(esquema["required"]) == set(esquema["properties"])
     assert esquema["properties"]["categoria"]["enum"] == ["matricula", NAO_LOCALIZADO]
+
+
+def test_extrair_campos_chamada_valida(config):
+    from src.extracao import extrair_campos
+    from src.llm_client import ClienteLLM
+    from testes.falsos import SDKFalso, interacao
+
+    payload = {
+        "protocolo": "2026-000142",
+        "data": "14/10/2026",
+        "solicitante": "Marcos Santos",
+        "assunto": "Matrícula",
+        "pedido": "Lista de documentos",
+        "categoria": "matricula",
+        "campos_ausentes": [],
+        "confianca": "alta",
+        "necessita_revisao": False,
+        "motivo_revisao": "",
+    }
+    sdk = SDKFalso(interacao(json.dumps(payload)))
+    cliente = ClienteLLM(config, chave="fake", sdk=sdk)
+
+    resultado = extrair_campos("Texto da solicitacao", origem="entrada.txt", cliente=cliente, config=config)
+    assert resultado.campos["protocolo"] == "2026-000142"
+    assert resultado.campos["solicitante"] == "Marcos Santos"
+    assert resultado.campos["categoria"] == "matricula"
+    assert resultado.campos["necessita_revisao"] is False
+    assert len(sdk.chamadas) == 1
+    assert "conteudo_externo" in sdk.chamadas[0]["input"]
+
+
+def test_extrair_campos_trata_resposta_malformada(config):
+    from src.extracao import extrair_campos
+    from src.llm_client import ClienteLLM
+    from testes.falsos import SDKFalso, interacao
+
+    sdk = SDKFalso(interacao("Texto sem JSON nenhum"))
+    cliente = ClienteLLM(config, chave="fake", sdk=sdk)
+
+    resultado = extrair_campos("Texto qualquer", origem="entrada.txt", cliente=cliente, config=config)
+    assert resultado.campos["protocolo"] == NAO_LOCALIZADO
+    assert resultado.campos["necessita_revisao"] is True
+    assert resultado.campos["confianca"] == "baixa"
+
+
+def test_gerar_minuta_chamada_valida(config):
+    from src.minuta import gerar_minuta
+    from src.llm_client import ClienteLLM
+    from testes.falsos import SDKFalso, interacao
+
+    sdk = SDKFalso(interacao("Minuta com brasão e protocolo 2026-000142"))
+    cliente = ClienteLLM(config, chave="fake", sdk=sdk)
+
+    campos = {
+        "protocolo": "2026-000142",
+        "data": "14/10/2026",
+        "solicitante": "Marcos Santos",
+        "assunto": "Matrícula",
+        "pedido": "Documentos",
+        "categoria": "matricula",
+        "campos_ausentes": [],
+    }
+    minuta = gerar_minuta(campos, fontes=["originais/texto.txt"], cliente=cliente, config=config)
+    assert "Minuta com brasão" in minuta.texto
+    assert minuta.fontes == ["originais/texto.txt"]
+    assert minuta.campos_ausentes == []
+    assert len(sdk.chamadas) == 1
+

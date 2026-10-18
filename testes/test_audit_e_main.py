@@ -58,7 +58,8 @@ def test_parte_pendente_tem_codigo_proprio(cli_isolada, monkeypatch):
     from testes.falsos import SDKFalso
 
     monkeypatch.setattr(cli, "ClienteLLM", lambda config: SDKFalso())
-    assert cli.main(["processar", "texto-01"]) == cli.SAIDA_PENDENTE
+    assert cli.main(["processar", "audio-01"]) == cli.SAIDA_PENDENTE
+
 
 
 def test_avaliacao_sem_revisoes(cli_isolada, capsys):

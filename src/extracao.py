@@ -9,9 +9,11 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+import json
+
 from .config import Config
-from .llm_client import ClienteLLM, RespostaLLM
-from .prompts import Prompt
+from .llm_client import ClienteLLM, RespostaLLM, formato_json
+from .prompts import Prompt, carregar_prompt, delimitar
 from .tipos import PendenteDeImplementacao
 
 NAO_LOCALIZADO = "não localizado"
@@ -85,4 +87,29 @@ def extrair_campos(texto: str, *, origem: str, cliente: ClienteLLM, config: Conf
     - passar o JSON devolvido por normalizar_extracao, também quando json.loads falhar.
     O texto chega já mascarado (privacidade.mascarar); o original fica com o fluxo.
     """
-    raise PendenteDeImplementacao("RF05", "texto")
+    prompt_sistema = carregar_prompt(config, "sistema_seguro", 1)
+    prompt_extracao = carregar_prompt(config, "extracao", 1)
+
+    conteudo_delimitado = delimitar(texto, origem)
+    entrada = f"{prompt_extracao.texto}\n\n{conteudo_delimitado}"
+
+    categorias = config.dados.get("categorias", [])
+    esquema = esquema_extracao(categorias)
+    formato = formato_json(esquema)
+
+    resposta = cliente.gerar(
+        modelo=config.modelo("texto"),
+        entrada=entrada,
+        instrucao_sistema=prompt_sistema.texto,
+        formato_resposta=formato,
+        saida="texto",
+    )
+
+    try:
+        dados = json.loads(resposta.texto)
+    except Exception:
+        dados = {}
+
+    campos = normalizar_extracao(dados, categorias)
+    return ResultadoExtracao(campos=campos, resposta=resposta, prompt=prompt_extracao)
+

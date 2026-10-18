@@ -10,7 +10,7 @@
   "parametros_geracao": {
     "max_output_tokens": 4096
   },
-  "timeout_segundos": 60,
+  "timeout_segundos": 180,
   "armazenar_no_provedor": false,
   "precos_usd_por_milhao_tokens": {
     "gemini-3.8-flash": { "entrada": 0.75, "saida": 3.75 },
@@ -22,7 +22,13 @@
     "audio": { "extensoes": [".mp3", ".wav", ".m4a", ".ogg", ".flac"], "tamanho_max_mb": 20 },
     "imagem": { "extensoes": [".pdf", ".png", ".jpg", ".jpeg", ".webp"], "tamanho_max_mb": 20 }
   },
-  "categorias": [],
+  "categorias": [
+    "matricula",
+    "informacao",
+    "solicitacao_documentos",
+    "reclamacao",
+    "cancelamento"
+  ],
   "privacidade": {
     "mascarar_antes_de_enviar": ["cpf", "rg", "email", "telefone"]
   },
@@ -43,6 +49,12 @@
       "modalidade": "texto",
       "arquivo": "dados/originais/entrada_texto.txt",
       "gabarito": "dados/gabaritos/texto-01.json"
+    },
+    {
+      "id": "texto-injection",
+      "modalidade": "texto",
+      "arquivo": "dados/originais/entrada_texto_injection.txt",
+      "gabarito": "dados/gabaritos/texto-injection.json"
     },
     {
       "id": "audio-01",

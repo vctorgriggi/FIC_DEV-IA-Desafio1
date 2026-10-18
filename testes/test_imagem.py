@@ -110,12 +110,15 @@ def test_gabarito_imagem_coerente_com_os_dados_criticos():
     assert conferencia["nao_encontrados"] == []
 
 
-def test_fluxo_imagem_compara_com_gabarito_antes_da_compreensao(config, auditoria):
+def test_fluxo_imagem_compara_com_gabarito_antes_da_compreensao(config, auditoria, monkeypatch):
     gabarito = {"texto_referencia": "CÓDIGO: 2026-000142\nNOME: MARCOS VINICIUS", "dados_criticos": ["2026-000142"]}
     (config.raiz / "dados/gabaritos").mkdir(parents=True)
     (config.raiz / "dados/gabaritos/imagem-01.json").write_text(json.dumps(gabarito), encoding="utf-8")
 
     cliente = cliente_com(config, interacao(json.dumps(RESPOSTA_OCR)))
+    def _pendente(*args, **kwargs):
+        raise PendenteDeImplementacao("RF05", "texto")
+    monkeypatch.setattr(fluxo, "extrair_campos", _pendente)
     with pytest.raises(PendenteDeImplementacao, match="RF05"):
         fluxo.processar_caso("imagem-01", config=config, cliente=cliente, auditoria=auditoria)
 

@@ -85,11 +85,12 @@ def test_audio_passa_por_confirmacao_humana_antes_da_minuta(config, auditoria, p
 
 
 def test_parte_pendente_fica_registrada_como_erro(config, auditoria):
-    with pytest.raises(PendenteDeImplementacao, match="RF05"):
-        fluxo.processar_caso("texto-01", config=config, cliente=None, auditoria=auditoria)
+    with pytest.raises(PendenteDeImplementacao, match="RF06"):
+        fluxo.processar_caso("audio-01", config=config, cliente=None, auditoria=auditoria)
     ultimo = auditoria.eventos()[-1]
-    assert ultimo["etapa"] == "compreensao"
-    assert "RF05" in ultimo["erro"]
+    assert ultimo["etapa"] == "extracao_texto"
+    assert "RF06" in ultimo["erro"]
+
 
 
 def test_revisao_exige_justificativa_e_so_acontece_uma_vez(config, auditoria, partes_falsas):
