@@ -1,0 +1,22 @@
+{
+  "id_execucao": "fbe5cd03f09d",
+  "caso_id": "imagem-01",
+  "modalidade": "imagem",
+  "arquivo_origem": "dados/originais/entrada_pdf-imagem.pdf",
+  "extracao": "dados/processados/imagem-01/fbe5cd03f09d/extracao.json",
+  "arquivo_minuta": "resultados/minutas/fbe5cd03f09d.md",
+  "arquivo_renderizado": null,
+  "campos_ausentes": [],
+  "fontes": [
+    "dados/originais/entrada_pdf-imagem.pdf"
+  ],
+  "gerada_em": "2026-10-18T16:14:28-04:00",
+  "status": "rejeitada",
+  "revisao": {
+    "decisao": "rejeitar",
+    "justificativa": "Rejeitada.",
+    "revisor": "Victor G Silva",
+    "data_hora": "2026-10-18T16:16:05-04:00",
+    "sha256_minuta": "bf0b7c3c2e3564e17b839c76845acce888dd3ec50065bf16f81319f4e9edef25"
+  }
+}

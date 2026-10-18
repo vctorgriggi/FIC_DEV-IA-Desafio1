@@ -7,6 +7,7 @@ armazenamento no provedor vêm do config.json; a chave vem do .env.
 from __future__ import annotations
 
 import json
+import threading
 import time
 from dataclasses import dataclass, field
 from typing import Any
@@ -14,6 +15,8 @@ from typing import Any
 from .config import Config, carregar_chave
 from .privacidade import ocultar_segredos
 
+
+STATUS_REPETIVEIS = (500, 502, 503, 504)
 
 # Campo da Interaction onde cada tipo de saída chega.
 CAMPOS_SAIDA = {"texto": "output_text", "audio": "output_audio", "imagem": "output_image"}
@@ -58,6 +61,10 @@ class RespostaVazia(ErroLLM):
     mensagem_padrao = "O modelo devolveu uma resposta vazia."
 
 
+class RespostaIncompleta(ErroLLM):
+    mensagem_padrao = "A resposta do modelo foi cortada pelo limite de tokens (max_output_tokens no config.json)."
+
+
 class RespostaMalformada(ErroLLM):
     mensagem_padrao = "O modelo devolveu uma resposta fora do formato pedido."
 
@@ -83,8 +90,14 @@ class ClienteLLM:
             if not self._chave:
                 raise ChaveAusente()
             from google import genai
+            from google.genai import types
 
-            sdk = genai.Client(api_key=self._chave)
+            # google-genai 2.31.0: a Interactions API repete a chamada esperando o
+            # Retry-After do servidor sem teto (num 429 de cota esgotada, a CLI
+            # travava por minutos), e attempts=0 vira 1. Repetir só em 5xx deixa o 429
+            # voltar na hora; o prazo de relógio em _chamar cobre o resto.
+            repeticao = types.HttpRetryOptions(attempts=1, http_status_codes=list(STATUS_REPETIVEIS))
+            sdk = genai.Client(api_key=self._chave, http_options=types.HttpOptions(retry_options=repeticao))
         self._sdk = sdk
 
     def gerar(
@@ -122,7 +135,7 @@ class ClienteLLM:
 
         inicio = time.perf_counter()
         try:
-            interacao = self._sdk.interactions.create(**argumentos)
+            interacao = self._chamar(argumentos)
         except Exception as erro:
             convertido = self._converter_erro(erro)
             if convertido is None:
@@ -131,6 +144,9 @@ class ClienteLLM:
             raise convertido from None
         duracao = time.perf_counter() - inicio
 
+        # O raciocínio conta no max_output_tokens; quando ele estoura, o JSON chega cortado.
+        if getattr(interacao, "status", "completed") in ("incomplete", "budget_exceeded"):
+            raise RespostaIncompleta()
         texto = (getattr(interacao, "output_text", None) or "").strip()
         if not _tem_saida(interacao, saida):
             raise RespostaVazia()
@@ -145,6 +161,26 @@ class ClienteLLM:
             parametros={k: v for k, v in argumentos.items() if k not in ("model", "input", "system_instruction")},
             bruta=interacao,
         )
+
+    def _chamar(self, argumentos: dict) -> Any:
+        """Chama o SDK com prazo de relógio de timeout_segundos, seja qual for o motivo da demora."""
+        resultado: dict[str, Any] = {}
+
+        def alvo() -> None:
+            try:
+                resultado["interacao"] = self._sdk.interactions.create(**argumentos)
+            except BaseException as erro:  # devolvido à thread principal logo abaixo
+                resultado["erro"] = erro
+
+        # daemon: se o SDK seguir preso, a thread não impede o processo de terminar.
+        linha = threading.Thread(target=alvo, daemon=True)
+        linha.start()
+        linha.join(self.config.dados["timeout_segundos"])
+        if linha.is_alive():
+            raise TempoEsgotado()
+        if "erro" in resultado:
+            raise resultado["erro"]
+        return resultado["interacao"]
 
     def _custo(self, modelo: str, entrada: int | None, saida: int | None, tipo_saida: str) -> float | None:
         preco = self.config.dados.get("precos_usd_por_milhao_tokens", {}).get(modelo)

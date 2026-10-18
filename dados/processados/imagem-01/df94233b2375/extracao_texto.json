@@ -1,0 +1,12 @@
+{
+  "trechos_incertos": [],
+  "metadados": {
+    "rota": "visão multimodal na nuvem (Gemini API)",
+    "modelo": "gemini-3.8-flash",
+    "mime_type": "application/pdf",
+    "sha256_original": "a4b3bc0518df73244856ab27e010b561680b5f60ee8e730be4df83b3b567505f",
+    "legibilidade": "boa",
+    "observacoes": "",
+    "prompt_sistema": "sistema_seguro_v1"
+  }
+}

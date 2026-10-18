@@ -1,0 +1,18 @@
+{
+  "campos": {
+    "protocolo": "2026-000142",
+    "data": "14/10/2026",
+    "solicitante": "Marcos Vinícius de Almeida Santos",
+    "assunto": "Efetivação de matrícula no curso Técnico em Enfermagem",
+    "pedido": "Solicitação de efetivação da matrícula no curso Técnico em Enfermagem (turno noturno) e informação sobre quais documentos ainda precisam ser apresentados.",
+    "categoria": "matricula",
+    "campos_ausentes": [],
+    "confianca": "alta",
+    "necessita_revisao": false,
+    "motivo_revisao": ""
+  },
+  "fontes": [
+    "dados/originais/entrada_texto.txt"
+  ],
+  "imagem_institucional": "dados/originais/brasao.png"
+}

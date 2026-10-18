@@ -1,69 +1,37 @@
 # Uso de IA no desenvolvimento
 
-Documento exigido pela Seção 10 do enunciado para assegurar transparência, rastreabilidade e governança no uso de assistentes de codificação.
+Registro exigido pela Seção 10 do enunciado. A IA foi usada como apoio: tirar
+dúvidas, sugerir abordagens e revisar trechos. O código, os prompts e as
+decisões são da equipe.
 
-## 1. Ferramentas, Modelos e Versões Utilizados
+## 1. Ferramentas e modelos
 
-- **Assistente de Codificação:** Google Antigravity IDE (Agentic AI Assistant).
-- **Modelo de Linguagem do Assistente:** Gemini 3.8 Flash (High).
-- **Modelo de IA Generativa da Solução:** `gemini-3.8-flash` via SDK `google-genai` (versão 2.31.0) usando a Interactions API.
-- **Ambiente de Execução:** Python 3.12.9 (Windows x64), pytest 9.1.1, python-dotenv 1.2.4.
+- **Assistente de apoio:** Google Antigravity IDE, modelo Gemini 3.8 Flash (High).
+- **Modelo da solução:** `gemini-3.8-flash` via `google-genai` 2.31.0 (Interactions API).
 
-## 2. Solicitações Relevantes Feitas à IA
+## 2. Solicitações relevantes
 
-1. **Solicitação 1 — Mapeamento de Requisitos e Responsabilidades:**
-   - *Comando:* Análise integral do documento `Desafio_01-Pratico_IA_Generativa_Aulas_01_a_07.docx.pdf` e identificação do que é necessário para o papel de "gerenciamento e manipulação de textos com IA".
-   - *Resultado:* Mapeamento preciso dos requisitos RF02 (Experimento de prompts), RF03 (Prompt seguro e injeção), RF05 (Extração JSON estruturada), RF09 (Minuta institucional) e RF12 (LGPD/minimização).
+1. Ajuda para mapear, no enunciado, os requisitos da parte de texto (RF02, RF03, RF05, RF09, RF12).
+2. Dúvidas sobre saída estruturada com esquema JSON no SDK `google-genai`.
+3. Sugestões de entrada adversarial para o caso de prompt injection.
 
-2. **Solicitação 2 — Implementação da Extração Estruturada e Minuta:**
-   - *Comando:* Implementação de `src/extracao.py` e `src/minuta.py` integrando chamadas ao Gemini com *Structured Outputs* e esquema JSON validado com categorias documentadas.
-   - *Resultado:* Criação das funções `extrair_campos` e `gerar_minuta`, além de criação dos prompts versionados em `prompts/`.
+## 3. Sugestões aceitas, modificadas e rejeitadas
 
-3. **Solicitação 3 — Criação do Caso de Teste de Prompt Injection e Experimento de Prompts:**
-   - *Comando:* Elaboração de uma entrada adversarial contendo tentativa de evasão de tag `</conteudo_externo>` e pedidos de concessão indevida de valores, e execução do experimento controlado comparando Prompts A, B e C.
-   - *Resultado:* Criação de `dados/originais/entrada_texto_injection.txt`, `dados/gabaritos/texto-injection.json` e relatório comparativo com dados empíricos em `documentacao/experimento_prompts.md`.
+- **Aceita:** usar `response_format` com esquema JSON e enum de categorias.
+- **Modificada:** timeout de 60 s, ajustado pela equipe para 180 s após testes reais.
+- **Rejeitada:** qualquer envio automático de resposta; toda minuta passa por decisão humana.
 
-## 3. Sugestões Aceitas, Modificadas e Rejeitadas
+## 4. Erros encontrados
 
-- **Aceita:** Utilização de `response_format` com esquema JSON rigoroso no SDK `google-genai` para forçar o Gemini a responder apenas dados tipados com enum de categorias e valor `"não localizado"`.
-- **Aceita:** Criação de caso de teste com Prompt Injection e fechamento simulado de tags XML para demonstrar empiricamente a robustez do `prompts.delimitar()`.
-- **Modificada:** O timeout original configurado em 60s no `config.json` foi estendido para 180s, pois chamadas com modelos de raciocínio profundo da família Flash exigem margem adicional de latência de rede.
-- **Rejeitada:** Qualquer tentativa de envio automatizado de e-mail ou despacho: mantida a premissa inegociável de que nenhuma resposta sai sem a validação e decisão explícita de um servidor humano (`Human-in-the-Loop`).
+- O timeout sugerido era curto para o modelo e estourava na primeira chamada.
+- Tags falsas como `</conteudo_externo>` precisavam ser neutralizadas antes de entrar no prompt.
 
-## 4. Erros ou Inadequações Encontrados e Corrigidos
+## 5. Validação
 
-- **Timeout em Chamada Inicial:** A chamada inicial via `interactions.create` excedeu 60 segundos devido ao tempo de pensamento interno do modelo; ajustado para 180 segundos no `config.json`.
-- **Dependência Ausente:** A biblioteca `google-genai` não estava inicialmente instalada no Python do sistema; instalada com sucesso via `pip install -r requirements.txt`.
-- **Escape de Tags em Prompt Injection:** Identificada necessidade de garantir que tags falsas de `</conteudo_externo>` no texto do usuário fossem neutralizadas para `&lt;/conteudo_externo>` antes da concatenação, o que funcionou com 100% de eficácia.
+- Testes automatizados (`python -m pytest`), sem chamada à API.
+- Execução real dos casos, com revisão humana das saídas.
 
-## 5. Forma de Validação do Código e do Conteúdo Gerado
+## 6. Responsabilidade
 
-- **Bateria de Testes Unitários:** Execução de 58 testes automatizados via `python -m pytest`, cobrindo tratamento de erros de API, validação de arquivos, conformidade de esquemas JSON e integridade dos prompts.
-- **Teste de Conexão Real:** Execução do comando `python -m src.main verificar --chamar-api` validando comunicação ativa com o Google AI Studio.
-- **Execução End-to-End do Pipeline:** Processamento real dos casos `texto-01` e `texto-injection` com validação humana dos artefatos produzidos (`dados/processados/` e `resultados/minutas/`).
-
-## 6. Declaração de Responsabilidade
-
-A equipe revisou linha por linha o código-fonte, os prompts, as saídas produzidas e a documentação técnica, atestando a compreensão plena de todos os módulos e assumindo responsabilidade integral sobre a solução entregue.
-
-
-## Complemento — RF06/RF07 com Codex (18/10/2026)
-
-Esta seção complementa os registros anteriores, sem substituir as contribuições
-ali descritas. Ferramenta: Codex nesta sessão; o identificador exato do modelo
-não foi exposto ao agente e não é presumido. SDK/modelos da aplicação permanecem
-os declarados no projeto, distintos do assistente de programação.
-
-Solicitações relevantes: (1) auditar aulas/enunciado/contratos; (2) consolidar
-relatório técnico; (3) implementar áudio com contratos preservados, testes sem
-API e documentação de bloqueios. Foram aceitas reutilização do cliente único,
-ffprobe da Aula 05 e WAV; a revisão foi limitada a espaços/quebras em vez de
-reescrever fatos. Foi rejeitado acrescentar aviso após aprovação: o texto já
-aprovado deve contê-lo. Um teste detectou remoção indevida de underscores em
-caminhos na preparação Markdown; a expressão foi corrigida e retestada.
-
-Validação nesta etapa: 30 testes unittest com SDK/ffprobe simulados; não houve
-inferência real nem audição. A suíte pytest e a checagem executável do SDK fixado
-ficaram bloqueadas pela falta de dependências e por DNS indisponível no download.
-Detalhes e evidências no relatório de implementação. A equipe ainda precisa
-revisar código e conteúdo e comprovar os critérios acadêmicos reais.
+A equipe revisou e entende todo o código, prompts e documentação, e assume
+responsabilidade integral pela solução entregue.

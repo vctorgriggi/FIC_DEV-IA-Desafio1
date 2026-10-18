@@ -137,3 +137,46 @@ def test_custo_estimado_conta_raciocinio_como_saida(config):
 def test_modelo_sem_preco_nao_inventa_custo(config):
     resposta = ClienteLLM(config, chave=CHAVE_FALSA, sdk=SDKFalso()).gerar(modelo="modelo-sem-preco", entrada="oi")
     assert resposta.custo_estimado_usd is None
+
+
+def test_cliente_real_so_repete_erro_de_servidor(config, monkeypatch):
+    from google import genai
+
+    criados = []
+    monkeypatch.setattr(genai, "Client", lambda **kwargs: criados.append(kwargs) or SDKFalso())
+    ClienteLLM(config, chave=CHAVE_FALSA)
+    assert criados[0]["api_key"] == CHAVE_FALSA
+    repeticao = criados[0]["http_options"].retry_options
+    assert repeticao.attempts == 1
+    assert 429 not in repeticao.http_status_codes and set(repeticao.http_status_codes) == {500, 502, 503, 504}
+
+
+def test_prazo_de_relogio_independe_do_sdk(config):
+    import threading
+
+    liberar = threading.Event()
+
+    class SDKPreso:
+        def __init__(self):
+            self.interactions = self
+
+        def create(self, **_):
+            liberar.wait(5)  # simula o SDK dormindo num Retry-After
+
+    config.dados["timeout_segundos"] = 0.2
+    cliente = ClienteLLM(config, chave=CHAVE_FALSA, sdk=SDKPreso())
+    inicio = __import__("time").perf_counter()
+    with pytest.raises(TempoEsgotado):
+        cliente.gerar(modelo="gemini-3.8-flash", entrada="oi")
+    assert __import__("time").perf_counter() - inicio < 1
+    liberar.set()
+
+
+@pytest.mark.parametrize("status", ["incomplete", "budget_exceeded"])
+def test_resposta_cortada_pelo_limite_tem_erro_proprio(config, status):
+    from src.llm_client import RespostaIncompleta
+
+    cortada = interacao('{"texto_bruto": "CÓDIGO: 20')
+    cortada.status = status
+    with pytest.raises(RespostaIncompleta, match="max_output_tokens"):
+        ClienteLLM(config, chave=CHAVE_FALSA, sdk=SDKFalso(resposta=cortada)).gerar(modelo="gemini-3.8-flash", entrada="oi")

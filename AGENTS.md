@@ -10,6 +10,7 @@ texto, áudio e imagem e gera minutas para revisão humana. Enunciado em
 source .venv/bin/activate      # Python >= 3.10; o 3.9 do macOS não instala o SDK
 python -m pytest               # não chama a API
 python -m src.main verificar   # versões, chave e arquivos dos casos
+python -m src.main interface   # interface local em http://127.0.0.1:8000
 ```
 
 Não há lint nem typecheck configurados.
@@ -27,6 +28,7 @@ src/              # base compartilhada + uma parte por modalidade (tabela no REA
 prompts/          # <nome>_v<N>.md; prompt alterado é versão nova, nunca edição
 dados/originais/  # entradas do desafio; nunca alterar (o hash vai para o log)
 dados/gabaritos/  # resultado esperado, escrito antes de executar o caso
+interface/        # front-end Vite/React; dist/ é versionado e servido por src/web.py
 ```
 
 ## Nunca fazer
@@ -55,6 +57,8 @@ dados/gabaritos/  # resultado esperado, escrito antes de executar o caso
   rodada final da entrega entra num commit próprio com `git add -f`.
 - Uso de IA: declarado de forma resumida em `documentacao/uso_de_ia.md`,
   escrito pelo grupo. Commits não levam trailer de coautoria de IA.
+- Interface: só chama funções de fluxo.py e revisao.py; regra de negócio não
+  mora no front-end. Mudou interface/src → `npm run build` e commite dist/.
 - Identificadores e mensagens em português.
 
 ## Gotchas
@@ -62,6 +66,9 @@ dados/gabaritos/  # resultado esperado, escrito antes de executar o caso
 - Agente escreve `client.models.generate_content` → a doc atual do Gemini usa
   `client.interactions.create`; siga o formato das docstrings de `audio.py`,
   `vision.py` e `image_generation.py`.
+- CLI parada por minutos após um 429 → o SDK repete esperando o `Retry-After`
+  sem teto, e `attempts=0` vira 1; `llm_client.py` só deixa repetir 5xx e
+  aplica prazo de relógio. Não troque isso por ajuste de `attempts`.
 - Atualizou o `google-genai` → rode os testes: as exceções da Interactions API
   vêm de um módulo privado do SDK, e `testes/test_llm_client.py` quebra se ele mudar.
 

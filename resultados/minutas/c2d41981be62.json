@@ -1,0 +1,22 @@
+{
+  "id_execucao": "c2d41981be62",
+  "caso_id": "texto-01",
+  "modalidade": "texto",
+  "arquivo_origem": "dados/originais/entrada_texto.txt",
+  "extracao": "dados/processados/texto-01/c2d41981be62/extracao.json",
+  "arquivo_minuta": "resultados/minutas/c2d41981be62.md",
+  "arquivo_renderizado": null,
+  "campos_ausentes": [],
+  "fontes": [
+    "dados/originais/entrada_texto.txt"
+  ],
+  "gerada_em": "2026-10-18T15:31:10-04:00",
+  "status": "aprovada",
+  "revisao": {
+    "decisao": "aprovar",
+    "justificativa": "Tudo ok.",
+    "revisor": "Victor G Silva",
+    "data_hora": "2026-10-18T16:37:10-04:00",
+    "sha256_minuta": "f1b983cb1edd577c881a27284b5041681796829110da15cbb755f039f6b661ca"
+  }
+}

@@ -107,8 +107,9 @@ def extrair_campos(texto: str, *, origem: str, cliente: ClienteLLM, config: Conf
 
     try:
         dados = json.loads(resposta.texto)
-    except Exception:
-        dados = {}
+    except json.JSONDecodeError:
+        # Critério do RF05: o JSON final continua válido; o motivo avisa o revisor.
+        dados = {"motivo_revisao": "Resposta do modelo fora do formato JSON; nenhum campo foi extraído."}
 
     campos = normalizar_extracao(dados, categorias)
     return ResultadoExtracao(campos=campos, resposta=resposta, prompt=prompt_extracao)

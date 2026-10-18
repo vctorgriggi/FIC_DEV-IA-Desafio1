@@ -1,0 +1,22 @@
+{
+  "id_execucao": "21f71850a288",
+  "caso_id": "imagem-01",
+  "modalidade": "imagem",
+  "arquivo_origem": "dados/originais/entrada_pdf-imagem.pdf",
+  "extracao": "dados/processados/imagem-01/21f71850a288/extracao.json",
+  "arquivo_minuta": "resultados/minutas/21f71850a288.md",
+  "arquivo_renderizado": null,
+  "campos_ausentes": [],
+  "fontes": [
+    "dados/originais/entrada_pdf-imagem.pdf"
+  ],
+  "gerada_em": "2026-10-18T16:30:44-04:00",
+  "status": "aprovada",
+  "revisao": {
+    "decisao": "aprovar",
+    "justificativa": "Tudo em conformidade.",
+    "revisor": "Victor G Silva",
+    "data_hora": "2026-10-18T16:31:13-04:00",
+    "sha256_minuta": "d5fe7270a7bae1bdfd4566e0dcfd518b60a3deec5cfdeab96fe59d7f61024e00"
+  }
+}

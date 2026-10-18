@@ -7,7 +7,7 @@ import json
 import sys
 from pathlib import Path
 
-from . import fluxo
+from . import avaliacao, experimento, fluxo
 from .audit import Auditoria, agora_iso
 from .config import CasoInexistente, Config, carregar_chave, carregar_config, versoes
 from .entradas import ArquivoInvalido, validar_arquivo
@@ -16,6 +16,7 @@ from .image_generation import ErroPeca
 from .revisao import (
     ATALHOS_PECA,
     RevisaoInvalida,
+    confirmar_campos_criticos,
     ler_metadados,
     perguntar_checklist_peca,
     perguntar_decisao,
@@ -56,8 +57,27 @@ def cmd_casos(config: Config, args: argparse.Namespace) -> None:
 
 
 def cmd_processar(config: Config, args: argparse.Namespace) -> None:
-    config.caso(args.caso)  # caso inexistente falha antes de exigir a chave
-    metadados = fluxo.processar_caso(args.caso, config=config, cliente=ClienteLLM(config), auditoria=Auditoria(config))
+    caso = config.caso(args.caso)  # caso inexistente falha antes de exigir a chave
+    cliente, auditoria = ClienteLLM(config), Auditoria(config)
+    print(f"Processando {args.caso} ({caso['modalidade']}): leitura e extração dos campos, cerca de 30 s…", flush=True)
+    estado = fluxo.preparar_caso(args.caso, config=config, cliente=cliente, auditoria=auditoria)
+    _concluir(config, estado, cliente, auditoria)
+
+
+def cmd_confirmar(config: Config, args: argparse.Namespace) -> None:
+    estado, _ = fluxo.ler_estado(config, args.id_execucao)
+    _concluir(config, estado, ClienteLLM(config), Auditoria(config))
+
+
+def _concluir(config: Config, estado: dict, cliente: ClienteLLM, auditoria: Auditoria) -> None:
+    confirmados = None
+    if estado["exige_confirmacao"] and estado["status"] == fluxo.AGUARDANDO_CONFIRMACAO:
+        print(f"\nAbra o original e compare antes de confirmar: {estado['arquivo_origem']}")
+        confirmados, _ = confirmar_campos_criticos(estado["campos"], estado["trechos_incertos"])
+    print("Gerando a minuta…", flush=True)
+    metadados = fluxo.concluir_caso(
+        estado["id_execucao"], campos_confirmados=confirmados, config=config, cliente=cliente, auditoria=auditoria
+    )
     print(f"Minuta gerada: {metadados['arquivo_minuta']}")
     print(f"Revise com: python -m src.main revisar {metadados['id_execucao']}")
 
@@ -79,6 +99,18 @@ def cmd_audio_minuta(config: Config, args: argparse.Namespace) -> None:
 
 
 def cmd_avaliacao(config: Config, args: argparse.Namespace) -> None:
+    avaliacoes = avaliacao.avaliar_todas(config)
+    for item in avaliacoes:
+        situacao = "ok" if not item["falhas"] else f"{len(item['falhas'])} divergência(s)"
+        print(f"{item['caso_id']:16} {item['id_execucao']}  {item['status_revisao']:24} {situacao}")
+        for falha in item["falhas"]:
+            print(f"    - {falha}")
+    destino = config.caminho("logs") / "avaliacao.json"
+    destino.parent.mkdir(parents=True, exist_ok=True)
+    destino.write_text(json.dumps(avaliacoes, ensure_ascii=False, indent=2), encoding="utf-8")
+    if avaliacoes:
+        print(f"Esperado contra obtido em {config.relativo(destino)}\n")
+
     resumo = resumo_revisoes(config)
     for status, total in sorted(resumo["por_status"].items()):
         print(f"{status:25} {total}")
@@ -89,17 +121,34 @@ def cmd_avaliacao(config: Config, args: argparse.Namespace) -> None:
     print(f"Taxa de aprovação com correção: {resumo['taxa_aprovacao_com_correcao']:.1%}")
 
 
-def ler_especificacao(caminho: str) -> dict:
+def ler_arquivo_json(caminho: str) -> dict:
     try:
         return json.loads(Path(caminho).read_text(encoding="utf-8"))
     except FileNotFoundError:
-        raise ArquivoInvalido(f"Especificação não encontrada: {caminho}.") from None
+        raise ArquivoInvalido(f"Arquivo não encontrado: {caminho}.") from None
     except json.JSONDecodeError as erro:
-        raise ArquivoInvalido(f"Especificação não é JSON válido: {caminho} ({erro}).") from None
+        raise ArquivoInvalido(f"Arquivo não é JSON válido: {caminho} ({erro}).") from None
+
+
+def cmd_experimento_prompts(config: Config, args: argparse.Namespace) -> None:
+    entrada = ler_arquivo_json(args.entrada)
+    metricas = experimento.executar_experimento(
+        entrada, origem=config.relativo(Path(args.entrada)), config=config, cliente=ClienteLLM(config), auditoria=Auditoria(config)
+    )
+    print(f"Modelo: {metricas['modelo']}  (mesmos parâmetros e prompt de sistema nos três)")
+    for rotulo, r in metricas["resultados"].items():
+        custo = f"US$ {r['custo_estimado_usd']:.5f}" if r["custo_estimado_usd"] is not None else "custo n/d"
+        print(f"Prompt {rotulo}: {r['duracao_s']:.1f}s  {r['tokens_entrada']} → {r['tokens_saida']} tokens  {custo}  {r['saida']}")
+    print(f"Métricas em {config.relativo(config.caminho('experimentos') / metricas['id_execucao'] / 'metricas.json')}")
+
+
+def cmd_gerar_prompt_c(config: Config, args: argparse.Namespace) -> None:
+    destino = experimento.gerar_prompt_c(config=config, cliente=ClienteLLM(config), auditoria=Auditoria(config))
+    print(f"Prompt C gerado pelo metaprompt: {config.relativo(destino)}")
 
 
 def cmd_peca_visual(config: Config, args: argparse.Namespace) -> None:
-    especificacao = ler_especificacao(args.especificacao)
+    especificacao = ler_arquivo_json(args.especificacao)
     imagem_base = validar_arquivo(Path(args.imagem_base), "imagem", config).caminho if args.imagem_base else None
     peca = fluxo.gerar_peca_visual(
         args.caso,
@@ -131,6 +180,15 @@ def cmd_revisar_peca(config: Config, args: argparse.Namespace) -> None:
     print(f"Status da peça: {metadados['status']}.")
 
 
+def cmd_interface(config: Config, args: argparse.Namespace) -> None:
+    import uvicorn
+
+    from .web import criar_app
+
+    print(f"Interface em http://127.0.0.1:{args.porta}  (Ctrl+C para encerrar)", flush=True)
+    uvicorn.run(criar_app(config), host="127.0.0.1", port=args.porta, log_level="warning")
+
+
 def montar_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="python -m src.main", description="Central Inteligente de Atendimento — Desafio 1")
     sub = parser.add_subparsers(dest="comando", required=True)
@@ -145,6 +203,10 @@ def montar_parser() -> argparse.ArgumentParser:
     processar.add_argument("caso")
     processar.set_defaults(funcao=cmd_processar)
 
+    confirmar = sub.add_parser("confirmar", help="retoma uma execução parada na confirmação dos dados críticos")
+    confirmar.add_argument("id_execucao")
+    confirmar.set_defaults(funcao=cmd_confirmar)
+
     revisar = sub.add_parser("revisar", help="aprova, rejeita ou pede nova geração de uma minuta")
     revisar.add_argument("id_execucao")
     revisar.set_defaults(funcao=cmd_revisar)
@@ -153,13 +215,25 @@ def montar_parser() -> argparse.ArgumentParser:
     audio.add_argument("id_execucao")
     audio.set_defaults(funcao=cmd_audio_minuta)
 
-    sub.add_parser("avaliacao", help="contagem por status e taxa de aprovação (RF13)").set_defaults(funcao=cmd_avaliacao)
+    sub.add_parser("avaliacao", help="esperado contra obtido por caso e taxa de aprovação (RF13)").set_defaults(funcao=cmd_avaliacao)
 
     peca = sub.add_parser("peca-visual", help="gera ou edita a peça visual de um caso (RF10)")
     peca.add_argument("caso")
     peca.add_argument("--especificacao", required=True, help="JSON com sujeito, composição, estilo, iluminação, proporção e restrições")
     peca.add_argument("--imagem-base", help="imagem a editar; sem ela, gera uma nova")
     peca.set_defaults(funcao=cmd_peca_visual)
+
+    experimento_prompts = sub.add_parser("experimento-prompts", help="roda os prompts A, B e C do RF02 com a mesma entrada")
+    experimento_prompts.add_argument("--entrada", required=True, help="JSON com campos, fontes e imagem institucional")
+    experimento_prompts.set_defaults(funcao=cmd_experimento_prompts)
+
+    sub.add_parser("gerar-prompt-c", help="gera o Prompt C do RF02 a partir de prompts/metaprompt_v1.md").set_defaults(
+        funcao=cmd_gerar_prompt_c
+    )
+
+    interface = sub.add_parser("interface", help="abre a interface gráfica local no navegador")
+    interface.add_argument("--porta", type=int, default=8000)
+    interface.set_defaults(funcao=cmd_interface)
 
     revisar_peca = sub.add_parser("revisar-peca", help="checklist e decisão sobre uma peça visual (RF10)")
     revisar_peca.add_argument("id_execucao")

@@ -1,0 +1,46 @@
+{
+  "id_execucao": "882e9080c8c0",
+  "caso_id": "imagem-01",
+  "imagem": "resultados/imagens/882e9080c8c0.png",
+  "ilustracao_original": "resultados/imagens/882e9080c8c0_ilustracao_ia.jpg",
+  "prompt": "Gere uma ilustração para uma peça de orientação institucional fictícia.\nSujeito: sala de aula de curso técnico em enfermagem, vazia e arrumada, com uma maca de simulação forrada, estetoscópio, kit de primeiros socorros fechado e cadernos sobre a mesa do professor\nComposição: plano geral visto levemente de cima, elementos principais no centro, fundo limpo, nada cortado nas bordas\nEstilo: ilustração vetorial plana, formas simples, paleta institucional sóbria em azul, verde-água e branco\nIluminação: luz artificial suave e uniforme de sala de aula à noite, janelas mostrando o céu noturno\nProporção: 4:3\nRestrições:\n- sem texto, letras ou números na imagem (o texto é aplicado depois)\n- sem pessoas reais, rostos identificáveis ou figuras públicas\n- sem brasões, bandeiras, logotipos ou símbolos oficiais\n- sem sangue, agulhas ou cenas de procedimento\n- aparência acolhedora e profissional",
+  "especificacao": {
+    "sujeito": "sala de aula de curso técnico em enfermagem, vazia e arrumada, com uma maca de simulação forrada, estetoscópio, kit de primeiros socorros fechado e cadernos sobre a mesa do professor",
+    "composicao": "plano geral visto levemente de cima, elementos principais no centro, fundo limpo, nada cortado nas bordas",
+    "estilo": "ilustração vetorial plana, formas simples, paleta institucional sóbria em azul, verde-água e branco",
+    "iluminacao": "luz artificial suave e uniforme de sala de aula à noite, janelas mostrando o céu noturno",
+    "proporcao": "4:3",
+    "restricoes": [
+      "sem sangue, agulhas ou cenas de procedimento",
+      "aparência acolhedora e profissional"
+    ],
+    "texto": {
+      "titulo": "Matrícula: atenção à frequência no início das aulas",
+      "introducao": "Curso Técnico em Enfermagem, turno noturno, início em 01/02/2027. A matrícula é cancelada automaticamente se o estudante faltar, sem justificativa comprovada:",
+      "itens": [
+        "nos 2 (dois) primeiros dias de aula consecutivos; ou",
+        "em 3 (três) dias de aula, consecutivos ou não, nos 10 (dez) primeiros dias de aula."
+      ],
+      "rodape": "Exemplo fictício de material de orientação (Desafio 1 — FIC_DEV)."
+    }
+  },
+  "imagem_base": null,
+  "modelo": "gemini-3.1-flash-lite-image",
+  "data_geracao": "2026-10-18T16:10:01-04:00",
+  "nota_proveniencia": "Ilustração gerada por IA (gemini-3.1-flash-lite-image, Google Gemini) em 2026-10-18T16:10:01-04:00; texto aplicado por código a partir dos dados do caso fictício. Conteúdo sintético, sem pessoas reais. A ilustração do modelo carrega marca d'água SynthID.",
+  "status": "aprovada",
+  "revisao": {
+    "checklist": {
+      "textos": true,
+      "simbolos_objetos": true,
+      "pessoas_maos": true,
+      "coerencia": true,
+      "proveniencia": true
+    },
+    "decisao": "aprovar",
+    "justificativa": "Aprovada.",
+    "revisor": "Victor G Silva",
+    "data_hora": "2026-10-18T16:12:49-04:00",
+    "sha256_peca": "3050712ce62a4fcf94479d764123fe36654e2ab2fdc33b928e9e164f7ee49503"
+  }
+}

@@ -195,3 +195,34 @@ def test_peca_visual_guarda_prompt_modelo_data_e_proveniencia(config, auditoria,
     assert metadados["data_geracao"] == "2026-10-17"
     assert metadados["nota_proveniencia"] == "Imagem gerada por IA"
     assert metadados["especificacao"] == {"sujeito": "cartaz"}
+
+
+def test_imagem_para_na_confirmacao_e_conclui_depois(config, auditoria, partes_falsas, monkeypatch):
+    monkeypatch.setattr(
+        fluxo.vision, "extrair_texto",
+        lambda arquivo, **_: TextoExtraido(texto_bruto="b", texto_revisado="r", trechos_incertos=["2024 — rasura"]),
+    )
+    estado = fluxo.preparar_caso("imagem-01", config=config, cliente=None, auditoria=auditoria)
+    assert estado["exige_confirmacao"] and estado["trechos_incertos"] == ["2024 — rasura"]
+    assert [p["id_execucao"] for p in fluxo.pendentes_de_confirmacao(config)] == [estado["id_execucao"]]
+
+    with pytest.raises(RevisaoInvalida, match="Confirme"):
+        fluxo.concluir_caso(estado["id_execucao"], campos_confirmados=None, config=config, cliente=None, auditoria=auditoria)
+
+    meta = fluxo.concluir_caso(
+        estado["id_execucao"], campos_confirmados={"protocolo": "2026-000009", "data": CAMPOS["data"]},
+        revisor="Servidor A", config=config, cliente=None, auditoria=auditoria,
+    )
+    assert "2026-000009" in (config.raiz / meta["arquivo_minuta"]).read_text(encoding="utf-8")
+    confirmacao = auditoria.eventos(etapa="confirmacao_campos_criticos")[0]
+    assert confirmacao["revisor"] == "Servidor A" and confirmacao["extra"]["campos_corrigidos"] == ["protocolo"]
+    assert fluxo.pendentes_de_confirmacao(config) == []
+    with pytest.raises(RevisaoInvalida, match="já foi concluída"):
+        fluxo.concluir_caso(estado["id_execucao"], campos_confirmados={}, config=config, cliente=None, auditoria=auditoria)
+
+
+def test_texto_conclui_sem_confirmacao(config, auditoria, partes_falsas):
+    estado = fluxo.preparar_caso("texto-01", config=config, cliente=None, auditoria=auditoria)
+    assert not estado["exige_confirmacao"] and fluxo.pendentes_de_confirmacao(config) == []
+    meta = fluxo.concluir_caso(estado["id_execucao"], campos_confirmados=None, config=config, cliente=None, auditoria=auditoria)
+    assert meta["status"] == "aguardando_revisao"

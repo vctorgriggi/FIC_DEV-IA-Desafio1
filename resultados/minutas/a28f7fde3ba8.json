@@ -1,0 +1,22 @@
+{
+  "id_execucao": "a28f7fde3ba8",
+  "caso_id": "imagem-01",
+  "modalidade": "imagem",
+  "arquivo_origem": "dados/originais/entrada_pdf-imagem.pdf",
+  "extracao": "dados/processados/imagem-01/a28f7fde3ba8/extracao.json",
+  "arquivo_minuta": "resultados/minutas/a28f7fde3ba8.md",
+  "arquivo_renderizado": null,
+  "campos_ausentes": [],
+  "fontes": [
+    "dados/originais/entrada_pdf-imagem.pdf"
+  ],
+  "gerada_em": "2026-10-18T16:36:26-04:00",
+  "status": "aprovada",
+  "revisao": {
+    "decisao": "aprovar",
+    "justificativa": "Protocolo corrigido na confirmação: dígito rasurado lido como 2024; confirmado 2026 pela solicitação em texto do mesmo cidadão. Demais dados conferidos com a ficha.",
+    "revisor": "Victor G Silva",
+    "data_hora": "2026-10-18T16:36:36-04:00",
+    "sha256_minuta": "1e439ba8dbbecdb094cd9e39208a7fc7717943850e567e4f27aa1ae036c7a630"
+  }
+}

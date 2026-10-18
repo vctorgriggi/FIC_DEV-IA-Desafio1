@@ -1,0 +1,54 @@
+{
+  "id_execucao": "987a3d6fd565",
+  "data_hora": "2026-10-18T15:17:41-04:00",
+  "modelo": "gemini-3.8-flash",
+  "prompt_sistema": "sistema_seguro_v1",
+  "entrada": "dados/experimento_rf02/entrada_texto-01.json",
+  "resultados": {
+    "A": {
+      "prompt": "minuta_a_v1",
+      "saida": "resultados/experimentos/987a3d6fd565/prompt_A.md",
+      "duracao_s": 14.324,
+      "tokens_entrada": 493,
+      "tokens_saida": 2085,
+      "custo_estimado_usd": 0.008188,
+      "parametros": {
+        "store": false,
+        "timeout": 180,
+        "generation_config": {
+          "max_output_tokens": 4096
+        }
+      }
+    },
+    "B": {
+      "prompt": "minuta_b_v1",
+      "saida": "resultados/experimentos/987a3d6fd565/prompt_B.md",
+      "duracao_s": 8.923,
+      "tokens_entrada": 1022,
+      "tokens_saida": 1398,
+      "custo_estimado_usd": 0.006009,
+      "parametros": {
+        "store": false,
+        "timeout": 180,
+        "generation_config": {
+          "max_output_tokens": 4096
+        }
+      }
+    },
+    "C": {
+      "prompt": "minuta_c_v1",
+      "saida": "resultados/experimentos/987a3d6fd565/prompt_C.md",
+      "duracao_s": 8.743,
+      "tokens_entrada": 816,
+      "tokens_saida": 1179,
+      "custo_estimado_usd": 0.005033,
+      "parametros": {
+        "store": false,
+        "timeout": 180,
+        "generation_config": {
+          "max_output_tokens": 4096
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "id_execucao": "a28f7fde3ba8",
+  "caso_id": "imagem-01",
+  "modalidade": "imagem",
+  "arquivo_origem": "dados/originais/entrada_pdf-imagem.pdf",
+  "texto_original": "GOVERNO DE MATO GROSSO\nSECRETARIA DE ESTADO DE CIÊNCIA, TECNOLOGIA E INOVAÇÃO - SECITECI/MT\nESCOLA TÉCNICA ESTADUAL DE CUIABÁ\nFICHA DE MATRÍCULA\nCÓDIGO: 2024-000142\nNOME: MARCOS VINÍCIUS DE ALMEIDA SANTOS\nDATA DE NASCIMENTO: 12/08/2008\nCPF: 123.456.789-00\nRG: 1234567-8\nÓRGÃO EXPEDIDOR:\nNATURALIDADE: CUIABÁ\nUF:\nNOME DA MÃE: LÚCIA HELENA DE ALMEIDA SANTOS\nNOME DO PAI:\nCURSO: TÉCNICO EM ENFERMAGEM\nCH: 1200 HORAS\nEIXO TECNOLÓGICO: SAÚDE\nTURMA:\nMUNICÍPIO:\nTURNO: NOTURNO\nINÍCIO DO CURSO: 01/02/2027\nTÉRMINO DO CURSO:\nTEL. CELULAR:\nTELEFONE RESIDENCIAL:\nE-MAIL: marcos.almeida.teste@exemplo.com\nDATA MATRÍCULA: 14/10/2026\n[X] Estou ciente que minha matrícula será automaticamente cancelada se faltar, sem justificativa comprovada:\n- nos 02 (dois) primeiros dias de aula consecutivos;\n- 03 (três) dias de aula, consecutivos ou não, no período dos 10 (dez) primeiros dias de aula.\nASSINATURA DO ALUNO OU RESPONSÁVEL: [assinatura]\nASSINATURA DA SECRETARIA ESCOLAR:",
+  "campos": {
+    "protocolo": "2024-000142",
+    "data": "14/10/2026",
+    "solicitante": "MARCOS VINÍCIUS DE ALMEIDA SANTOS",
+    "assunto": "Matrícula no curso Técnico em Enfermagem",
+    "pedido": "Efetivação de matrícula no curso Técnico em Enfermagem no período noturno",
+    "categoria": "matricula",
+    "campos_ausentes": [],
+    "confianca": "media",
+    "necessita_revisao": true,
+    "motivo_revisao": "O formulário contém campos cadastrais não preenchidos (órgão expedidor, UF, turma, telefones), ausência de assinatura da secretaria escolar e discrepância temporal entre o código de identificação gerado (prefixo 2024) e as datas de matrícula (2026) e início do curso (2027)."
+  },
+  "dados_mascarados_no_envio": {
+    "cpf": 1,
+    "rg": 1,
+    "email": 1
+  },
+  "trechos_incertos": [],
+  "exige_confirmacao": true,
+  "preparado_em": "2026-10-18T16:34:06-04:00",
+  "status": "concluido"
+}
