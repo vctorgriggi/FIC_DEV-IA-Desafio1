@@ -20,11 +20,11 @@ from pathlib import Path
 from .config import Config
 from .entradas import ArquivoEntrada, ArquivoInvalido, validar_arquivo
 from .llm_client import ClienteLLM, RespostaMalformada, RespostaVazia, formato_json, ler_json
+from .minuta import AVISO_LACUNAS
 from .prompts import carregar_prompt
 from .revisao import RevisaoInvalida
 from .tipos import TextoExtraido
 
-AVISO_LACUNAS = 'Os campos identificados como não localizado representam informações ausentes no documento.'
 VERSAO_LOCUCAO = 'markdown_conservador_v1'
 ESQUEMA_TRANSCRICAO = {
     'type': 'object',
@@ -81,9 +81,15 @@ def inspecionar_audio(caminho: Path, config: Config) -> dict:
             'codecs': [s.get('codec_name', 'desconhecido') for s in audios]}
 
 
+# O modelo transcreve protocolo, CPF e RG dígito a dígito ("1 2 3 4 5 6 7 8 9 - 0 0"); separados,
+# eles escapam do mascaramento (privacidade.py) e da comparação com o gabarito.
+_DIGITOS_DITADOS = re.compile(r'(?<!\w)\d(?: \d){2,}(?: ?- ?\d(?: \d)*)*(?!\w)')
+
+
 def revisar_transcricao(bruto: str) -> str:
-    """Normaliza apresentação, preservando todas as palavras e números."""
+    """Normaliza apresentação: só espaços e quebras, preservando todos os caracteres."""
     linhas = [re.sub(r'[^\S\n]+', ' ', l).strip() for l in bruto.splitlines()]
+    linhas = [_DIGITOS_DITADOS.sub(lambda m: m.group(0).replace(' ', ''), l) for l in linhas]
     return re.sub(r'\n{3,}', '\n\n', '\n'.join(linhas)).strip()
 
 
@@ -145,6 +151,9 @@ def preparar_locucao(texto: str) -> str:
     linhas = []
     for linha in texto.splitlines():
         if re.fullmatch(r'\s*(?:-{3,}|_{3,}|\*{3,})\s*', linha):
+            continue
+        linha = re.sub(r'!\[[^\[\]]*\]\([^()]*\)', '', linha)
+        if not linha.strip():
             continue
         linha = re.sub(r'^\s{0,3}#{1,6}\s+', '', linha)
         linha = re.sub(r'^\s*[-*+]\s+', '', linha)

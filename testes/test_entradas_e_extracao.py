@@ -185,3 +185,25 @@ def test_dados_criticos_dos_gabaritos_existem_na_fonte():
         dados = json.loads(gabarito.read_text(encoding="utf-8"))
         fonte = (RAIZ / caso["arquivo"]).read_text(encoding="utf-8") if caso["modalidade"] == "texto" else dados["texto_referencia"]
         assert conferir_dados_criticos(fonte, dados["dados_criticos"])["nao_encontrados"] == [], caso["id"]
+
+
+def test_minuta_com_lacuna_traz_o_aviso_que_libera_a_voz():
+    from src import audio
+    from src.config import carregar_config
+    from src.llm_client import ClienteLLM
+    from src.minuta import AVISO_LACUNAS, gerar_minuta
+    from testes.falsos import SDKFalso, interacao
+
+    config = carregar_config()
+    campos = {"protocolo": "2026-000142", "data": NAO_LOCALIZADO, "solicitante": "Fulano", "assunto": "Matrícula",
+              "pedido": "Documentos", "categoria": "matricula", "campos_ausentes": ["data"]}
+    com_lacuna = gerar_minuta(campos, fontes=["dados/originais/x.txt"], config=config,
+                              cliente=ClienteLLM(config, chave="c", sdk=SDKFalso(interacao("Prazo: não localizado."))))
+    assert com_lacuna.texto.count(AVISO_LACUNAS) == 1
+    assert com_lacuna.texto.index(AVISO_LACUNAS) < com_lacuna.texto.index("### Fontes consultadas")
+    audio.preparar_locucao(com_lacuna.texto)  # não levanta: a voz fica liberada
+
+    completos = {**campos, "data": "14/10/2026", "campos_ausentes": []}
+    sem_lacuna = gerar_minuta(completos, fontes=["dados/originais/x.txt"], config=config,
+                              cliente=ClienteLLM(config, chave="c", sdk=SDKFalso(interacao("Tudo informado."))))
+    assert AVISO_LACUNAS not in sem_lacuna.texto

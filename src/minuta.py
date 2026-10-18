@@ -16,6 +16,8 @@ from .extracao import CAMPOS_OBRIGATORIOS, NAO_LOCALIZADO
 from .llm_client import ClienteLLM, RespostaLLM
 from .prompts import Prompt, carregar_prompt, delimitar
 
+# RF07: o áudio só fala "não localizado" com este aviso no texto aprovado (audio.preparar_locucao).
+AVISO_LACUNAS = "Os campos identificados como não localizado representam informações ausentes no documento."
 PROMPT_MINUTA = ("minuta", 2)
 PROMPT_SISTEMA = ("sistema_seguro", 1)
 ORGAO = "GOVERNO DO ESTADO DE MATO GROSSO — CENTRAL DE ATENDIMENTO"
@@ -58,7 +60,10 @@ def gerar_minuta(campos: dict, *, fontes: list[str], cliente: ClienteLLM, config
         instrucao_sistema=sistema.texto,
         saida="texto",
     )
-    texto = "\n\n".join([cabecalho(campos, config), resposta.texto.strip(), secao_fontes(fontes)]) + "\n"
+    partes = [cabecalho(campos, config), resposta.texto.strip()]
+    if NAO_LOCALIZADO in "\n".join(partes).casefold():
+        partes.append(f"*{AVISO_LACUNAS}*")
+    texto = "\n\n".join([*partes, secao_fontes(fontes)]) + "\n"
     return Minuta(
         texto=texto,
         campos_ausentes=[str(c) for c in campos.get("campos_ausentes", [])],

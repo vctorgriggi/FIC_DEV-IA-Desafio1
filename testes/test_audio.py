@@ -153,8 +153,22 @@ class AudioSimuladoTest(unittest.TestCase):
         self.assertEqual(texto.split(), audio.revisar_transcricao(texto).split())
 
     def test_locucao_conservadora(self):
-        texto = '# Comunicado\n**Protocolo:** 123-4\n- *Nome X*\n![Brasão](dados/brasao.png)\n---'
-        self.assertEqual(audio.preparar_locucao(texto), 'Comunicado\nProtocolo: 123-4\nNome X\nBrasão (dados/brasao.png)')
+        texto = '# Comunicado\n![Brasão](../../dados/brasao.png)\n**Protocolo:** 123-4\n- *Nome X*\n[Fonte](dados/x.txt)\n---'
+        # A imagem é decorativa e sai da fala; links continuam com o destino audível.
+        self.assertEqual(audio.preparar_locucao(texto), 'Comunicado\nProtocolo: 123-4\nNome X\nFonte (dados/x.txt)')
+
+    def test_revisao_junta_digitos_ditados_um_a_um(self):
+        bruto = 'Protocolo 2 0 2 6 - 0 0 0 1 4 2, CPF 1 2 3 4 5 6 7 8 9 - 0 0, RG 1 2 3 4 5 6 7 - 8; nasci em 12 de agosto, 1200 horas.'
+        self.assertEqual(
+            audio.revisar_transcricao(bruto),
+            'Protocolo 2026-000142, CPF 123456789-00, RG 1234567-8; nasci em 12 de agosto, 1200 horas.',
+        )
+
+    def test_digitos_juntados_permitem_mascarar_cpf_e_rg(self):
+        from src.privacidade import mascarar
+        revisado = audio.revisar_transcricao('CPF 1 2 3 4 5 6 7 8 9 - 0 0 e RG 1 2 3 4 5 6 7 - 8')
+        _, contagem = mascarar(revisado, ['cpf', 'rg'])
+        self.assertEqual(contagem, {'cpf': 1, 'rg': 1})
 
     def test_lacunas_exigem_aviso_previamente_aprovado(self):
         with self.assertRaises(RevisaoInvalida):
