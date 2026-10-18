@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Callable
 
 from .audit import Auditoria, Evento, agora_iso
+from .comparacao import tokens
 from .config import Config
 
 AGUARDANDO = "aguardando_revisao"
@@ -140,21 +141,42 @@ def perguntar_decisao(
 
 def confirmar_campos_criticos(
     campos: dict,
+    trechos_incertos: list[str] | None = None,
+    *,
     perguntar: Callable[[str], str] | None = None,
     mostrar: Callable[[str], None] | None = None,
 ) -> tuple[dict, list[str]]:
-    """Mostra cada campo crítico; Enter confirma, qualquer texto substitui o valor."""
+    """Mostra os trechos incertos da extração e cada campo crítico; Enter confirma, texto substitui.
+
+    Campo cujo valor contém um trecho incerto ganha um alerta na pergunta.
+    """
     perguntar = perguntar or input
     mostrar = mostrar or print
+    trechos_incertos = trechos_incertos or []
+    if trechos_incertos:
+        mostrar("Trechos que a extração marcou como incertos:")
+        for trecho in trechos_incertos:
+            mostrar(f"  - {trecho}")
     mostrar("Confira os dados críticos extraídos (Enter confirma, ou digite o valor correto):")
     confirmados = dict(campos)
     corrigidos = []
     for campo in CAMPOS_CRITICOS:
-        resposta = perguntar(f"  {campo} = {campos.get(campo)!r} > ").strip()
+        valor = campos.get(campo)
+        alerta = "  [ATENÇÃO: contém trecho incerto]" if _contem_trecho_incerto(str(valor), trechos_incertos) else ""
+        resposta = perguntar(f"  {campo} = {valor!r}{alerta} > ").strip()
         if resposta:
             confirmados[campo] = resposta
             corrigidos.append(campo)
     return confirmados, corrigidos
+
+
+def _contem_trecho_incerto(valor: str, trechos_incertos: list[str]) -> bool:
+    normalizado = " ".join(tokens(valor))
+    for trecho in trechos_incertos:
+        lido = " ".join(tokens(trecho.split(" — ", 1)[0]))
+        if lido and lido in normalizado:
+            return True
+    return False
 
 
 def perguntar_checklist_peca(perguntar: Callable[[str], str] | None = None) -> dict[str, bool]:

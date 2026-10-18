@@ -78,7 +78,7 @@ def processar_caso(
     config: Config,
     cliente: ClienteLLM,
     auditoria: Auditoria,
-    confirmar: Callable[[dict], tuple[dict, list[str]]] = confirmar_campos_criticos,
+    confirmar: Callable[[dict, list[str]], tuple[dict, list[str]]] = confirmar_campos_criticos,
 ) -> dict:
     """Processa um caso do config.json até a minuta aguardando revisão; devolve os metadados."""
     caso = config.caso(caso_id)
@@ -131,9 +131,9 @@ def processar_caso(
     corrigidos: list[str] = []
     if modalidade != "texto":
         with _etapa(auditoria, base, "confirmacao_campos_criticos") as evento:
-            campos, corrigidos = confirmar(campos)
+            campos, corrigidos = confirmar(campos, extraido.trechos_incertos)
             evento.decisao_humana = "corrigido" if corrigidos else "confirmado"
-            evento.extra = {"campos_corrigidos": corrigidos}
+            evento.extra = {"campos_corrigidos": corrigidos, "trechos_incertos_exibidos": extraido.trechos_incertos}
 
     _gravar_json(
         pasta / "extracao.json",

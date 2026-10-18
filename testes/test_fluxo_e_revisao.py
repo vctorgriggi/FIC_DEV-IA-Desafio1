@@ -58,15 +58,24 @@ def test_texto_chega_a_minuta_aguardando_revisao(config, auditoria, partes_falsa
 
 def test_audio_passa_por_confirmacao_humana_antes_da_minuta(config, auditoria, partes_falsas, monkeypatch):
     monkeypatch.setattr(
-        fluxo.audio, "transcrever", lambda arquivo, **_: TextoExtraido(texto_bruto="bruto", texto_revisado="revisado")
+        fluxo.audio,
+        "transcrever",
+        lambda arquivo, **_: TextoExtraido(texto_bruto="bruto", texto_revisado="revisado", trechos_incertos=["0001 — ruído"]),
     )
+    exibidos = []
+
+    def confirmar(campos, trechos):
+        exibidos.extend(trechos)
+        return {**campos, "protocolo": "2026-000002"}, ["protocolo"]
+
     meta = fluxo.processar_caso(
         "audio-01",
         config=config,
         cliente=None,
         auditoria=auditoria,
-        confirmar=lambda campos: ({**campos, "protocolo": "2026-000002"}, ["protocolo"]),
+        confirmar=confirmar,
     )
+    assert exibidos == ["0001 — ruído"]
     assert etapas(auditoria, meta["id_execucao"]) == [
         "entrada", "extracao_texto", "compreensao", "confirmacao_campos_criticos", "geracao_minuta"
     ]
@@ -128,9 +137,22 @@ def test_perguntas_do_terminal_repetem_ate_resposta_valida():
     assert perguntar_decisao(lambda _: next(respostas)) == ("aprovar", "Dados conferidos", "Servidor A")
 
     respostas = iter(["", "2026-000009", ""])
-    campos, corrigidos = confirmar_campos_criticos(CAMPOS, lambda _: next(respostas), lambda _: None)
+    perguntas, exibido = [], []
+
+    def perguntar(pergunta):
+        perguntas.append(pergunta)
+        return next(respostas)
+
+    campos, corrigidos = confirmar_campos_criticos(
+        {**CAMPOS, "protocolo": "2024-000001"},
+        ["2024 — dígito rasurado"],
+        perguntar=perguntar,
+        mostrar=exibido.append,
+    )
+    assert "  - 2024 — dígito rasurado" in exibido
+    assert "ATENÇÃO" in perguntas[0] and "ATENÇÃO" not in perguntas[1]
     assert corrigidos == ["data"]
-    assert campos["data"] == "2026-000009" and campos["protocolo"] == CAMPOS["protocolo"]
+    assert campos["data"] == "2026-000009" and campos["protocolo"] == "2024-000001"
 
 
 def test_taxa_de_aprovacao(config, auditoria, partes_falsas):

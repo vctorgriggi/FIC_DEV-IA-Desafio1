@@ -25,6 +25,7 @@ class TextoExtraido:
 
     texto_bruto: str
     texto_revisado: str
+    # Cada item no formato "trecho — motivo"; a confirmação humana destaca o campo que contém o trecho.
     trechos_incertos: list[str] = field(default_factory=list)
     # Ex.: idioma e duração do áudio (RF06), páginas do documento (RF08).
     metadados: dict = field(default_factory=dict)
