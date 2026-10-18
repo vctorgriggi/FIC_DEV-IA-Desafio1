@@ -12,7 +12,7 @@ Requer Python 3.10 ou mais recente (exigência do SDK `google-genai`). Testado c
 python3 -m venv .venv
 source .venv/bin/activate          # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-cp .env.example .env               # preencha GEMINI_API_KEY com a chave do Google AI Studio
+cp .env.example .env               # Windows: copy .env.example .env; preencha GEMINI_API_KEY (Google AI Studio)
 python -m src.main verificar       # mostra e registra versões, chave e arquivos dos casos
 python -m src.main verificar --chamar-api   # opcional: uma chamada curta para testar a chave
 ```
@@ -33,7 +33,8 @@ python -m src.main processar texto-01         # entrada -> extração -> compree
 python -m src.main confirmar <id_execucao>    # retoma uma execução parada na confirmação dos dados críticos
 python -m src.main revisar <id_execucao>      # aprovar, aprovar com correção, rejeitar ou pedir nova geração
 python -m src.main audio-minuta <id_execucao>  # áudio da minuta aprovada (RF07)
-python -m src.main avaliacao                  # contagem por status e taxa de aprovação (RF13)
+python -m src.main avaliacao                  # esperado contra obtido por caso e taxa de aprovação (RF13)
+python -m src.main gerar-prompt-c              # gera o Prompt C a partir do metaprompt (RF02), se ainda não existir
 python -m src.main experimento-prompts --entrada dados/experimento_rf02/entrada_texto-01.json  # prompts A, B e C (RF02)
 python -m src.main peca-visual imagem-01 --especificacao prompts/peca_visual_v1.json [--imagem-base <imagem>]  # RF10
 python -m src.main revisar-peca <id_execucao>  # checklist e decisão sobre a peça (RF10)
@@ -42,21 +43,20 @@ python -m pytest                              # testes; não chamam a API
 
 Códigos de saída: `0` sucesso, `1` erro de uso (caso, arquivo ou revisão inválidos), `2` erro do provedor (chave, cota, indisponibilidade, timeout), `3` parte ainda não implementada, `130` operação cancelada no terminal.
 
-## Divisão do trabalho
+## Requisitos e onde estão
 
-Cada integrante implementa uma modalidade. As funções pendentes levantam `PendenteDeImplementacao` e trazem, na docstring, o que o requisito pede e o formato da chamada ao Gemini.
-
-| Parte | Requisitos | Onde | Situação |
+| Parte | Requisitos | Código | Situação |
 |---|---|---|---|
-| Base compartilhada | RF01, RF03 (delimitação e prompt de sistema), RF04, RF11, RF12 (mascaramento), RF13 (revisão e taxa de aprovação) | `config.py`, `llm_client.py`, `prompts.py`, `audit.py`, `privacidade.py`, `entradas.py`, `revisao.py`, `fluxo.py`, `main.py` | pronta, com testes |
-| Texto | RF02, RF03 (caso de teste com prompt injection), RF05, RF09 | `extracao.py`, `minuta.py`, `experimento.py`, `prompts/`, `documentacao/experimento_prompts.md` | pronta, com testes |
+| Base | RF01, RF03 (delimitação e prompt de sistema), RF04, RF11, RF12 (mascaramento), RF13 | `config.py`, `llm_client.py`, `prompts.py`, `audit.py`, `privacidade.py`, `entradas.py`, `revisao.py`, `avaliacao.py`, `fluxo.py`, `main.py`, `web.py` | pronta, com testes |
+| Texto | RF02, RF03 (caso de prompt injection), RF05, RF09 | `extracao.py`, `minuta.py`, `experimento.py`, `prompts/` | pronta, com testes |
 | Áudio | RF06, RF07 | `audio.py` (`transcrever`, `sintetizar`) | pendente |
-| Imagem | RF08, RF10 | `vision.py`, `comparacao.py`, `image_generation.py`, `prompts/ocr_v1.md`, `prompts/peca_visual_v1.json` | pronta, com testes; decisões em `documentacao/visao_e_imagem.md` |
-| Todos | RF12 (matriz de dados pessoais), RF13, entregáveis | `documentacao/`, `dados/gabaritos/` | pendente |
+| Imagem | RF08, RF10 | `vision.py`, `comparacao.py`, `image_generation.py`, `prompts/ocr_v1.md`, `prompts/peca_visual_v1.json` | pronta, com testes |
 
-Áudio e imagem desembocam em `extrair_campos` e `gerar_minuta`: enquanto a parte de texto não estiver pronta, o fluxo dessas modalidades para na etapa de compreensão. Cada parte pode ser testada isoladamente substituindo as outras, como em `testes/test_fluxo_e_revisao.py`.
+As três modalidades terminam na mesma extração de campos e na mesma minuta. O contrato entre elas é o formato de `TextoExtraido` (`tipos.py`) e o esquema de `extracao.py`.
 
-O contrato entre as partes é o formato de `TextoExtraido` (`tipos.py`) e o esquema de `extracao.py`. Mudança neles afeta as três modalidades: combinem antes.
+## Documentação da entrega
+
+Em [`documentacao/`](documentacao/README.md): relatório técnico, experimento de prompts (RF02), visão, OCR e peça visual (RF08, RF10), matriz LGPD (RF12), avaliação com as decisões humanas e a taxa de aprovação (RF13) e registro do uso de IA. As saídas da rodada final ficam em `resultados/` e `dados/processados/`.
 
 ## Categorias (RF05)
 
@@ -72,7 +72,7 @@ A extração classifica cada solicitação em uma destas categorias (`categorias
 
 ## Gabaritos
 
-Cada caso precisa de um resultado esperado escrito antes da execução (seção 6 do enunciado). Copie `dados/gabaritos/_modelo.json` para `dados/gabaritos/<caso>.json`, com o nome que está em `config.json`.
+Cada caso tem um resultado esperado escrito antes da execução (seção 6 do enunciado), em `dados/gabaritos/<caso>.json`. Para um caso novo, copie `dados/gabaritos/_modelo.json` com o nome que está em `config.json`.
 
 ## Decisões e limitações
 
@@ -81,10 +81,12 @@ Cada caso precisa de um resultado esperado escrito antes da execução (seção 
 - **Timeout (RF04):** `timeout_segundos` é um prazo de relógio sobre a chamada inteira, aplicado pelo `llm_client.py`. O SDK 2.31.0 repete chamadas esperando o `Retry-After` do servidor sem teto, e `attempts=0` vira 1; num 429 de cota esgotada a CLI travava por minutos. Por isso o cliente só deixa o SDK repetir erros 5xx: o 429 volta na hora como "limite de requisições".
 - **Sem armazenamento no provedor:** as chamadas usam `store=False` (`armazenar_no_provedor` no config).
 - **Parâmetros do experimento (RF02):** os modelos Gemini 3.6 ou mais recentes ignoram `temperature`, `top_p` e `top_k` (fonte: docs oficiais Gemini API, text-generation, out/2026). O controle disponível é `max_output_tokens`, `seed` e `thinking_level`.
-- **Custos estimados:** calculados com os preços da camada paga em `precos_usd_por_milhao_tokens`. Valores vigentes até 31/12/2026 (fonte: docs oficiais Gemini API, pricing, out/2026); a página anuncia preços em dobro para `gemini-3.8-flash` e para os TTS a partir de 01/01/2027. O custo de raciocínio entra como saída. Geração de imagem não tem cota gratuita: US$ 0,0336 por imagem 1K.
+- **Custos estimados:** calculados com os preços da camada paga em `precos_usd_por_milhao_tokens`. Valores vigentes até 31/12/2026 (fonte: docs oficiais Gemini API, pricing, out/2026); a página anuncia preços em dobro para `gemini-3.8-flash` e para os TTS a partir de 01/01/2027. O custo de raciocínio entra como saída. Geração de imagem não tem cota gratuita: US$ 0,0336 por imagem 1K. Custos medidos de cada execução: `documentacao/relatorio_tecnico.md`.
 - **Erros do provedor:** a Interactions API levanta exceções de um módulo privado do SDK. `llm_client.py` as classifica por atributo (`status_code`, nome da classe), e `testes/test_llm_client.py` importa as classes reais para avisar se o SDK mudar.
 - **Chave inválida** chega como HTTP 400 com `API_KEY_INVALID`, não como 401.
 - **Rastreabilidade:** `resultados/logs/execucoes.jsonl` guarda referências (arquivo de origem, versão e hash do prompt, parâmetros, caminho da saída), não o conteúdo. Prompt alterado é arquivo novo em `prompts/` (`<nome>_v<N>.md`).
+- **Fluxo em duas fases:** `preparar_caso` vai até a extração dos campos e grava o estado; `concluir_caso` registra a confirmação humana e gera a minuta. Uma execução interrompida na confirmação pode ser retomada (`confirmar` ou interface).
+- **Limite de tokens:** `max_output_tokens` é 8192 porque o raciocínio do modelo conta no limite; com 4096, o JSON do OCR chegou cortado. Resposta cortada gera um erro próprio, e não "fora do formato".
 - **Revisão:** o áudio (RF07) só é gerado de minuta aprovada e com o mesmo hash registrado na aprovação. Dados críticos de áudio e imagem (protocolo, data, solicitante) passam por confirmação humana antes da minuta.
 - **Minuta (RF09):** o modelo redige só o corpo. Cabeçalho com brasão, órgão e dados de referência e a seção de fontes entram por código, então não dependem do modelo e reaproveitam os dados já confirmados. Os campos vão ao modelo dentro de `<conteudo_externo>` (RF03), sem `motivo_revisao` nem confiança. O prompt de produção é `minuta_v2`: o Prompt B do experimento sem as partes que o código assumiu.
 - **Peça visual (RF10):** o modelo gera só a ilustração; o texto e o selo de conteúdo sintético são aplicados com Pillow, para o texto sair exato. Cada peça em `resultados/imagens/` tem ao lado a ilustração original do modelo e um `.json` com prompt, especificação, modelo, data, nota de proveniência e revisão. A composição usa Arial ou DejaVu Sans; sem nenhuma das duas, a peça não é gerada (a fonte embutida do Pillow não tem acentos).
