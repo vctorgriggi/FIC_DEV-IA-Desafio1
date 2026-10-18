@@ -1,7 +1,10 @@
 import json
 
 from src.config import RAIZ
-from src.experimento import PROMPTS, executar_experimento
+import pytest
+
+from src.entradas import ArquivoInvalido
+from src.experimento import PROMPTS, executar_experimento, gerar_prompt_c
 from src.llm_client import ClienteLLM
 from testes.falsos import SDKFalso, interacao
 
@@ -18,7 +21,8 @@ def test_tres_prompts_com_mesmo_modelo_parametros_sistema_e_entrada(config, audi
     assert len(sdk.chamadas) == 3
     for campo in ("model", "system_instruction", "generation_config", "timeout", "store"):
         assert len({json.dumps(c[campo], sort_keys=True) for c in sdk.chamadas}) == 1, campo
-    blocos = {c["input"][c["input"].index("<conteudo_externo"):] for c in sdk.chamadas}
+    # rindex: o prompt pode citar a etiqueta; o bloco anexado pelo sistema é o último.
+    blocos = {c["input"][c["input"].rindex('<conteudo_externo origem="campos_extraidos">'):] for c in sdk.chamadas}
     assert len(blocos) == 1  # mesma entrada delimitada; só o prompt da tarefa muda
     assert ENTRADA["campos"]["protocolo"] in blocos.pop()
 
@@ -31,4 +35,18 @@ def test_tres_prompts_com_mesmo_modelo_parametros_sistema_e_entrada(config, audi
     pasta = config.caminho("experimentos") / metricas["id_execucao"]
     assert json.loads((pasta / "metricas.json").read_text(encoding="utf-8")) == metricas
     eventos = auditoria.eventos(caso_id="experimento-rf02")
-    assert [e["versao_prompt"] for e in eventos] == ["minuta_a_v1", "minuta_b_v1", "minuta_c_v1"]
+    assert [e["versao_prompt"] for e in eventos] == ["minuta_a_v1", "minuta_b_v1", "minuta_c_v2"]
+
+
+def test_prompt_c_vem_do_metaprompt_e_nao_sobrescreve(config, auditoria):
+    (config.caminho("prompts") / "minuta_c_v2.md").unlink(missing_ok=True)
+    sdk = SDKFalso(interacao("```markdown\n# PROMPT C\nRedija a minuta.\n```"))
+    cliente = ClienteLLM(config, chave="c", sdk=sdk)
+    destino = gerar_prompt_c(config=config, cliente=cliente, auditoria=auditoria)
+
+    assert destino.read_text(encoding="utf-8") == "# PROMPT C\nRedija a minuta.\n"
+    metaprompt = (config.caminho("prompts") / "metaprompt_v1.md").read_text(encoding="utf-8").strip()
+    assert sdk.chamadas[0]["input"] == metaprompt
+    assert auditoria.eventos(etapa="metaprompt")[0]["versao_prompt"] == "metaprompt_v1"
+    with pytest.raises(ArquivoInvalido, match="já existe"):
+        gerar_prompt_c(config=config, cliente=cliente, auditoria=auditoria)

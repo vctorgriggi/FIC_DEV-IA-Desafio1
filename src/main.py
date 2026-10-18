@@ -122,6 +122,11 @@ def cmd_experimento_prompts(config: Config, args: argparse.Namespace) -> None:
     print(f"Métricas em {config.relativo(config.caminho('experimentos') / metricas['id_execucao'] / 'metricas.json')}")
 
 
+def cmd_gerar_prompt_c(config: Config, args: argparse.Namespace) -> None:
+    destino = experimento.gerar_prompt_c(config=config, cliente=ClienteLLM(config), auditoria=Auditoria(config))
+    print(f"Prompt C gerado pelo metaprompt: {config.relativo(destino)}")
+
+
 def cmd_peca_visual(config: Config, args: argparse.Namespace) -> None:
     especificacao = ler_arquivo_json(args.especificacao)
     imagem_base = validar_arquivo(Path(args.imagem_base), "imagem", config).caminho if args.imagem_base else None
@@ -188,6 +193,10 @@ def montar_parser() -> argparse.ArgumentParser:
     experimento_prompts = sub.add_parser("experimento-prompts", help="roda os prompts A, B e C do RF02 com a mesma entrada")
     experimento_prompts.add_argument("--entrada", required=True, help="JSON com campos, fontes e imagem institucional")
     experimento_prompts.set_defaults(funcao=cmd_experimento_prompts)
+
+    sub.add_parser("gerar-prompt-c", help="gera o Prompt C do RF02 a partir de prompts/metaprompt_v1.md").set_defaults(
+        funcao=cmd_gerar_prompt_c
+    )
 
     revisar_peca = sub.add_parser("revisar-peca", help="checklist e decisão sobre uma peça visual (RF10)")
     revisar_peca.add_argument("id_execucao")

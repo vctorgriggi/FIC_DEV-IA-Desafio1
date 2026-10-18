@@ -62,6 +62,9 @@ dados/gabaritos/  # resultado esperado, escrito antes de executar o caso
 - Agente escreve `client.models.generate_content` → a doc atual do Gemini usa
   `client.interactions.create`; siga o formato das docstrings de `audio.py`,
   `vision.py` e `image_generation.py`.
+- CLI parada por minutos após um 429 → o SDK repete esperando o `Retry-After`
+  sem teto, e `attempts=0` vira 1; `llm_client.py` só deixa repetir 5xx e
+  aplica prazo de relógio. Não troque isso por ajuste de `attempts`.
 - Atualizou o `google-genai` → rode os testes: as exceções da Interactions API
   vêm de um módulo privado do SDK, e `testes/test_llm_client.py` quebra se ele mudar.
 

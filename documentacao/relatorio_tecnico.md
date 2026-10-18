@@ -48,7 +48,7 @@ Custo estimado pela tabela da camada paga, válida até 31/12/2026 (fonte: docs 
 | `texto-01` (extração + minuta) | 2 | 0,0121 |
 | `texto-injection` (extração + minuta) | 2 | 0,0131 |
 | `imagem-01` (OCR + extração) | 2 | 0,0178 |
-| Experimento de prompts (A, B, C) | 3 | 0,0192 |
+| Experimento de prompts (A, B, C, rodada final) | 3 | 0,0265 |
 | Peça visual | 1 | 0,0336 por imagem 1K (não executada: sem cota gratuita) |
 
 ## Riscos e mitigações

@@ -9,14 +9,47 @@ chamada vira um evento na auditoria.
 from __future__ import annotations
 
 import json
+import re
+from pathlib import Path
 
 from .audit import Auditoria, Evento, agora_iso, novo_id
 from .config import Config
+from .entradas import ArquivoInvalido
 from .llm_client import ClienteLLM
 from .minuta import PROMPT_SISTEMA
 from .prompts import carregar_prompt, delimitar
 
-PROMPTS = {"A": ("minuta_a", 1), "B": ("minuta_b", 1), "C": ("minuta_c", 1)}
+METAPROMPT = ("metaprompt", 1)
+# minuta_c_v1 foi escrito pelo assistente de codificação sem metaprompt escrito;
+# o C do experimento é o v2, gerado por gerar_prompt_c a partir de METAPROMPT.
+PROMPTS = {"A": ("minuta_a", 1), "B": ("minuta_b", 1), "C": ("minuta_c", 2)}
+_CERCA = re.compile(r"^```[a-zA-Z]*\n(.*)\n```$", re.DOTALL)
+
+
+def gerar_prompt_c(*, config: Config, cliente: ClienteLLM, auditoria: Auditoria) -> Path:
+    """Gera o Prompt C do RF02 a partir do metaprompt; prompt publicado nunca é sobrescrito."""
+    nome, versao = PROMPTS["C"]
+    destino = config.caminho("prompts") / f"{nome}_v{versao}.md"
+    if destino.exists():
+        raise ArquivoInvalido(f"{config.relativo(destino)} já existe; prompt alterado é versão nova.")
+    metaprompt = carregar_prompt(config, *METAPROMPT)
+    resposta = cliente.gerar(modelo=config.modelo("texto"), entrada=metaprompt.texto)
+    texto = resposta.texto.strip()
+    if cercado := _CERCA.match(texto):
+        texto = cercado.group(1).strip()
+    destino.write_text(texto + "\n", encoding="utf-8")
+    auditoria.registrar(
+        Evento(
+            id_execucao=novo_id(),
+            caso_id="experimento-rf02",
+            etapa="metaprompt",
+            modalidade="texto",
+            versao_prompt=metaprompt.identificador,
+            hash_prompt=metaprompt.hash,
+            saida=config.relativo(destino),
+        ).com_resposta(resposta)
+    )
+    return destino
 
 
 def executar_experimento(
