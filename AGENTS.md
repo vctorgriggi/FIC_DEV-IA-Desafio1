@@ -10,6 +10,7 @@ texto, áudio e imagem e gera minutas para revisão humana. Enunciado em
 source .venv/bin/activate      # Python >= 3.10; o 3.9 do macOS não instala o SDK
 python -m pytest               # não chama a API
 python -m src.main verificar   # versões, chave e arquivos dos casos
+python -m src.main interface   # interface local em http://127.0.0.1:8000
 ```
 
 Não há lint nem typecheck configurados.
@@ -27,6 +28,7 @@ src/              # base compartilhada + uma parte por modalidade (tabela no REA
 prompts/          # <nome>_v<N>.md; prompt alterado é versão nova, nunca edição
 dados/originais/  # entradas do desafio; nunca alterar (o hash vai para o log)
 dados/gabaritos/  # resultado esperado, escrito antes de executar o caso
+interface/        # front-end Vite/React; dist/ é versionado e servido por src/web.py
 ```
 
 ## Nunca fazer
@@ -55,6 +57,8 @@ dados/gabaritos/  # resultado esperado, escrito antes de executar o caso
   rodada final da entrega entra num commit próprio com `git add -f`.
 - Uso de IA: declarado de forma resumida em `documentacao/uso_de_ia.md`,
   escrito pelo grupo. Commits não levam trailer de coautoria de IA.
+- Interface: só chama funções de fluxo.py e revisao.py; regra de negócio não
+  mora no front-end. Mudou interface/src → `npm run build` e commite dist/.
 - Identificadores e mensagens em português.
 
 ## Gotchas
