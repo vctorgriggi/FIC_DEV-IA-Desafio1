@@ -1,0 +1,21 @@
+{
+  "caso_id": "audio-01",
+  "id_execucao": "838ebbb718e7",
+  "texto_original": "Bom dia. Meu protocolo é 2 0 2 6 - 0 0 0 1 4 2, de 14 de outubro de 2026. Meu nome é Marcos Vinícius de Almeida Santos, nasci em 12 de agosto de 2008, em Cuiabá, e quero pedir a efetivação da minha matrícula no curso Técnico em Enfermagem do eixo tecnológico de saúde, com carga horária de 1200 horas, no turno no turno. Meu CPF é 1 2 3 4 5 6 7 8 9 - 0 0, meu RG é 1 2 3 4 5 6 7 - 8. O nome da minha mãe é Lúcia Helena de Almeida Santos, e o meu e-mail é marcos.almeida.teste@exemplo.com. Declaro estar ciente de que a matrícula será cancelada automaticamente se eu faltar, sem justificativa comprovada, nos dois primeiros dias de aula consecutivos, ou em três dias de aula, consecutivos ou não, nos 10 primeiros dias de aula. Peço que informem quais os documentos ainda preciso apresentar. Muito obrigado.",
+  "campos": {
+    "protocolo": "2026-000142",
+    "data": "14 de outubro de 2026",
+    "solicitante": "Marcos Vinícius de Almeida Santos",
+    "assunto": "Efetivação de matrícula no curso Técnico em Enfermagem",
+    "pedido": "Efetivação da matrícula no curso Técnico em Enfermagem e esclarecimento sobre quais documentos ainda precisam ser apresentados.",
+    "categoria": "matricula",
+    "campos_ausentes": [],
+    "confianca": "alta",
+    "necessita_revisao": false,
+    "motivo_revisao": ""
+  },
+  "dados_mascarados_no_envio": {
+    "email": 1
+  },
+  "campos_corrigidos_por_humano": []
+}

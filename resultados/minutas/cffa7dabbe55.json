@@ -1,0 +1,58 @@
+{
+  "id_execucao": "cffa7dabbe55",
+  "caso_id": "audio-01",
+  "modalidade": "audio",
+  "arquivo_origem": "dados/originais/entrada_audio.mp3",
+  "extracao": "dados/processados/audio-01/cffa7dabbe55/extracao.json",
+  "arquivo_minuta": "resultados/minutas/cffa7dabbe55.md",
+  "arquivo_renderizado": null,
+  "campos_ausentes": [],
+  "fontes": [
+    "dados/originais/entrada_audio.mp3"
+  ],
+  "gerada_em": "2026-10-18T18:12:16-04:00",
+  "status": "aprovada",
+  "revisao": {
+    "decisao": "aprovar",
+    "justificativa": "OK",
+    "revisor": "Victor G Silva",
+    "data_hora": "2026-10-18T18:12:19-04:00",
+    "sha256_minuta": "a744a59a90cdd8b3cdeec147376a946d5b42d6f2aeb32921009237b290bb04bd"
+  },
+  "audio": "resultados/audios/cffa7dabbe55.wav",
+  "sintese": {
+    "modelo": "gemini-3.8-flash-tts",
+    "voz": "Kore",
+    "estilo": "Fale em português brasileiro, com tom institucional, claro, sério e acolhedor, em ritmo pausado. Articule nomes, datas e protocolos com clareza. Leia somente o texto fornecido, sem comentários ou acréscimos.",
+    "formato": "wav",
+    "idioma_locucao": "pt-BR",
+    "preparacao": "markdown_conservador_v1",
+    "sha256_minuta": "a744a59a90cdd8b3cdeec147376a946d5b42d6f2aeb32921009237b290bb04bd",
+    "sha256_texto_falado": "04874ff91b8343ec65e4c59c6136ecabb78345e049ce068bcc042eca2a478cfd",
+    "sha256_audio": "b832ef2572852cb48d30ffdc66afff456ef58fa2cdfef3a52a4f8d0239201692",
+    "arquivo": "resultados/audios/cffa7dabbe55.wav",
+    "duracao_audio_s": 107.68,
+    "taxa_amostragem_hz": 24000,
+    "canais": 1,
+    "bits_por_amostra": 16,
+    "duracao_requisicao_s": 31.971,
+    "tokens_entrada": 346,
+    "tokens_saida": 2692,
+    "custo_estimado_usd": 0.024401,
+    "parametros": {
+      "store": false,
+      "timeout": 180,
+      "generation_config": {
+        "max_output_tokens": 8192,
+        "speech_config": [
+          {
+            "voice": "Kore"
+          }
+        ]
+      },
+      "response_format": {
+        "type": "audio"
+      }
+    }
+  }
+}

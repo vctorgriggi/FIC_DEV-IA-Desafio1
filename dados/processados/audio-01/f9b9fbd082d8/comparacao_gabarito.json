@@ -1,0 +1,64 @@
+{
+  "bruto": {
+    "similaridade": 0.87,
+    "palavras_referencia": 130,
+    "palavras_corretas": 124,
+    "taxa_acerto_palavras": 0.954,
+    "erros": [
+      {
+        "tipo": "substituicao",
+        "esperado": "2026-000142",
+        "obtido": "2 0 2 6 0 0 0 1 4 2"
+      },
+      {
+        "tipo": "substituicao",
+        "esperado": "no turno",
+        "obtido": "noturno"
+      },
+      {
+        "tipo": "substituicao",
+        "esperado": "123456789-00",
+        "obtido": "1 2 3 4 5 6 7 8 9 0 0"
+      },
+      {
+        "tipo": "substituicao",
+        "esperado": "1234567-8",
+        "obtido": "1 2 3 4 5 6 7 8"
+      },
+      {
+        "tipo": "substituicao",
+        "esperado": "10",
+        "obtido": "dez"
+      }
+    ]
+  },
+  "revisado": {
+    "similaridade": 0.981,
+    "palavras_referencia": 130,
+    "palavras_corretas": 127,
+    "taxa_acerto_palavras": 0.977,
+    "erros": [
+      {
+        "tipo": "substituicao",
+        "esperado": "no turno",
+        "obtido": "noturno"
+      },
+      {
+        "tipo": "substituicao",
+        "esperado": "10",
+        "obtido": "dez"
+      }
+    ]
+  },
+  "dados_criticos": {
+    "encontrados": [
+      "2026-000142",
+      "14 de outubro de 2026",
+      "Marcos Vinícius de Almeida Santos",
+      "12 de agosto de 2008",
+      "123456789-00",
+      "1234567-8"
+    ],
+    "nao_encontrados": []
+  }
+}

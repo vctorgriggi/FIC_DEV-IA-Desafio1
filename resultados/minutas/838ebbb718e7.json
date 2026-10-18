@@ -1,0 +1,22 @@
+{
+  "id_execucao": "838ebbb718e7",
+  "caso_id": "audio-01",
+  "modalidade": "audio",
+  "arquivo_origem": "dados/originais/entrada_audio.mp3",
+  "extracao": "dados/processados/audio-01/838ebbb718e7/extracao.json",
+  "arquivo_minuta": "resultados/minutas/838ebbb718e7.md",
+  "arquivo_renderizado": null,
+  "campos_ausentes": [],
+  "fontes": [
+    "dados/originais/entrada_audio.mp3"
+  ],
+  "gerada_em": "2026-10-18T18:11:51-04:00",
+  "status": "aprovada",
+  "revisao": {
+    "decisao": "aprovar",
+    "justificativa": "OK",
+    "revisor": "Victor G Silva",
+    "data_hora": "2026-10-18T18:11:57-04:00",
+    "sha256_minuta": "515d8b5f7417c5a1c35624c990d163fee369fa27a00f1e862f331442d0b3ba3c"
+  }
+}

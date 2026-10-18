@@ -1,0 +1,18 @@
+{
+  "trechos_incertos": [],
+  "metadados": {
+    "duracao_audio_s": 89.16,
+    "medicao_duracao": "ffprobe -count_frames",
+    "formato_detectado": "mp3",
+    "codecs": [
+      "mp3"
+    ],
+    "idioma": "pt",
+    "modelo": "gemini-3.8-flash",
+    "duracao_requisicao_s": 11.048,
+    "sha256_original": "aa396a4bc0d990ef05b031d8771cbad2d46ebc45ec1ad1adf4d23cb3c7cd2fa6",
+    "revisao": "espaços e quebras de linha; sem alteração de palavras",
+    "prompt_sistema": "sistema_seguro_v1",
+    "hash_prompt_sistema": "2e5ec844f60b"
+  }
+}
