@@ -7,7 +7,7 @@ import json
 import sys
 from pathlib import Path
 
-from . import experimento, fluxo
+from . import avaliacao, experimento, fluxo
 from .audit import Auditoria, agora_iso
 from .config import CasoInexistente, Config, carregar_chave, carregar_config, versoes
 from .entradas import ArquivoInvalido, validar_arquivo
@@ -79,6 +79,18 @@ def cmd_audio_minuta(config: Config, args: argparse.Namespace) -> None:
 
 
 def cmd_avaliacao(config: Config, args: argparse.Namespace) -> None:
+    avaliacoes = avaliacao.avaliar_todas(config)
+    for item in avaliacoes:
+        situacao = "ok" if not item["falhas"] else f"{len(item['falhas'])} divergência(s)"
+        print(f"{item['caso_id']:16} {item['id_execucao']}  {item['status_revisao']:24} {situacao}")
+        for falha in item["falhas"]:
+            print(f"    - {falha}")
+    destino = config.caminho("logs") / "avaliacao.json"
+    destino.parent.mkdir(parents=True, exist_ok=True)
+    destino.write_text(json.dumps(avaliacoes, ensure_ascii=False, indent=2), encoding="utf-8")
+    if avaliacoes:
+        print(f"Esperado contra obtido em {config.relativo(destino)}\n")
+
     resumo = resumo_revisoes(config)
     for status, total in sorted(resumo["por_status"].items()):
         print(f"{status:25} {total}")
@@ -165,7 +177,7 @@ def montar_parser() -> argparse.ArgumentParser:
     audio.add_argument("id_execucao")
     audio.set_defaults(funcao=cmd_audio_minuta)
 
-    sub.add_parser("avaliacao", help="contagem por status e taxa de aprovação (RF13)").set_defaults(funcao=cmd_avaliacao)
+    sub.add_parser("avaliacao", help="esperado contra obtido por caso e taxa de aprovação (RF13)").set_defaults(funcao=cmd_avaliacao)
 
     peca = sub.add_parser("peca-visual", help="gera ou edita a peça visual de um caso (RF10)")
     peca.add_argument("caso")
