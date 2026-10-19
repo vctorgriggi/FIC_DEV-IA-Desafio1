@@ -23,5 +23,5 @@
   ],
   "minuta_deve_conter": [],
   "minuta_nao_pode_conter": [],
-  "observacoes": "Rascunho escrito com apoio de IA a partir do PDF; conferir campo a campo antes de executar. O dígito final do ano no CÓDIGO está rasurado (pode ser lido como 4); o valor correto, confirmado pela solicitação em texto do mesmo caso, é 2026-000142. A ficha não traz um pedido escrito, por isso 'pedido' fica como não localizado. 'categoria' depende da lista de categorias que a parte de texto vai definir."
+  "observacoes": "Escrito com apoio de IA a partir do PDF e conferido campo a campo por Victor Griggi Moreira Regis da Silva. O dígito final do ano no CÓDIGO está rasurado (pode ser lido como 4); o valor correto, confirmado pela solicitação em texto do mesmo caso, é 2026-000142. A ficha não traz um pedido escrito, por isso 'pedido' fica como não localizado. 'categoria' ficou em branco porque dependia da lista de categorias definida depois pela parte de texto; por isso não é conferida."
 }
