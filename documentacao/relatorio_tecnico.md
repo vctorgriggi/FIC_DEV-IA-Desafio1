@@ -51,12 +51,13 @@ Custo estimado pela tabela padrão da OpenAI (`precos_usd_por_milhao_tokens` e `
 | `texto-injection` (extração + minuta) | 2 | 0,0042 |
 | `imagem-01`, três execuções (OCR + extração + minuta, cada) | 9 | 0,0453 |
 | `audio-01` (transcrição + extração + minuta) | 3 | 0,0114 |
+| `audio-01-ruido` (transcrição + extração) | 2 | 0,0086 |
 | Voz das minutas aprovadas do `audio-01` (80,6 s) e do `texto-01` (99,9 s) | 2 | sem estimativa: a Speech API não informa tokens |
 | Prompt C gerado pelo metaprompt | 1 | 0,0048 |
 | Experimento de prompts (A, B, C) | 3 | 0,0087 |
 | Peça visual (1536x1152) | 1 | 0,0229 |
 | Verificação dos dois áudios contra o texto aprovado (transcrição de cada WAV) | 2 | 0,0136 |
-| **Total registrado no log** | 25 | **0,1153** |
+| **Total registrado no log** | 27 | **0,1239** |
 
 Fora do log ficaram oito sínteses curtas de teste da leitura do protocolo, cada uma com sua transcrição.
 
@@ -82,7 +83,7 @@ Fora do log ficaram oito sínteses curtas de teste da leitura do protocolo, cada
 
 ## Limitações
 
-- Um caso por modalidade, mais o caso de injeção: os resultados mostram comportamento, não estatística.
+- Um caso por modalidade, mais o caso de injeção e a versão com ruído do áudio: os resultados mostram comportamento, não estatística.
 - `gpt-4o-mini-tts` e os demais modelos da Speech API serão desligados em 06/01/2027; o RF07 precisará migrar para a Realtime API.
 - O `gpt-transcribe` não aponta trechos incertos na transcrição.
 - A amostragem não é fixada no experimento de prompts: não verificamos se `gpt-6.1-terra` aceita `temperature`.

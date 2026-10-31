@@ -33,7 +33,7 @@ def api(config, monkeypatch):
 
 def test_painel_vazio_lista_casos(api):
     painel = api.get("/api/painel").json()
-    assert [c["id"] for c in painel["casos"]] == ["texto-01", "texto-injection", "audio-01", "imagem-01"]
+    assert [c["id"] for c in painel["casos"]] == ["texto-01", "texto-injection", "audio-01", "audio-01-ruido", "imagem-01"]
     assert painel["minutas"] == [] and painel["pendentes"] == [] and painel["pecas"] == []
     assert set(painel["checklist_peca"]) == set(CHECKLIST_PECA)
 

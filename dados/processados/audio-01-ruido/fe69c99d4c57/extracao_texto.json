@@ -1,0 +1,19 @@
+{
+  "trechos_incertos": [],
+  "metadados": {
+    "duracao_audio_s": 89.16,
+    "medicao_duracao": "ffprobe -count_frames",
+    "formato_detectado": "mp3",
+    "codecs": [
+      "mp3"
+    ],
+    "idioma": "pt",
+    "idiomas_indicados": [
+      "pt"
+    ],
+    "modelo": "gpt-transcribe",
+    "duracao_requisicao_s": 4.724,
+    "sha256_original": "6c9badadb42d7a68819c2632f055255fe7882a9a2201686913ca94718c176f31",
+    "revisao": "espaços e quebras de linha; sem alteração de palavras"
+  }
+}

@@ -72,6 +72,12 @@
       "gabarito": "dados/gabaritos/audio-01.json"
     },
     {
+      "id": "audio-01-ruido",
+      "modalidade": "audio",
+      "arquivo": "dados/originais/entrada_audio_ruido.mp3",
+      "gabarito": "dados/gabaritos/audio-01-ruido.json"
+    },
+    {
       "id": "imagem-01",
       "modalidade": "imagem",
       "arquivo": "dados/originais/entrada_pdf-imagem.pdf",

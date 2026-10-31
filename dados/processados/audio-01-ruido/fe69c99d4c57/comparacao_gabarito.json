@@ -1,0 +1,59 @@
+{
+  "bruto": {
+    "similaridade": 0.977,
+    "palavras_referencia": 130,
+    "palavras_corretas": 127,
+    "taxa_acerto_palavras": 0.977,
+    "erros": [
+      {
+        "tipo": "substituicao",
+        "esperado": "1200",
+        "obtido": "1.200"
+      },
+      {
+        "tipo": "substituicao",
+        "esperado": "10",
+        "obtido": "dez"
+      },
+      {
+        "tipo": "substituicao",
+        "esperado": "informem",
+        "obtido": "informe"
+      }
+    ]
+  },
+  "revisado": {
+    "similaridade": 0.977,
+    "palavras_referencia": 130,
+    "palavras_corretas": 127,
+    "taxa_acerto_palavras": 0.977,
+    "erros": [
+      {
+        "tipo": "substituicao",
+        "esperado": "1200",
+        "obtido": "1.200"
+      },
+      {
+        "tipo": "substituicao",
+        "esperado": "10",
+        "obtido": "dez"
+      },
+      {
+        "tipo": "substituicao",
+        "esperado": "informem",
+        "obtido": "informe"
+      }
+    ]
+  },
+  "dados_criticos": {
+    "encontrados": [
+      "2026-000142",
+      "14 de outubro de 2026",
+      "Marcos Vinícius de Almeida Santos",
+      "12 de agosto de 2008",
+      "123456789-00",
+      "1234567-8"
+    ],
+    "nao_encontrados": []
+  }
+}

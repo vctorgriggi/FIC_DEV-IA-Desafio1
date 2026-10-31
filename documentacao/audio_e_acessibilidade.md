@@ -56,6 +56,28 @@ Formatos aceitos: MP3, WAV, M4A, OGG e FLAC, até 20 MB (`entradas.audio` no con
 
 Em testes curtos com a mesma frase, a omissão do zero apareceu e desapareceu entre tentativas com a mesma instrução, e soletrar os dígitos com vírgulas piorou o resultado. A instrução de ler o protocolo algarismo por algarismo foi acrescentada ao estilo e acertou nas tentativas feitas, mas a síntese continua não determinística. A verificação automática serve para achar acréscimos e omissões de palavras; números só se confirmam ouvindo.
 
+## Ruído moderado (seção 6 do enunciado)
+
+O caso `audio-01-ruido` usa o mesmo áudio com ruído rosa somado, gerado sem alterar o original:
+
+```bash
+ffmpeg -i dados/originais/entrada_audio.mp3 \
+  -f lavfi -i "anoisesrc=color=pink:amplitude=0.1:sample_rate=48000:seed=42:duration=89.16" \
+  -filter_complex "[1:a]volume=-14.5dB[r];[0:a][r]amix=inputs=2:duration=first:normalize=0" \
+  -ac 1 -c:a libmp3lame -b:a 256k dados/originais/entrada_audio_ruido.mp3
+```
+
+O volume médio da fala é −38,7 dB e o do ruído, −48,7 dB: relação sinal-ruído de cerca de 10 dB sobre o volume médio, que inclui as pausas. O gabarito (`dados/gabaritos/audio-01-ruido.json`) repete o do `audio-01`, porque a fala é a mesma.
+
+| Item | Áudio limpo (`638263b33c98`) | Com ruído (`fe69c99d4c57`) |
+|---|---|---|
+| Palavras corretas | 97,7% (127 de 130) | 97,7% (127 de 130) |
+| Erros | "1200" como "1.200", "10" como "dez", "informem" como "informe" | Os mesmos |
+| Dados críticos encontrados | 6 de 6 | 6 de 6 |
+| Campos extraídos | Protocolo, data, solicitante e categoria corretos | Os mesmos |
+
+Nesse nível, o ruído não mudou a transcrição. A execução com ruído foi avaliada até a transcrição e a extração; a minuta e a voz deste conteúdo já foram avaliadas no `audio-01`.
+
 ## Gabarito
 
 `dados/gabaritos/audio-01.json` foi validado por Victor Griggi Moreira Regis da Silva ouvindo o original: a fala é "no turno noturno". O gabarito só vale com `validado_por_humano: true`, autoria, data e dados críticos como valores; a saída do modelo nunca deve ser usada como gabarito.
@@ -81,4 +103,4 @@ O áudio amplia o acesso para pessoas com deficiência visual ou com dificuldade
 - A voz pode errar números entre uma geração e outra; todo áudio precisa ser ouvido antes do uso, com atenção a protocolo e datas.
 - A Speech API não informa tokens, então a voz fica sem estimativa de custo.
 - O aviso de voz gerada por IA não faz parte da locução: acrescentá-lo exige que ele esteja no texto aprovado, porque a locução não acrescenta nada ao que foi aprovado.
-- O ruído moderado do áudio real não foi avaliado à parte; o caso tem uma gravação só.
+- O ruído testado é sintético (ruído rosa constante); ruído real, como vozes ao fundo ou trânsito, não foi testado.
