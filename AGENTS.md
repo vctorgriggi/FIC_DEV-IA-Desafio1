@@ -1,8 +1,9 @@
 # Central Inteligente de Atendimento — Desafio 1
 
 Protótipo local (FIC_DEV, IA Generativa) que recebe solicitações fictícias em
-texto, áudio e imagem e gera minutas para revisão humana. Enunciado em
-`enunciado/`; instalação, comandos, modelos e limitações no `README.md`.
+texto, áudio e imagem e gera minutas para revisão humana. Enunciados em
+`enunciado/desafio-1/` e `enunciado/desafio-2/`; instalação, comandos, modelos
+e limitações no `README.md`.
 
 ## Como rodar
 

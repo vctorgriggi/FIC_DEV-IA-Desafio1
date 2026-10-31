@@ -1,6 +1,6 @@
 # Central Inteligente de Atendimento e Comunicação Institucional
 
-Desafio Prático 1 — FIC_DEV, Inteligência Artificial Generativa. O enunciado transcrito está em [enunciado/](enunciado/README.md); o PDF original fica na raiz.
+Desafio Prático 1 — FIC_DEV, Inteligência Artificial Generativa. Os enunciados transcritos, com os PDFs originais, estão em [enunciado/](enunciado/README.md): o do Desafio 1 e o do Desafio 2, que evolui este mesmo projeto.
 
 Protótipo local que recebe solicitações fictícias em texto, áudio e imagem, extrai os campos, gera uma minuta de resposta e a deixa aguardando revisão de um servidor. Nada é enviado ao cidadão.
 
