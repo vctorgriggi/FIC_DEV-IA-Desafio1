@@ -51,13 +51,13 @@ Custo estimado pela tabela padrão da OpenAI (`precos_usd_por_milhao_tokens` e `
 | `texto-injection` (extração + minuta) | 2 | 0,0042 |
 | `imagem-01`, três execuções (OCR + extração + minuta, cada) | 9 | 0,0453 |
 | `audio-01` (transcrição + extração + minuta) | 3 | 0,0114 |
-| `audio-01-ruido` (transcrição + extração) | 2 | 0,0086 |
+| `audio-01-ruido`, duas execuções (transcrição + extração, cada) | 4 | 0,0173 |
 | Voz das minutas aprovadas do `audio-01` (80,6 s) e do `texto-01` (99,9 s) | 2 | sem estimativa: a Speech API não informa tokens |
 | Prompt C gerado pelo metaprompt | 1 | 0,0048 |
 | Experimento de prompts (A, B, C) | 3 | 0,0087 |
 | Peça visual (1536x1152) | 1 | 0,0229 |
 | Verificação dos dois áudios contra o texto aprovado (transcrição de cada WAV) | 2 | 0,0136 |
-| **Total registrado no log** | 27 | **0,1239** |
+| **Total registrado no log** | 29 | **0,1326** |
 
 Fora do log ficaram oito sínteses curtas de teste da leitura do protocolo, cada uma com sua transcrição.
 

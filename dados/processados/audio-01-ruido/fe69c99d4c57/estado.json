@@ -24,5 +24,10 @@
   "trechos_incertos": [],
   "exige_confirmacao": true,
   "preparado_em": "2026-10-31T12:16:54-04:00",
-  "status": "aguardando_confirmacao"
+  "status": "descartada",
+  "descarte": {
+    "justificativa": "este de ruído: avaliado até a transcrição, que repetiu o resultado do áudio limpo.",
+    "revisor": "Victor Griggi Moreira Regis da Silva",
+    "data_hora": "2026-10-31T12:19:32-04:00"
+  }
 }

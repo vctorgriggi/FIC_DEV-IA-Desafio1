@@ -76,7 +76,7 @@ O volume médio da fala é −38,7 dB e o do ruído, −48,7 dB: relação sinal
 | Dados críticos encontrados | 6 de 6 | 6 de 6 |
 | Campos extraídos | Protocolo, data, solicitante e categoria corretos | Os mesmos |
 
-Nesse nível, o ruído não mudou a transcrição. A execução com ruído foi avaliada até a transcrição e a extração; a minuta e a voz deste conteúdo já foram avaliadas no `audio-01`.
+Nesse nível, o ruído não mudou a transcrição. Uma segunda execução com ruído (`5b38f4c67b9c`) deu o mesmo resultado. As duas foram avaliadas até a transcrição e a extração e depois descartadas, com registro no log: a minuta e a voz deste conteúdo já foram avaliadas no `audio-01`.
 
 ## Gabarito
 
