@@ -14,7 +14,7 @@ Requer FFmpeg com `ffprobe` no PATH (ver Instalação no README). Em `config.jso
 
 - `modelos.transcricao`: `gpt-transcribe`; `modelos.tts`: `gpt-4o-mini-tts`;
 - `audio.idiomas`: `["pt"]`, enviado ao modelo de transcrição como dica de idioma;
-- `audio.voz`: `marin` (voz predefinida); `audio.estilo`: português do Brasil, tom institucional, claro e pausado, sem acréscimos, enviado como instrução de entonação;
+- `audio.voz`: `marin` (voz predefinida); `audio.estilo`: português do Brasil, tom institucional, claro e pausado, protocolo lido algarismo por algarismo, sem acréscimos, enviado como instrução de entonação;
 - `audio.timeout_inspecao_s`: 30 s para o `ffprobe`; o timeout da API é o `timeout_segundos` geral.
 
 Formatos aceitos: MP3, WAV, M4A, OGG e FLAC, até 20 MB (`entradas.audio` no config; o limite da API é 25 MB).
@@ -46,9 +46,15 @@ Formatos aceitos: MP3, WAV, M4A, OGG e FLAC, até 20 MB (`entradas.audio` no con
 | Mascaramento antes da extração | CPF, RG e e-mail mascarados |
 | Campos extraídos | Protocolo 2026-000142, data "14 de outubro de 2026", solicitante Marcos Vinícius de Almeida Santos, categoria `matricula`; confirmados por pessoa sem correção |
 | Comparação com o gabarito validado | 97,7% das palavras certas (127 de 130), no bruto e no revisado; 6 de 6 dados críticos; erros apontados: "1200" como "1.200", "10" como "dez", "informem" como "informe" |
-| Voz da minuta aprovada (`638263b33c98`) | WAV PCM de 80,6 s, 24 kHz, mono, 16 bits, voz `marin`; 13,9 s de chamada; a minuta trazia o aviso de lacunas; hash do texto sintetizado igual ao registrado na aprovação |
+| Voz da minuta aprovada do `audio-01` (`638263b33c98`) | WAV PCM de 80,6 s, 24 kHz, mono, 16 bits, voz `marin`; 13,9 s de chamada; hash do texto sintetizado igual ao registrado na aprovação. **Ouvida: o protocolo saiu como "2026, zero, zero, 142", com um zero a menos** |
+| Voz da minuta aprovada do `texto-01` (`0b09035747ca`) | WAV PCM de 99,9 s, voz `marin`, com a instrução de ler o protocolo algarismo por algarismo; 14,6 s de chamada; hash igual ao da aprovação. Ouvida: protocolo com os três zeros. É o áudio de referência do RF07 |
 
-**Áudio contra texto aprovado (critério de aceite do RF07):** o WAV gerado foi transcrito com `gpt-transcribe` e comparado com o texto falado esperado (`resultados/audios/638263b33c98_verificacao.json`). Resultado: 97,9% das palavras (137 de 140), sem acréscimos. Diferenças: "a" omitido, o caminho do arquivo de fonte lido sem barras, e o protocolo transcrito como "2026 00142". Como a verificação é outra transcrição automática, essa diferença no protocolo precisa ser conferida ouvindo o áudio.
+**Áudio contra texto aprovado (critério de aceite do RF07):** cada WAV foi transcrito com `gpt-transcribe` e comparado com o texto falado esperado (`resultados/audios/<id>_verificacao.json`): 97,9% das palavras no `audio-01` e 97,8% no `texto-01`, sem acréscimos. Nos dois, a transcrição registrou o protocolo errado ("2026 00142" e "2026 00042"), e a escuta humana decidiu:
+
+- No `audio-01`, a voz de fato omitiu um zero. É um erro crítico: o áudio não corresponde ao texto aprovado num dado crítico. O arquivo fica como evidência e não deve ser usado.
+- No `texto-01`, a voz falou os três zeros; o erro foi da transcrição de verificação.
+
+Em testes curtos com a mesma frase, a omissão do zero apareceu e desapareceu entre tentativas com a mesma instrução, e soletrar os dígitos com vírgulas piorou o resultado. A instrução de ler o protocolo algarismo por algarismo foi acrescentada ao estilo e acertou nas tentativas feitas, mas a síntese continua não determinística. A verificação automática serve para achar acréscimos e omissões de palavras; números só se confirmam ouvindo.
 
 ## Gabarito
 
@@ -72,6 +78,7 @@ O áudio amplia o acesso para pessoas com deficiência visual ou com dificuldade
 
 - O `gpt-transcribe` não marca trechos incertos; a incerteza da transcrição só aparece na confirmação humana e na comparação com o gabarito.
 - `gpt-4o-mini-tts` e os demais modelos da Speech API serão desligados em 06/01/2027; o substituto indicado, `gpt-realtime-2.1-mini`, só funciona pela Realtime API (fonte: docs oficiais OpenAI API, text-to-speech, out/2026).
+- A voz pode errar números entre uma geração e outra; todo áudio precisa ser ouvido antes do uso, com atenção a protocolo e datas.
 - A Speech API não informa tokens, então a voz fica sem estimativa de custo.
 - O aviso de voz gerada por IA não faz parte da locução: acrescentá-lo exige que ele esteja no texto aprovado, porque a locução não acrescenta nada ao que foi aprovado.
 - O ruído moderado do áudio real não foi avaliado à parte; o caso tem uma gravação só.

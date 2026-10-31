@@ -51,13 +51,13 @@ Custo estimado pela tabela padrão da OpenAI (`precos_usd_por_milhao_tokens` e `
 | `texto-injection` (extração + minuta) | 2 | 0,0042 |
 | `imagem-01`, três execuções (OCR + extração + minuta, cada) | 9 | 0,0453 |
 | `audio-01` (transcrição + extração + minuta) | 3 | 0,0114 |
-| Voz da minuta aprovada do `audio-01` (80,6 s de áudio) | 1 | sem estimativa: a Speech API não informa tokens |
+| Voz das minutas aprovadas do `audio-01` (80,6 s) e do `texto-01` (99,9 s) | 2 | sem estimativa: a Speech API não informa tokens |
 | Prompt C gerado pelo metaprompt | 1 | 0,0048 |
 | Experimento de prompts (A, B, C) | 3 | 0,0087 |
 | Peça visual (1536x1152) | 1 | 0,0229 |
-| **Total registrado no log** | 22 | **0,1017** |
+| **Total registrado no log** | 23 | **0,1017** |
 
-Fora do log, a verificação do áudio contra o texto aprovado (uma transcrição do WAV gerado) custou US$ 0,0061 estimado.
+Fora do log ficaram a verificação dos dois áudios contra o texto aprovado (uma transcrição de cada WAV, US$ 0,0136 estimado) e oito sínteses curtas de teste da leitura do protocolo, cada uma com sua transcrição.
 
 ## Riscos e mitigações
 
@@ -66,6 +66,7 @@ Fora do log, a verificação do áudio contra o texto aprovado (uma transcriçã
 | Alucinação | Regra "não invente" e "não localizado" no prompt de sistema; dados de referência da minuta copiados dos campos por código; revisão humana | `avaliacao.md`: campos exatos conferem nos casos de texto; datas atribuídas no fecho foram pegas na revisão |
 | Prompt injection | Conteúdo externo delimitado, com a etiqueta de fechamento neutralizada; minuta sem `motivo_revisao`; conferência de `minuta_nao_pode_conter` | Caso `texto-injection`: nada do ataque na minuta, tentativa sinalizada |
 | Erro de leitura (OCR, transcrição) | Texto bruto preservado, trechos incertos, comparação com gabarito, confirmação humana dos dados críticos | `visao_e_imagem.md`: protocolo rasurado marcado como ilegível e preenchido na confirmação |
+| Erro da voz sintética | Áudio só de texto aprovado; verificação por transcrição; escuta humana antes do uso | `audio_e_acessibilidade.md`: voz omitiu um zero do protocolo no `audio-01`, pego na verificação e confirmado ouvindo |
 | Exposição de dados | Mascaramento, `store=False`, log sem conteúdo, chave só no `.env` | `lgpd_campos.md` |
 | Dependência de fornecedor | Provedor isolado em um módulo; modelos no config | Trocar de provedor exige reescrever só `llm_client.py` e os testes dele |
 | Serviço indisponível ou cota esgotada | Erros traduzidos em mensagens claras; prazo de relógio por chamada; sem repetição automática do SDK | `testes/test_llm_client.py` |

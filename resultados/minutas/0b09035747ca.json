@@ -18,5 +18,31 @@
     "revisor": "Victor Griggi Moreira Regis da Silva",
     "data_hora": "2026-10-31T11:21:30-04:00",
     "sha256_minuta": "f1b07fe9a1088d76c59251dff65eb211abc8f52e6346ae83a953b0ea40486190"
+  },
+  "audio": "resultados/audios/0b09035747ca.wav",
+  "sintese": {
+    "modelo": "gpt-4o-mini-tts",
+    "voz": "marin",
+    "estilo": "Fale em português brasileiro, com tom institucional, claro, sério e acolhedor, em ritmo pausado. Articule nomes, datas e protocolos com clareza. Leia números de protocolo algarismo por algarismo, pronunciando cada zero. Leia somente o texto fornecido, sem comentários ou acréscimos.",
+    "formato": "wav",
+    "idioma_locucao": "pt-BR",
+    "preparacao": "markdown_conservador_v1",
+    "sha256_minuta": "f1b07fe9a1088d76c59251dff65eb211abc8f52e6346ae83a953b0ea40486190",
+    "sha256_texto_falado": "75fa033a4e03ef841f93c40c1dbf41dba61222f3ac0decd4c50f460641d3a4b1",
+    "sha256_audio": "217c5ec0f8218668e507e375c13bb0c8c962390c82fff9bc35eaab233c9f867f",
+    "arquivo": "resultados/audios/0b09035747ca.wav",
+    "duracao_audio_s": 99.85,
+    "taxa_amostragem_hz": 24000,
+    "canais": 1,
+    "bits_por_amostra": 16,
+    "duracao_requisicao_s": 14.571,
+    "tokens_entrada": null,
+    "tokens_saida": null,
+    "custo_estimado_usd": null,
+    "parametros": {
+      "voice": "marin",
+      "instructions": "Fale em português brasileiro, com tom institucional, claro, sério e acolhedor, em ritmo pausado. Articule nomes, datas e protocolos com clareza. Leia números de protocolo algarismo por algarismo, pronunciando cada zero. Leia somente o texto fornecido, sem comentários ou acréscimos.",
+      "response_format": "wav"
+    }
   }
 }

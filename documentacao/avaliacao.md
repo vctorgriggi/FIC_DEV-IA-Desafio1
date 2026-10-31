@@ -47,7 +47,7 @@ Revisões feitas em 31/10/2026 na interface, todas registradas em `resultados/lo
 | `0b8591d5a30b` | `imagem-01` | Protocolo corrigido para 2026-000142 | Nova geração pedida | Pendências diziam que o protocolo constava e estava ausente ao mesmo tempo | Alta |
 | `5270cc7d02bb` | `imagem-01` | Protocolo corrigido para 2026-000142 | Aprovada com correção | Correção da data do fecho descrita na justificativa, mas não aplicada ao texto salvo | Média |
 | `0f37876c722b` | `imagem-01` | Protocolo corrigido para 2026-000142 | Aprovada | Dados conferidos com a ficha; pendência do pedido sinalizada | — |
-| `638263b33c98` | `audio-01` | Confirmado sem correção | Aprovada com correção; áudio gerado | Data do fecho trocada por "não localizado" | Média |
+| `638263b33c98` | `audio-01` | Confirmado sem correção | Aprovada com correção; áudio gerado com erro no protocolo | Data do fecho trocada por "não localizado" | Média (minuta); crítica (áudio) |
 
 **Taxa de aprovação** (`python -m src.main avaliacao`):
 
@@ -63,6 +63,10 @@ O OCR não conseguiu ler o dígito rasurado e a extração marcou `protocolo` co
 ### Correção registrada e não aplicada (`5270cc7d02bb`)
 
 A justificativa diz que a data do fecho foi corrigida, mas o texto salvo, cujo hash ficou registrado na aprovação, ainda traz `Data: 14/10/2026`, a data da solicitação. Na interface, a correção é o texto do editor no momento do registro, e depois do registro a minuta não muda. O caso foi processado de novo (`0f37876c722b`), e a decisão final do `imagem-01` é a aprovação dessa minuta. Lição: conferir o texto do editor antes de registrar a decisão.
+
+### Voz com o protocolo errado (`638263b33c98`)
+
+A voz da minuta aprovada do `audio-01` falou o protocolo como "2026, zero, zero, 142", omitindo um zero. A verificação automática (transcrição do áudio) apontou a diferença, e a escuta humana a confirmou. Pelo protocolo, é erro crítico: o áudio não corresponde ao texto aprovado. O arquivo fica como evidência e não deve ser usado. O código não sobrescreve áudio; a voz de referência do RF07 é a da minuta aprovada do `texto-01` (`0b09035747ca`), gerada depois de acrescentar ao estilo a leitura do protocolo algarismo por algarismo e conferida ouvindo. Detalhes em `audio_e_acessibilidade.md`.
 
 ### Data da solicitação no fecho
 
