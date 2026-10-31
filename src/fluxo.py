@@ -18,7 +18,7 @@ from .audit import Auditoria, Evento, agora_iso, novo_id
 from .comparacao import comparar_com_gabarito
 from .config import Config
 from .entradas import ArquivoInvalido, validar_arquivo
-from .extracao import extrair_campos, normalizar_extracao
+from .extracao import NAO_LOCALIZADO, extrair_campos, normalizar_extracao
 from .llm_client import ClienteLLM, RespostaLLM
 from .minuta import gerar_minuta
 from .privacidade import mascarar
@@ -220,6 +220,9 @@ def concluir_caso(
                 if valor and valor != campos.get(campo):
                     campos[campo] = valor
                     corrigidos.append(campo)
+            # Campo preenchido pela pessoa deixa de ser ausente; senão a minuta o trata como lacuna.
+            ausentes = [c for c in campos.get("campos_ausentes", []) if c not in corrigidos]
+            campos["campos_ausentes"] = sorted(ausentes + [c for c in corrigidos if campos[c] == NAO_LOCALIZADO])
             evento.decisao_humana = "corrigido" if corrigidos else "confirmado"
             evento.revisor = revisor
             evento.extra = {"campos_corrigidos": corrigidos, "trechos_incertos_exibidos": estado["trechos_incertos"]}

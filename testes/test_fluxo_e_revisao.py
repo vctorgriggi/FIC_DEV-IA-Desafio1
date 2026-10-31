@@ -241,3 +241,31 @@ def test_execucao_pendente_pode_ser_descartada_com_registro(config, auditoria, p
     assert descarte["decisao_humana"] == "descartada" and descarte["revisor"] == "Servidor A"
     with pytest.raises(RevisaoInvalida):
         fluxo.concluir_caso(estado["id_execucao"], campos_confirmados={}, config=config, cliente=None, auditoria=auditoria)
+
+
+def test_campo_preenchido_na_confirmacao_deixa_de_ser_ausente(config, auditoria, monkeypatch):
+    recebidos = []
+    monkeypatch.setattr(
+        fluxo.vision, "extrair_texto", lambda arquivo, **_: TextoExtraido(texto_bruto="b", texto_revisado="r")
+    )
+    monkeypatch.setattr(
+        fluxo, "extrair_campos",
+        lambda texto, **_: ResultadoExtracao(
+            campos={**CAMPOS, "categoria": "matricula", "protocolo": "não localizado", "campos_ausentes": ["protocolo"]}
+        ),
+    )
+    monkeypatch.setattr(
+        fluxo, "gerar_minuta",
+        lambda campos, *, fontes, **_: recebidos.append(campos) or Minuta(texto="m", campos_ausentes=campos["campos_ausentes"], fontes=fontes),
+    )
+    estado = fluxo.preparar_caso("imagem-01", config=config, cliente=None, auditoria=auditoria)
+    assert estado["campos"]["campos_ausentes"] == ["protocolo"]
+
+    meta = fluxo.concluir_caso(
+        estado["id_execucao"], campos_confirmados={"protocolo": "2026-000142", "data": "", "solicitante": "não localizado"},
+        revisor="Servidor A", config=config, cliente=None, auditoria=auditoria,
+    )
+    assert recebidos[0]["protocolo"] == "2026-000142"
+    # Protocolo preenchido sai da lista; solicitante apagado pela pessoa entra nela.
+    assert recebidos[0]["campos_ausentes"] == ["solicitante"]
+    assert meta["campos_ausentes"] == ["solicitante"]
