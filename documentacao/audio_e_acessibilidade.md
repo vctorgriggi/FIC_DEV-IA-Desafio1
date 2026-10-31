@@ -51,8 +51,8 @@ Formatos aceitos: MP3, WAV, M4A, OGG e FLAC, até 20 MB (`entradas.audio` no con
 
 **Áudio contra texto aprovado (critério de aceite do RF07):** `python -m src.main verificar-audio <id>` (ou o botão na página da minuta) transcreve o WAV com `gpt-transcribe` e compara com o texto falado esperado, em `resultados/audios/<id>_verificacao.json`. Resultado: 97,9% das palavras no `audio-01` e 97,3% no `texto-01`, sem acréscimos. Nos dois, a transcrição registrou o protocolo errado ("2026 00142" e "2026-00042"), e a escuta humana decidiu, registrada com `python -m src.main revisar-audio <id>` ou na interface:
 
-- No `audio-01`, a voz de fato omitiu um zero. É um erro crítico: o áudio não corresponde ao texto aprovado num dado crítico. O arquivo fica como evidência e não deve ser usado.
-- No `texto-01`, a voz falou os três zeros; o erro foi da transcrição de verificação.
+- No `audio-01`, a voz de fato omitiu um zero. É um erro crítico: o áudio não corresponde ao texto aprovado num dado crítico. Revisão do áudio registrada como **rejeitado**; o arquivo fica como evidência e não deve ser usado.
+- No `texto-01`, a voz falou os três zeros; o erro foi da transcrição de verificação. Revisão do áudio registrada como **aprovado**.
 
 Em testes curtos com a mesma frase, a omissão do zero apareceu e desapareceu entre tentativas com a mesma instrução, e soletrar os dígitos com vírgulas piorou o resultado. A instrução de ler o protocolo algarismo por algarismo foi acrescentada ao estilo e acertou nas tentativas feitas, mas a síntese continua não determinística. A verificação automática serve para achar acréscimos e omissões de palavras; números só se confirmam ouvindo.
 

@@ -45,5 +45,13 @@
       "response_format": "wav"
     }
   },
-  "verificacao_audio": "resultados/audios/0b09035747ca_verificacao.json"
+  "verificacao_audio": "resultados/audios/0b09035747ca_verificacao.json",
+  "revisao_audio": {
+    "decisao": "aprovar",
+    "status": "aprovado",
+    "justificativa": "Protocolo falado com os três zeros (2026, zero, zero, zero, 142). Texto do áudio confere com a minuta aprovada, sem acréscimos.",
+    "revisor": "Victor Griggi Moreira Regis da Silva",
+    "data_hora": "2026-10-31T12:14:14-04:00",
+    "sha256_audio": "217c5ec0f8218668e507e375c13bb0c8c962390c82fff9bc35eaab233c9f867f"
+  }
 }

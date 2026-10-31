@@ -68,7 +68,7 @@ Desde então, a correção recusa texto que altere o cabeçalho (brasão, órgã
 
 ### Voz com o protocolo errado (`638263b33c98`)
 
-A voz da minuta aprovada do `audio-01` falou o protocolo como "2026, zero, zero, 142", omitindo um zero. A verificação automática (transcrição do áudio) apontou a diferença, e a escuta humana a confirmou. Pelo protocolo, é erro crítico: o áudio não corresponde ao texto aprovado. O arquivo fica como evidência e não deve ser usado. O código não sobrescreve áudio; a voz de referência do RF07 é a da minuta aprovada do `texto-01` (`0b09035747ca`), gerada depois de acrescentar ao estilo a leitura do protocolo algarismo por algarismo e conferida ouvindo. Detalhes em `audio_e_acessibilidade.md`.
+A voz da minuta aprovada do `audio-01` falou o protocolo como "2026, zero, zero, 142", omitindo um zero. A verificação automática (transcrição do áudio) apontou a diferença, e a escuta humana a confirmou; a revisão do áudio foi registrada como rejeitado. Pelo protocolo, é erro crítico: o áudio não corresponde ao texto aprovado. O arquivo fica como evidência e não deve ser usado. O código não sobrescreve áudio; a voz de referência do RF07 é a da minuta aprovada do `texto-01` (`0b09035747ca`), gerada depois de acrescentar ao estilo a leitura do protocolo algarismo por algarismo e conferida ouvindo. Detalhes em `audio_e_acessibilidade.md`.
 
 ### Data da solicitação no fecho
 

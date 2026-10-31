@@ -45,5 +45,13 @@
       "response_format": "wav"
     }
   },
-  "verificacao_audio": "resultados/audios/638263b33c98_verificacao.json"
+  "verificacao_audio": "resultados/audios/638263b33c98_verificacao.json",
+  "revisao_audio": {
+    "decisao": "rejeitar",
+    "status": "rejeitado",
+    "justificativa": "Protocolo falado como 2026, zero, zero, 142, com um zero a menos.",
+    "revisor": "Victor Griggi Moreira Regis da Silva",
+    "data_hora": "2026-10-31T12:13:34-04:00",
+    "sha256_audio": "044f82e5a723457dc5bf43cc0ce130ff6b8cecdf4f7deb062d50e180c90d3f6b"
+  }
 }
