@@ -1,0 +1,25 @@
+{
+  "id_execucao": "0b8591d5a30b",
+  "caso_id": "imagem-01",
+  "modalidade": "imagem",
+  "arquivo_origem": "dados/originais/entrada_pdf-imagem.pdf",
+  "extracao": "dados/processados/imagem-01/0b8591d5a30b/extracao.json",
+  "arquivo_minuta": "resultados/minutas/0b8591d5a30b.md",
+  "arquivo_renderizado": null,
+  "campos_ausentes": [
+    "pedido",
+    "protocolo"
+  ],
+  "fontes": [
+    "dados/originais/entrada_pdf-imagem.pdf"
+  ],
+  "gerada_em": "2026-10-31T11:12:28-04:00",
+  "status": "nova_geracao_solicitada",
+  "revisao": {
+    "decisao": "nova_geracao",
+    "justificativa": "Na seção de pendências, a minuta afirma que o protocolo 2026-000142 consta nos dados e, ao mesmo tempo, que foi indicado como ausente. É uma contradição que não pode chegar ao cidadão. O protocolo foi conferido na ficha (dígito do ano rasurado) e na solicitação em texto do mesmo cidadão. Os demais dados de referência conferem com o original. Peço nova geração da minuta.",
+    "revisor": "Victor Griggi Moreira Regis da Silva",
+    "data_hora": "2026-10-31T11:17:03-04:00",
+    "sha256_minuta": "958d45059ea6f8c8a04532af8d299935c97a8e5c1b5bd87578120bcae1fa8660"
+  }
+}

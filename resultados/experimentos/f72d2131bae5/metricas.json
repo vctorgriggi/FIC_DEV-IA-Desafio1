@@ -1,0 +1,45 @@
+{
+  "id_execucao": "f72d2131bae5",
+  "data_hora": "2026-10-31T11:08:37-04:00",
+  "modelo": "gpt-6.1-terra",
+  "prompt_sistema": "sistema_seguro_v1",
+  "entrada": "dados/experimento_rf02/entrada_texto-01.json",
+  "resultados": {
+    "A": {
+      "prompt": "minuta_a_v1",
+      "saida": "resultados/experimentos/f72d2131bae5/prompt_A.md",
+      "duracao_s": 6.843,
+      "tokens_entrada": 456,
+      "tokens_saida": 512,
+      "custo_estimado_usd": 0.003016,
+      "parametros": {
+        "store": false,
+        "max_output_tokens": 25000
+      }
+    },
+    "B": {
+      "prompt": "minuta_b_v1",
+      "saida": "resultados/experimentos/f72d2131bae5/prompt_B.md",
+      "duracao_s": 5.412,
+      "tokens_entrada": 942,
+      "tokens_saida": 396,
+      "custo_estimado_usd": 0.002922,
+      "parametros": {
+        "store": false,
+        "max_output_tokens": 25000
+      }
+    },
+    "C": {
+      "prompt": "minuta_c_v3",
+      "saida": "resultados/experimentos/f72d2131bae5/prompt_C.md",
+      "duracao_s": 5.655,
+      "tokens_entrada": 874,
+      "tokens_saida": 376,
+      "custo_estimado_usd": 0.002754,
+      "parametros": {
+        "store": false,
+        "max_output_tokens": 25000
+      }
+    }
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "id_execucao": "638263b33c98",
+  "caso_id": "audio-01",
+  "modalidade": "audio",
+  "arquivo_origem": "dados/originais/entrada_audio.mp3",
+  "extracao": "dados/processados/audio-01/638263b33c98/extracao.json",
+  "arquivo_minuta": "resultados/minutas/638263b33c98.md",
+  "arquivo_renderizado": null,
+  "campos_ausentes": [],
+  "fontes": [
+    "dados/originais/entrada_audio.mp3"
+  ],
+  "gerada_em": "2026-10-31T11:14:05-04:00",
+  "status": "aprovada_com_correcao",
+  "revisao": {
+    "decisao": "aprovar_com_correcao",
+    "justificativa": "Protocolo, data e solicitante conferidos com o áudio original; curso, carga horária e turno conferem com a fala. Corrigi a data do fecho, que repetia a data da solicitação como data da comunicação.",
+    "revisor": "Victor Griggi Moreira Regis da Silva",
+    "data_hora": "2026-10-31T11:20:00-04:00",
+    "sha256_minuta": "da4dbf16775cb66a45dffdded2dd304d6e6159f9087a7c15bb2679226bd9acd2"
+  },
+  "audio": "resultados/audios/638263b33c98.wav",
+  "sintese": {
+    "modelo": "gpt-4o-mini-tts",
+    "voz": "marin",
+    "estilo": "Fale em português brasileiro, com tom institucional, claro, sério e acolhedor, em ritmo pausado. Articule nomes, datas e protocolos com clareza. Leia somente o texto fornecido, sem comentários ou acréscimos.",
+    "formato": "wav",
+    "idioma_locucao": "pt-BR",
+    "preparacao": "markdown_conservador_v1",
+    "sha256_minuta": "da4dbf16775cb66a45dffdded2dd304d6e6159f9087a7c15bb2679226bd9acd2",
+    "sha256_texto_falado": "811a5be7c0cdfda864508eb298e658cb608045f97ff26d44422efc8596ee56e4",
+    "sha256_audio": "044f82e5a723457dc5bf43cc0ce130ff6b8cecdf4f7deb062d50e180c90d3f6b",
+    "arquivo": "resultados/audios/638263b33c98.wav",
+    "duracao_audio_s": 80.65,
+    "taxa_amostragem_hz": 24000,
+    "canais": 1,
+    "bits_por_amostra": 16,
+    "duracao_requisicao_s": 13.929,
+    "tokens_entrada": null,
+    "tokens_saida": null,
+    "custo_estimado_usd": null,
+    "parametros": {
+      "voice": "marin",
+      "instructions": "Fale em português brasileiro, com tom institucional, claro, sério e acolhedor, em ritmo pausado. Articule nomes, datas e protocolos com clareza. Leia somente o texto fornecido, sem comentários ou acréscimos.",
+      "response_format": "wav"
+    }
+  }
+}

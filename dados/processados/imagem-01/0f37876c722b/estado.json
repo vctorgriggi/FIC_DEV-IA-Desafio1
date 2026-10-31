@@ -1,0 +1,34 @@
+{
+  "id_execucao": "0f37876c722b",
+  "caso_id": "imagem-01",
+  "modalidade": "imagem",
+  "arquivo_origem": "dados/originais/entrada_pdf-imagem.pdf",
+  "texto_original": "GOVERNO DE MATO GROSSO\nSECRETARIA DE ESTADO DE CIÊNCIA, TECNOLOGIA E INOVAÇÃO - SECITECI/MT\nESCOLA TÉCNICA ESTADUAL DE CUIABÁ\nFICHA DE MATRÍCULA\nCÓDIGO: 202[ilegível] - 000142\nNOME: MARCOS VINÍCIUS DE ALMEIDA SANTOS\nDATA DE NASCIMENTO: 12/08/2008\nCPF: 123.456.789-00\nRG: 1234567-8\nÓRGÃO EXPEDIDOR:\nNATURALIDADE: CUIABÁ\nUF:\nNOME DA MÃE: LÚCIA HELENA DE ALMEIDA SANTOS\nNOME DO PAI:\nCURSO: TÉCNICO EM ENFERMAGEM\nCH: 1200 HORAS\nEIXO TECNOLÓGICO: SAÚDE\nTURMA:\nMUNICÍPIO:\nTURNO: NOTURNO\nINÍCIO DO CURSO: 01/02/2027\nTÉRMINO DO CURSO:\nTEL. CELULAR:\nTELEFONE RESIDENCIAL:\nE-MAIL: MARCOS.ALMEIDA.TESTE@EXEMPLO.COM\nDATA MATRÍCULA: 14/10/2026\n[X] Estou ciente que minha matrícula será automaticamente cancelada se faltar, sem justificativa comprovada:\n- nos 02 (dois) primeiros dias de aula consecutivos;\n- 03 (três) dias de aula, consecutivos ou não, no período dos 10 (dez) primeiros dias de aula.\nASSINATURA DO ALUNO OU RESPONSÁVEL: [assinatura]\nASSINATURA DA SECRETARIA ESCOLAR:",
+  "campos": {
+    "protocolo": "não localizado",
+    "data": "14/10/2026",
+    "solicitante": "MARCOS VINÍCIUS DE ALMEIDA SANTOS",
+    "assunto": "Matrícula no curso Técnico em Enfermagem",
+    "pedido": "não localizado",
+    "categoria": "matricula",
+    "campos_ausentes": [
+      "pedido",
+      "protocolo"
+    ],
+    "confianca": "media",
+    "necessita_revisao": true,
+    "motivo_revisao": "Não há protocolo explicitamente identificado; o código da ficha está parcialmente ilegível. A ficha registra uma matrícula, mas não contém um pedido explícito do cidadão."
+  },
+  "dados_mascarados_no_envio": {
+    "cpf": 1,
+    "rg": 1,
+    "email": 1
+  },
+  "trechos_incertos": [
+    "202[ilegível] - 000142 — Dígito do código com traços sobrepostos.",
+    "123.456.789-00 — Parte final do CPF apresenta traços sobrepostos, tornando a leitura duvidosa."
+  ],
+  "exige_confirmacao": true,
+  "preparado_em": "2026-10-31T11:27:51-04:00",
+  "status": "concluido"
+}

@@ -15,12 +15,12 @@ entrada ─► extração do texto ─► comparação ─► compreensão ─�
 
 | Módulo | Papel |
 |---|---|
-| `llm_client.py` | Única porta para o Gemini: prazo de relógio, `store=False`, erros traduzidos, tokens e custo (RF04) |
+| `llm_client.py` | Única porta para a OpenAI: um método por tarefa (texto, transcrição, voz, imagem), prazo de relógio, `store=False`, erros traduzidos, tokens e custo (RF04) |
 | `prompts.py` + `prompts/` | Prompts versionados e delimitação do conteúdo externo (RF02, RF03) |
 | `entradas.py` | Validação de extensão, tamanho e codificação; hash do original |
 | `privacidade.py` | Mascaramento antes do envio e ocultação de segredos (RF12) |
 | `extracao.py` | Campos estruturados com esquema JSON e "não localizado" (RF05) |
-| `audio.py` | Transcrição e síntese de voz (RF06, RF07); situação na tabela "Requisitos e onde estão" do README |
+| `audio.py` | Transcrição e síntese de voz (RF06, RF07) |
 | `vision.py` | OCR por visão multimodal (RF08) |
 | `comparacao.py`, `avaliacao.py` | Esperado contra obtido (RF06, RF08, RF13) |
 | `minuta.py` | Minuta institucional; cabeçalho e fontes por código (RF09) |
@@ -34,37 +34,41 @@ entrada ─► extração do texto ─► comparação ─► compreensão ─�
 
 | Tarefa | Modelo | Por quê |
 |---|---|---|
-| Extração, minuta, OCR, transcrição | `gemini-3.8-flash` | Multimodal (texto, PDF, imagem, áudio), saída JSON por esquema, cota gratuita |
-| Síntese de voz | `gemini-3.8-flash-tts` | Português suportado, cota gratuita |
-| Imagem | `gemini-3.1-flash-lite-image` | Menor preço por imagem; sem cota gratuita |
+| Extração, minuta, OCR | `gpt-6.1-terra` | Texto e visão (PDF e imagem), saída JSON por esquema em modo estrito; preço intermediário da família (US$ 1 / 5 por milhão de tokens) |
+| Transcrição | `gpt-transcribe` | Modelo de transcrição recomendado pela OpenAI; devolve o idioma detectado; cobrança por minuto |
+| Síntese de voz | `gpt-4o-mini-tts` | Único modelo da Speech API com instrução de entonação; português suportado |
+| Imagem | `gpt-image-2.5-flare` | Geração cotidiana rápida, mesmo preço por token do modelo maior |
 
-Provedor único (Google Gemini, SDK `google-genai` 2.31.0, Interactions API), para uma só chave e um só tratamento de erros. A dependência de fornecedor fica contida em `llm_client.py` e nos nomes de modelo do `config.json`.
+Provedor único (OpenAI, SDK `openai` 3.41.0), para uma só chave e um só tratamento de erros. A dependência de fornecedor fica contida em `llm_client.py` e nos nomes de modelo do `config.json`. Fontes: docs oficiais OpenAI API, models e pricing, out/2026.
 
 ## Custos medidos
 
-Custo estimado pela tabela da camada paga, válida até 31/12/2026 (fonte: docs oficiais Gemini API, pricing, out/2026). Até as 16h06 de 18/10/2026 (casos de texto, primeira leitura do `imagem-01` e experimento de prompts), as chamadas usaram a camada gratuita, sem custo efetivo. A partir da peça visual, às 16h10, o projeto estava na camada paga, inclusive as execuções finais do `imagem-01`.
+Custo estimado pela tabela padrão da OpenAI (`precos_usd_por_milhao_tokens` e `precos_usd_por_minuto_audio` no config). A API não tem camada gratuita para esses modelos. Rodada de 31/10/2026:
 
 | Execução | Chamadas | Custo estimado (USD) |
 |---|---|---|
-| `texto-01` (extração + minuta) | 2 | 0,0121 |
-| `texto-injection` (extração + minuta) | 2 | 0,0131 |
-| `imagem-01` (OCR + extração) | 2 | 0,0178 |
-| `audio-01` (transcrição + extração) | 2 | 0,0137 |
-| Síntese de voz (teste técnico, 12,4 s de áudio; chamada direta à função, fora do fluxo e do log) | 1 | 0,0028 |
-| Voz da minuta aprovada do `audio-01` (107,7 s de áudio) | 1 | 0,0244 |
-| Experimento de prompts (A, B, C, rodada final) | 3 | 0,0265 |
-| Peça visual (imagem 1K) | 1 | 0,0337 |
+| `texto-01` (extração + minuta) | 2 | 0,0044 |
+| `texto-injection` (extração + minuta) | 2 | 0,0042 |
+| `imagem-01`, três execuções (OCR + extração + minuta, cada) | 9 | 0,0453 |
+| `audio-01` (transcrição + extração + minuta) | 3 | 0,0114 |
+| Voz da minuta aprovada do `audio-01` (80,6 s de áudio) | 1 | sem estimativa: a Speech API não informa tokens |
+| Prompt C gerado pelo metaprompt | 1 | 0,0048 |
+| Experimento de prompts (A, B, C) | 3 | 0,0087 |
+| Peça visual (1536x1152) | 1 | 0,0229 |
+| **Total registrado no log** | 22 | **0,1017** |
+
+Fora do log, a verificação do áudio contra o texto aprovado (uma transcrição do WAV gerado) custou US$ 0,0061 estimado.
 
 ## Riscos e mitigações
 
 | Risco | Mitigação | Evidência |
 |---|---|---|
-| Alucinação | Regra "não invente" e "não localizado" no prompt de sistema; dados de referência da minuta copiados dos campos por código; revisão humana | `avaliacao.md`: campos exatos conferem nos dois casos de texto |
+| Alucinação | Regra "não invente" e "não localizado" no prompt de sistema; dados de referência da minuta copiados dos campos por código; revisão humana | `avaliacao.md`: campos exatos conferem nos casos de texto; datas atribuídas no fecho foram pegas na revisão |
 | Prompt injection | Conteúdo externo delimitado, com a etiqueta de fechamento neutralizada; minuta sem `motivo_revisao`; conferência de `minuta_nao_pode_conter` | Caso `texto-injection`: nada do ataque na minuta, tentativa sinalizada |
-| Erro de leitura (OCR, transcrição) | Texto bruto preservado, trechos incertos, comparação com gabarito, confirmação humana dos dados críticos | `visao_e_imagem.md`: protocolo rasurado lido errado sem aviso do modelo; `audio_e_acessibilidade.md`: números ditados dígito a dígito, juntados na revisão |
+| Erro de leitura (OCR, transcrição) | Texto bruto preservado, trechos incertos, comparação com gabarito, confirmação humana dos dados críticos | `visao_e_imagem.md`: protocolo rasurado marcado como ilegível e preenchido na confirmação |
 | Exposição de dados | Mascaramento, `store=False`, log sem conteúdo, chave só no `.env` | `lgpd_campos.md` |
-| Dependência de fornecedor | Provedor isolado em um módulo; modelos no config | Trocar de provedor exige reescrever só `llm_client.py` |
-| Serviço indisponível ou cota esgotada | Erros traduzidos em mensagens claras; prazo de relógio por chamada; sem repetição em 429 | Cota zero de imagem retornou "limite de requisições" em menos de 1 s |
+| Dependência de fornecedor | Provedor isolado em um módulo; modelos no config | Trocar de provedor exige reescrever só `llm_client.py` e os testes dele |
+| Serviço indisponível ou cota esgotada | Erros traduzidos em mensagens claras; prazo de relógio por chamada; sem repetição automática do SDK | `testes/test_llm_client.py` |
 
 ## LGPD e avaliação
 
@@ -72,12 +76,13 @@ Custo estimado pela tabela da camada paga, válida até 31/12/2026 (fonte: docs 
 - Protocolo de avaliação, gravidade, resultados por caso e taxa de aprovação: [`avaliacao.md`](avaliacao.md).
 - Experimento de prompts: [`experimento_prompts.md`](experimento_prompts.md).
 - Visão, OCR e peça visual: [`visao_e_imagem.md`](visao_e_imagem.md).
+- Áudio e acessibilidade: [`audio_e_acessibilidade.md`](audio_e_acessibilidade.md).
 
 ## Limitações
 
 - Um caso por modalidade, mais o caso de injeção: os resultados mostram comportamento, não estatística.
-- A peça visual exige faturamento ativo: geração de imagem não tem cota gratuita.
-- Gemini 3.6 ou mais recente ignora `temperature`, então o experimento de prompts não controla amostragem (fonte: docs oficiais Gemini API, text-generation, out/2026).
-- Imagem e áudio vão inteiros ao provedor, sem mascaramento possível.
-- Um único áudio de teste: o ruído moderado não foi avaliado à parte.
+- `gpt-4o-mini-tts` e os demais modelos da Speech API serão desligados em 06/01/2027; o RF07 precisará migrar para a Realtime API.
+- O `gpt-transcribe` não aponta trechos incertos na transcrição.
+- A amostragem não é fixada no experimento de prompts: não verificamos se `gpt-6.1-terra` aceita `temperature`.
+- Imagem e áudio vão inteiros ao provedor, sem mascaramento possível; leitura parcial de CPF pelo OCR escapa do mascaramento.
 - Quando uma chamada falha, o evento do log registra o erro e a duração, mas não o modelo nem os tokens (`fluxo._etapa` só anota o modelo a partir de uma resposta).

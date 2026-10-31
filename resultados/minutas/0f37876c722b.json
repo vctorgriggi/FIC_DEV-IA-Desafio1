@@ -1,0 +1,24 @@
+{
+  "id_execucao": "0f37876c722b",
+  "caso_id": "imagem-01",
+  "modalidade": "imagem",
+  "arquivo_origem": "dados/originais/entrada_pdf-imagem.pdf",
+  "extracao": "dados/processados/imagem-01/0f37876c722b/extracao.json",
+  "arquivo_minuta": "resultados/minutas/0f37876c722b.md",
+  "arquivo_renderizado": null,
+  "campos_ausentes": [
+    "pedido"
+  ],
+  "fontes": [
+    "dados/originais/entrada_pdf-imagem.pdf"
+  ],
+  "gerada_em": "2026-10-31T11:28:18-04:00",
+  "status": "aprovada",
+  "revisao": {
+    "decisao": "aprovar",
+    "justificativa": "Dados de referência conferidos com a ficha; protocolo 2026-000142 confirmado pela solicitação em texto do mesmo cidadão. Pendência do pedido sinalizada corretamente; fecho sem data atribuída; sem dados pessoais.",
+    "revisor": "Victor Griggi Moreira Regis da Silva",
+    "data_hora": "2026-10-31T11:28:52-04:00",
+    "sha256_minuta": "9ab3e5db961482ef0592ab821f14e5dd9087f3b4ff1b0e14bf033f7672c2d851"
+  }
+}

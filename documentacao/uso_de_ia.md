@@ -7,7 +7,7 @@ decisões são da equipe.
 ## 1. Ferramentas e modelos
 
 - **Assistente de apoio:** Google Antigravity IDE, modelo Gemini 3.8 Flash (High).
-- **Modelo da solução:** `gemini-3.8-flash` via `google-genai` 2.31.0 (Interactions API).
+- **Modelos da solução:** `gpt-6.1-terra`, `gpt-transcribe`, `gpt-4o-mini-tts` e `gpt-image-2.5-flare`, via SDK `openai` 3.41.0.
 
 ## 2. Solicitações relevantes
 

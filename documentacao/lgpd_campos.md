@@ -22,14 +22,15 @@ Todos os dados do desafio são fictícios. A tabela mostra o que cada campo seri
 
 ## Medidas aplicadas
 
-- **Mascaramento antes do envio:** CPF, RG, e-mail e telefone viram `[CPF removido]` etc. (`privacidade.mascarar_antes_de_enviar` no `config.json`). Na transcrição, os dígitos ditados um a um são juntados antes, porque separados ("1 2 3 4 5 6 7 8 9 - 0 0") escapavam do padrão: nas duas execuções aprovadas do `audio-01`, processadas antes dessa correção, o CPF foi ao provedor sem máscara (dado fictício). O telefone do caso `texto-injection`, (65) 99888-7766, também é fictício. Na rodada real, `texto-01` teve CPF, RG e e-mail mascarados, e `texto-injection`, CPF e telefone. O texto original fica só na máquina local, em `dados/processados/`.
-- **Sem armazenamento no provedor:** todas as chamadas usam `store=False`.
+- **Mascaramento antes do envio:** CPF, RG, e-mail e telefone viram `[CPF removido]` etc. (`privacidade.mascarar_antes_de_enviar` no `config.json`). Na transcrição, os dígitos ditados um a um são juntados antes, porque separados ("1 2 3 4 5 6 7 8 9 - 0 0") escapariam do padrão. O telefone do caso `texto-injection`, (65) 99888-7766, também é fictício. Na rodada de 31/10/2026, `texto-01` e `audio-01` tiveram CPF, RG e e-mail mascarados; `texto-injection`, CPF e telefone; `imagem-01`, CPF, RG e e-mail nas execuções em que o CPF foi lido inteiro. O texto original fica só na máquina local, em `dados/processados/`.
+- **Sem armazenamento no provedor:** as chamadas de texto e visão (Responses API) usam `store=False`; transcrição, voz e imagem não têm esse parâmetro.
 - **Log sem conteúdo:** `resultados/logs/execucoes.jsonl` guarda caminhos, versões e hashes, não o texto.
-- **Sem credenciais:** a chave fica só no `.env`, fora do git. A varredura do repositório, das saídas e do histórico de commits não encontrou a chave nem o `.env`.
+- **Sem credenciais:** a chave fica só no `.env`, fora do git. A varredura do repositório, das saídas e do histórico de commits, feita em 31/10/2026, não encontrou a chave nem o `.env`.
 - **Minuta mínima:** a minuta recebe só os campos do pedido; CPF, RG, filiação e contatos não chegam a ela.
 
 ## Riscos residuais
 
 - Data de nascimento, filiação e naturalidade não são mascaradas: os padrões cobrem só formatos fixos (CPF, RG, e-mail, telefone). Num cenário real, a extração deveria receber só os trechos necessários ao pedido.
 - Imagem e áudio não podem ser mascarados antes do envio: o documento e a voz vão inteiros ao provedor. Ver `visao_e_imagem.md` sobre quando o processamento local seria preferível.
-- Na camada gratuita do Gemini, o conteúdo enviado é usado para melhorar os produtos do Google; na paga, não (fonte: docs oficiais Gemini API, pricing, out/2026). Em 18/10/2026, os casos de texto, a primeira leitura do `imagem-01` e o experimento de prompts rodaram na camada gratuita, só com dados fictícios; a partir das 16h10 (peça visual e execuções finais do `imagem-01`), o projeto já estava na camada paga. Com dados reais, a camada paga, ou outro arranjo contratual, seria obrigatória.
+- O OCR pode ler um dado pessoal só em parte: na execução `5270cc7d02bb` do `imagem-01`, o CPF veio como `123.456.[ilegível]00`, forma que o padrão de CPF não reconhece, e foi ao provedor na etapa de extração sem máscara (dado fictício).
+- Pela API, a OpenAI não usa os dados enviados para treinar modelos por padrão, mas guarda registros por até 30 dias para monitoramento de abuso (fonte: docs oficiais OpenAI API, your-data, out/2026). Com dados reais, seria preciso avaliar o contrato, a retenção e a residência de dados antes do uso.

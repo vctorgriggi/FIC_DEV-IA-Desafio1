@@ -1,0 +1,24 @@
+{
+  "id_execucao": "5270cc7d02bb",
+  "caso_id": "imagem-01",
+  "modalidade": "imagem",
+  "arquivo_origem": "dados/originais/entrada_pdf-imagem.pdf",
+  "extracao": "dados/processados/imagem-01/5270cc7d02bb/extracao.json",
+  "arquivo_minuta": "resultados/minutas/5270cc7d02bb.md",
+  "arquivo_renderizado": null,
+  "campos_ausentes": [
+    "pedido"
+  ],
+  "fontes": [
+    "dados/originais/entrada_pdf-imagem.pdf"
+  ],
+  "gerada_em": "2026-10-31T11:18:07-04:00",
+  "status": "aprovada_com_correcao",
+  "revisao": {
+    "decisao": "aprovar_com_correcao",
+    "justificativa": "Dados de referência conferidos com a ficha; protocolo 2026-000142 confirmado pela solicitação em texto. Corrigi a data do fecho, que repetia a data da solicitação como data da comunicação. O pedido segue não localizado, como no original.",
+    "revisor": "Victor Griggi Moreira Regis da Silva",
+    "data_hora": "2026-10-31T11:18:58-04:00",
+    "sha256_minuta": "217f5dd37135c406fde1821f8ccd75ac364f15e80348e6024c52b8be09c357f8"
+  }
+}

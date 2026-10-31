@@ -1,0 +1,30 @@
+{
+  "minuta": "resultados/minutas/638263b33c98.md",
+  "audio": "resultados/audios/638263b33c98.wav",
+  "modelo_verificacao": "gpt-transcribe",
+  "texto_falado_esperado": "GOVERNO DO ESTADO DE MATO GROSSO — CENTRAL DE ATENDIMENTO\nDados de referência\nProtocolo: 2026-000142\nData da solicitação: 14 de outubro de 2026\nInteressado(a): Marcos Vinícius de Almeida Santos\nAssunto: Efetivação de matrícula no curso técnico em enfermagem\nCorpo da Comunicação\nPrezado Senhor,\nConfirmamos o recebimento de sua solicitação de efetivação de matrícula no curso técnico em enfermagem, com carga horária de 1.200 horas, no turno noturno, e de informações sobre os documentos que ainda precisa apresentar.\nA confirmação da efetivação da matrícula e a identificação de eventuais documentos pendentes dependem da análise do setor competente.\nSinalização de Pendências e Dados Ausentes\nSituação da efetivação da matrícula: não localizado.\nDocumentos ainda necessários: não localizado.\nFecho Institucional\nAtenciosamente,\nLocal: não localizado\nData: não localizado\nServidor Responsável\nOs campos identificados como não localizado representam informações ausentes no documento.\nFontes consultadas\ndados/originais/entrada_audio.mp3",
+  "transcricao_do_audio": "Governo do Estado de Mato Grosso, Central de Atendimento. Dados de referência. Protocolo 2026 00142. Data da solicitação: 14 de outubro de 2026. Interessado: Marcos Vinícius de Almeida Santos. Assunto: efetivação de matrícula no curso técnico em enfermagem. Corpo da comunicação. Prezado senhor, confirmamos o recebimento de sua solicitação de efetivação de matrícula no curso técnico em enfermagem, com carga horária de 1.200 horas no turno noturno, e de informações sobre os documentos que ainda precisa apresentar. A confirmação da efetivação da matrícula e a identificação de eventuais documentos pendentes dependem da análise do setor competente. Sinalização de pendências e dados ausentes. Situação da efetivação da matrícula: não localizado. Documentos ainda necessários: não localizado. Fecho institucional. Atenciosamente, local: não localizado, data: não localizado, servidor responsável. Os campos identificados como não localizado representam informações ausentes no documento. Fontes consultadas: dados originais, entrada áudio.mp3.",
+  "comparacao": {
+    "similaridade": 0.972,
+    "palavras_referencia": 140,
+    "palavras_corretas": 137,
+    "taxa_acerto_palavras": 0.979,
+    "erros": [
+      {
+        "tipo": "substituicao",
+        "esperado": "2026-000142",
+        "obtido": "2026 00142"
+      },
+      {
+        "tipo": "omissao",
+        "esperado": "a",
+        "obtido": ""
+      },
+      {
+        "tipo": "substituicao",
+        "esperado": "dados/originais/entrada",
+        "obtido": "dados originais entrada"
+      }
+    ]
+  }
+}

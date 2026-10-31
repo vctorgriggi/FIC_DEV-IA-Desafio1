@@ -1,0 +1,22 @@
+{
+  "id_execucao": "0b09035747ca",
+  "caso_id": "texto-01",
+  "modalidade": "texto",
+  "arquivo_origem": "dados/originais/entrada_texto.txt",
+  "extracao": "dados/processados/texto-01/0b09035747ca/extracao.json",
+  "arquivo_minuta": "resultados/minutas/0b09035747ca.md",
+  "arquivo_renderizado": null,
+  "campos_ausentes": [],
+  "fontes": [
+    "dados/originais/entrada_texto.txt"
+  ],
+  "gerada_em": "2026-10-31T11:07:39-04:00",
+  "status": "aprovada_com_correcao",
+  "revisao": {
+    "decisao": "aprovar_com_correcao",
+    "justificativa": "Protocolo, data e solicitante conferidos com a solicitação; sem dados pessoais na minuta. Acrescentei o alerta sobre cancelamento por faltas, que o cidadão declarou na solicitação e a minuta omitia.",
+    "revisor": "Victor Griggi Moreira Regis da Silva",
+    "data_hora": "2026-10-31T11:21:30-04:00",
+    "sha256_minuta": "f1b07fe9a1088d76c59251dff65eb211abc8f52e6346ae83a953b0ea40486190"
+  }
+}
