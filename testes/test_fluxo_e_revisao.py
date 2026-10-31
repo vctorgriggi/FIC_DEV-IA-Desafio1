@@ -4,7 +4,7 @@ import pytest
 
 from src import fluxo
 from src.extracao import ResultadoExtracao
-from src.minuta import Minuta
+from src.minuta import Minuta, cabecalho
 from src.image_generation import PecaVisual
 from src.revisao import (
     RevisaoInvalida,
@@ -34,6 +34,11 @@ def partes_falsas(monkeypatch):
     monkeypatch.setattr(fluxo, "extrair_campos", extrair)
     monkeypatch.setattr(fluxo, "gerar_minuta", minuta)
     return enviados
+
+
+def texto_com_cabecalho(config, meta, corpo):
+    campos = json.loads((config.raiz / meta["extracao"]).read_text(encoding="utf-8"))["campos"]
+    return f"{cabecalho(campos, config)}\n\n{corpo}"
 
 
 def etapas(auditoria, id_execucao):
@@ -74,6 +79,7 @@ def test_audio_passa_por_confirmacao_humana_antes_da_minuta(config, auditoria, p
         cliente=None,
         auditoria=auditoria,
         confirmar=confirmar,
+        revisor="Servidor A",
     )
     assert exibidos == ["0001 — ruído"]
     assert etapas(auditoria, meta["id_execucao"]) == [
@@ -169,7 +175,9 @@ def test_taxa_de_aprovacao(config, auditoria, partes_falsas):
     for decisao in decisoes:
         meta = fluxo.processar_caso("texto-01", config=config, cliente=None, auditoria=auditoria)
         if decisao:
-            registrar_decisao(config, auditoria, meta["id_execucao"], decisao=decisao, justificativa="j", revisor="r")
+            corrigido = texto_com_cabecalho(config, meta, "Corpo corrigido.") if decisao == "aprovar_com_correcao" else None
+            registrar_decisao(config, auditoria, meta["id_execucao"], decisao=decisao, justificativa="j", revisor="r",
+                              texto_corrigido=corrigido)
     resumo = resumo_revisoes(config)
     assert resumo["revisadas"] == 3
     assert resumo["por_status"]["aguardando_revisao"] == 1
@@ -269,3 +277,39 @@ def test_campo_preenchido_na_confirmacao_deixa_de_ser_ausente(config, auditoria,
     # Protocolo preenchido sai da lista; solicitante apagado pela pessoa entra nela.
     assert recebidos[0]["campos_ausentes"] == ["solicitante"]
     assert meta["campos_ausentes"] == ["solicitante"]
+
+
+def test_correcao_guarda_a_minuta_gerada_e_nao_aceita_cabecalho_alterado(config, auditoria, partes_falsas):
+    meta = fluxo.processar_caso("texto-01", config=config, cliente=None, auditoria=auditoria)
+    arquivo = config.raiz / meta["arquivo_minuta"]
+    gerado = arquivo.read_text(encoding="utf-8")
+    alterado = texto_com_cabecalho(config, meta, "Corpo.").replace("2026-000001", "2026-000002")
+    with pytest.raises(RevisaoInvalida, match="cabeçalho"):
+        registrar_decisao(config, auditoria, meta["id_execucao"], decisao="aprovar_com_correcao",
+                          justificativa="j", revisor="r", texto_corrigido=alterado)
+    assert arquivo.read_text(encoding="utf-8") == gerado
+
+    corrigido = texto_com_cabecalho(config, meta, "Corpo corrigido.")
+    revisada = registrar_decisao(config, auditoria, meta["id_execucao"], decisao="aprovar_com_correcao",
+                                 justificativa="j", revisor="r", texto_corrigido=corrigido)
+    assert arquivo.read_text(encoding="utf-8") == corrigido + "\n"
+    assert (config.raiz / revisada["minuta_gerada"]).read_text(encoding="utf-8") == gerado
+    assert auditoria.eventos(etapa="revisao")[0]["extra"] == {"minuta_gerada": revisada["minuta_gerada"]}
+    assert len(auditoria.eventos(etapa="geracao_minuta")[0]["extra"]["sha256_minuta_gerada"]) == 64
+
+
+def test_log_nao_guarda_dado_pessoal_dos_trechos_e_da_comparacao(config, auditoria, partes_falsas, monkeypatch):
+    monkeypatch.setattr(
+        fluxo.vision, "extrair_texto",
+        lambda arquivo, **_: TextoExtraido(texto_bruto="CPF 123.456.7", texto_revisado="CPF 123.456.7",
+                                           trechos_incertos=["123.456.789-00 — rasura"]),
+    )
+    (config.raiz / "dados/gabaritos").mkdir(parents=True)
+    (config.raiz / "dados/gabaritos/imagem-01.json").write_text(
+        json.dumps({"texto_referencia": "CPF 123.456.789-00", "dados_criticos": ["123.456.789-00"]}), encoding="utf-8"
+    )
+    estado = fluxo.preparar_caso("imagem-01", config=config, cliente=None, auditoria=auditoria)
+    fluxo.concluir_caso(estado["id_execucao"], campos_confirmados={}, revisor="Servidor A",
+                        config=config, cliente=None, auditoria=auditoria)
+    log = auditoria.arquivo.read_text(encoding="utf-8")
+    assert "123.456.789-00" not in log and "[CPF removido]" in log

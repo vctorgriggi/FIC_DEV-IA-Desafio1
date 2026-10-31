@@ -11,7 +11,7 @@ from PIL import Image
 from src import fluxo
 from src.extracao import ResultadoExtracao
 from src.llm_client import ChaveAusente
-from src.minuta import Minuta
+from src.minuta import Minuta, cabecalho
 from src.revisao import CHECKLIST_PECA
 from src.tipos import TextoExtraido
 from src.web import criar_app
@@ -79,15 +79,18 @@ def test_decisao_com_correcao_grava_texto_e_trava_depois(api, config):
     sem_texto = {"decisao": "aprovar_com_correcao", "justificativa": "Ajuste", "revisor": "Servidor A"}
     assert api.post(f"/api/minutas/{id_minuta}/decisao", json=sem_texto).status_code == 400
 
-    corrigida = {**sem_texto, "texto_corrigido": "Texto corrigido pelo servidor."}
+    detalhe = api.get(f"/api/minutas/{id_minuta}").json()
+    texto = f"{cabecalho(detalhe['campos'], config)}\n\nTexto corrigido pelo servidor."
+    corrigida = {**sem_texto, "texto_corrigido": texto}
     resposta = api.post(f"/api/minutas/{id_minuta}/decisao", json=corrigida)
     assert resposta.status_code == 200 and resposta.json()["status"] == "aprovada_com_correcao"
     arquivo = config.raiz / resposta.json()["arquivo_minuta"]
-    assert arquivo.read_text(encoding="utf-8") == "Texto corrigido pelo servidor.\n"
+    assert arquivo.read_text(encoding="utf-8") == texto + "\n"
+    assert (config.raiz / resposta.json()["minuta_gerada"]).read_text(encoding="utf-8") == detalhe["texto"]
 
     outra = api.post(f"/api/minutas/{id_minuta}/decisao", json={**corrigida, "texto_corrigido": "Mudança tardia"})
     assert outra.status_code == 400
-    assert arquivo.read_text(encoding="utf-8") == "Texto corrigido pelo servidor.\n"
+    assert arquivo.read_text(encoding="utf-8") == texto + "\n"
 
 
 def test_decisao_invalida_nao_altera_a_minuta(api, config):

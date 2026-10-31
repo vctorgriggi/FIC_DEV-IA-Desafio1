@@ -79,6 +79,11 @@ export interface Avaliacao {
   campos: Record<string, { esperado: string; obtido: string; confere: boolean | null }>;
 }
 
+export interface ComparacaoAudio {
+  taxa_acerto_palavras: number | null;
+  erros: { tipo: string; esperado: string; obtido: string }[];
+}
+
 export interface MinutaDetalhe extends MinutaResumo {
   texto: string;
   campos: Campos;
@@ -86,6 +91,8 @@ export interface MinutaDetalhe extends MinutaResumo {
   avaliacao: Avaliacao | null;
   decisoes: string[];
   audio?: string;
+  verificacao: ComparacaoAudio | null;
+  revisao_audio?: Revisao & { status: string };
 }
 
 async function chamar<T>(caminho: string, corpo?: unknown): Promise<T> {
@@ -113,6 +120,9 @@ export const api = {
   decidirMinuta: (id: string, corpo: { decisao: string; justificativa: string; revisor: string; texto_corrigido?: string }) =>
     chamar<MinutaResumo>(`/api/minutas/${id}/decisao`, corpo),
   audio: (id: string) => chamar<{ audio: string }>(`/api/minutas/${id}/audio`, {}),
+  verificarAudio: (id: string) => chamar<MinutaResumo>(`/api/minutas/${id}/audio/verificar`, {}),
+  decidirAudio: (id: string, corpo: { decisao: string; justificativa: string; revisor: string }) =>
+    chamar<MinutaResumo>(`/api/minutas/${id}/audio/decisao`, corpo),
   gerarPeca: (caso: string) => chamar<{ peca: string }>("/api/pecas", { caso_id: caso }),
   peca: (id: string) => chamar<Peca>(`/api/pecas/${id}`),
   decidirPeca: (id: string, corpo: { checklist: Record<string, boolean>; decisao: string; justificativa: string; revisor: string }) =>

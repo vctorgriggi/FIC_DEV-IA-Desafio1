@@ -91,3 +91,27 @@ def test_cancelar_revisao_nao_registra_decisao(cli_isolada, monkeypatch):
     monkeypatch.setattr("builtins.input", cancelar)
     assert cli.main(["revisar", "abc"]) == cli.SAIDA_CANCELADA
     assert json.loads((cli_isolada.caminho("minutas") / "abc.json").read_text(encoding="utf-8"))["status"] == "aguardando_revisao"
+
+
+def test_revisar_com_correcao_le_o_texto_de_um_arquivo(cli_isolada, monkeypatch, tmp_path):
+    from src.minuta import cabecalho
+    from src.revisao import gravar_metadados
+
+    campos = {"protocolo": "2026-000001", "data": "01/10/2026", "solicitante": "Fulano", "assunto": "Matrícula"}
+    extracao = cli_isolada.raiz / "dados/processados/extracao.json"
+    extracao.write_text(json.dumps({"campos": campos}), encoding="utf-8")
+    topo = cabecalho(campos, cli_isolada)
+    (cli_isolada.caminho("minutas") / "abc.md").write_text(f"{topo}\n\nCorpo do modelo.\n", encoding="utf-8")
+    gravar_metadados(cli_isolada, {
+        "id_execucao": "abc", "caso_id": "texto-01", "modalidade": "texto", "arquivo_origem": "x",
+        "extracao": "dados/processados/extracao.json", "arquivo_minuta": "resultados/minutas/abc.md",
+        "campos_ausentes": [], "status": "aguardando_revisao",
+    })
+    corrigido = tmp_path / "corrigido.md"
+    corrigido.write_text(f"{topo}\n\nCorpo corrigido.", encoding="utf-8")
+    respostas = iter(["c", "Corrigi o corpo.", "Servidor A", str(corrigido)])
+    monkeypatch.setattr("builtins.input", lambda _: next(respostas))
+
+    assert cli.main(["revisar", "abc"]) == 0
+    assert (cli_isolada.caminho("minutas") / "abc.md").read_text(encoding="utf-8").endswith("Corpo corrigido.\n")
+    assert (cli_isolada.caminho("minutas") / "abc_gerada.md").read_text(encoding="utf-8").endswith("Corpo do modelo.\n")

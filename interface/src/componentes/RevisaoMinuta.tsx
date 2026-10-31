@@ -18,6 +18,8 @@ export function RevisaoMinuta({ id, ir }: { id: string; ir: (rota: string) => vo
   const [erro, setErro] = useState<string | null>(null);
   const [ocupado, setOcupado] = useState<string | null>(null);
   const [aviso, setAviso] = useState<string | null>(null);
+  const [decisaoAudio, setDecisaoAudio] = useState("");
+  const [justificativaAudio, setJustificativaAudio] = useState("");
 
   const carregar = () =>
     api
@@ -57,6 +59,33 @@ export function RevisaoMinuta({ id, ir }: { id: string; ir: (rota: string) => vo
       await api.audio(id);
       await carregar();
       setAviso("Áudio gerado.");
+    } catch (e) {
+      setErro((e as Error).message);
+    } finally {
+      setOcupado(null);
+    }
+  }
+
+  async function verificarAudio() {
+    setErro(null);
+    setOcupado("Comparando o áudio com o texto aprovado…");
+    try {
+      await api.verificarAudio(id);
+      await carregar();
+    } catch (e) {
+      setErro((e as Error).message);
+    } finally {
+      setOcupado(null);
+    }
+  }
+
+  async function decidirAudio(evento: React.FormEvent) {
+    evento.preventDefault();
+    setErro(null);
+    setOcupado("Registrando a decisão sobre o áudio…");
+    try {
+      await api.decidirAudio(id, { decisao: decisaoAudio, justificativa: justificativaAudio, revisor });
+      await carregar();
     } catch (e) {
       setErro((e as Error).message);
     } finally {
@@ -182,20 +211,76 @@ export function RevisaoMinuta({ id, ir }: { id: string; ir: (rota: string) => vo
           <Erro mensagem={erro} />
           {ocupado && <Carregando texto={ocupado} />}
           <div className="cartao__acoes">
-            {aprovada &&
-              (minuta.audio ? (
-                <audio controls src={urlArquivo(minuta.audio)} />
-              ) : (
-                <button className="botao" onClick={gerarAudio} disabled={!!ocupado}>
-                  Gerar áudio da minuta (acessibilidade)
-                </button>
-              ))}
+            {aprovada && !minuta.audio && (
+              <button className="botao" onClick={gerarAudio} disabled={!!ocupado}>
+                Gerar áudio da minuta (acessibilidade)
+              </button>
+            )}
             {!aprovada && (
               <button className="botao botao--primario" onClick={processarDeNovo} disabled={!!ocupado}>
                 Processar o caso de novo
               </button>
             )}
           </div>
+          {aprovada && minuta.audio && (
+            <div className="audio-revisao">
+              <h3>Áudio da minuta</h3>
+              <audio controls src={urlArquivo(minuta.audio)} />
+              {minuta.verificacao ? (
+                <>
+                  <p>
+                    Palavras do texto aprovado reconhecidas no áudio:{" "}
+                    {minuta.verificacao.taxa_acerto_palavras === null ? "—" : `${(minuta.verificacao.taxa_acerto_palavras * 100).toFixed(1)}%`}
+                  </p>
+                  {minuta.verificacao.erros.length > 0 && (
+                    <ul className="lista-alertas">
+                      {minuta.verificacao.erros.map((e, i) => (
+                        <li key={i}>
+                          {e.tipo}: esperado “{e.esperado}”, ouvido “{e.obtido}”
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                  <p className="bloco__ajuda">A transcrição também erra números: confira protocolo e datas ouvindo.</p>
+                </>
+              ) : (
+                <button className="botao" onClick={verificarAudio} disabled={!!ocupado}>
+                  Comparar áudio com o texto aprovado
+                </button>
+              )}
+              {minuta.revisao_audio ? (
+                <div className={`aviso ${minuta.revisao_audio.status === "aprovado" ? "aviso--ok" : "aviso--erro"}`}>
+                  Áudio {minuta.revisao_audio.status} por {minuta.revisao_audio.revisor} em{" "}
+                  {dataHora(minuta.revisao_audio.data_hora)}: {minuta.revisao_audio.justificativa}
+                </div>
+              ) : (
+                <form onSubmit={decidirAudio}>
+                  <div className="opcoes opcoes--compactas" role="radiogroup">
+                    {[
+                      ["aprovar", "Áudio confere com o texto"],
+                      ["rejeitar", "Áudio com erro"],
+                    ].map(([valor, rotulo]) => (
+                      <label key={valor} className={`opcao ${decisaoAudio === valor ? "opcao--marcada" : ""}`}>
+                        <input type="radio" name="decisao-audio" value={valor} checked={decisaoAudio === valor} onChange={() => setDecisaoAudio(valor)} />
+                        <strong>{rotulo}</strong>
+                      </label>
+                    ))}
+                  </div>
+                  <label className="campo">
+                    <span className="campo__rotulo">O que você ouviu</span>
+                    <textarea value={justificativaAudio} onChange={(e) => setJustificativaAudio(e.target.value)} rows={2} required />
+                  </label>
+                  <label className="campo">
+                    <span className="campo__rotulo">Revisor</span>
+                    <input value={revisor} onChange={(e) => setRevisor(e.target.value)} placeholder="Nome ou função" required />
+                  </label>
+                  <button className="botao botao--primario" type="submit" disabled={!decisaoAudio || !!ocupado}>
+                    Registrar decisão sobre o áudio
+                  </button>
+                </form>
+              )}
+            </div>
+          )}
         </section>
       )}
     </div>

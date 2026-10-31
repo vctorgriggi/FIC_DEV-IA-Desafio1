@@ -14,6 +14,7 @@ from typing import Callable
 from .audit import Auditoria, Evento, agora_iso
 from .comparacao import tokens
 from .config import Config
+from .minuta import cabecalho
 
 AGUARDANDO = "aguardando_revisao"
 DECISOES = {
@@ -35,6 +36,9 @@ CHECKLIST_PECA = {
     "proveniencia": "Selo de conteúdo gerado por IA visível?",
 }
 ATALHOS_PECA = {"a": "aprovar", "r": "rejeitar", "n": "nova_geracao"}
+# RF07: a escuta humana decide se o áudio corresponde ao texto aprovado.
+DECISOES_AUDIO = {"aprovar": "aprovado", "rejeitar": "rejeitado"}
+ATALHOS_AUDIO = {"a": "aprovar", "r": "rejeitar"}
 
 
 class RevisaoInvalida(ValueError):
@@ -69,6 +73,7 @@ def registrar_decisao(
     decisao: str,
     justificativa: str,
     revisor: str,
+    texto_corrigido: str | None = None,
 ) -> dict:
     if decisao not in DECISOES:
         raise RevisaoInvalida(f"Decisão desconhecida: {decisao}. Opções: {', '.join(DECISOES)}.")
@@ -76,12 +81,29 @@ def registrar_decisao(
         raise RevisaoInvalida("A justificativa é obrigatória.")
     if not revisor.strip():
         raise RevisaoInvalida("Informe quem revisou.")
+    if decisao == "aprovar_com_correcao" and not (texto_corrigido or "").strip():
+        raise RevisaoInvalida("Aprovar com correção exige o texto corrigido.")
+    if decisao != "aprovar_com_correcao" and texto_corrigido is not None:
+        raise RevisaoInvalida("Texto corrigido só é aceito com a decisão aprovar_com_correcao.")
 
     metadados = ler_metadados(config, id_execucao)
     if metadados["status"] != AGUARDANDO:
         raise RevisaoInvalida(f"Esta minuta já foi revisada (status: {metadados['status']}).")
 
     arquivo_minuta = config.raiz / metadados["arquivo_minuta"]
+    if texto_corrigido is not None:
+        campos = json.loads((config.raiz / metadados["extracao"]).read_text(encoding="utf-8"))["campos"]
+        # Os dados de referência já passaram pela confirmação humana; errado ali se corrige numa nova execução.
+        if cabecalho(campos, config) not in texto_corrigido:
+            raise RevisaoInvalida(
+                "A correção não pode alterar o cabeçalho (brasão, órgão e dados de referência). "
+                "Dado de referência errado pede nova geração."
+            )
+        # RF11: a saída do modelo continua disponível ao lado da versão corrigida.
+        gerada = arquivo_minuta.with_name(f"{arquivo_minuta.stem}_gerada.md")
+        gerada.write_bytes(arquivo_minuta.read_bytes())
+        arquivo_minuta.write_text(texto_corrigido.strip() + "\n", encoding="utf-8")
+        metadados["minuta_gerada"] = config.relativo(gerada)
     metadados["status"] = DECISOES[decisao]
     metadados["revisao"] = {
         "decisao": decisao,
@@ -100,6 +122,52 @@ def registrar_decisao(
             modalidade=metadados["modalidade"],
             arquivo_origem=metadados["arquivo_origem"],
             saida=metadados["arquivo_minuta"],
+            decisao_humana=decisao,
+            justificativa=justificativa.strip(),
+            revisor=revisor.strip(),
+            extra={"minuta_gerada": metadados["minuta_gerada"]} if texto_corrigido is not None else None,
+        )
+    )
+    return metadados
+
+
+def registrar_revisao_audio(
+    config: Config,
+    auditoria: Auditoria,
+    id_execucao: str,
+    *,
+    decisao: str,
+    justificativa: str,
+    revisor: str,
+) -> dict:
+    if decisao not in DECISOES_AUDIO:
+        raise RevisaoInvalida(f"Decisão desconhecida: {decisao}. Opções: {', '.join(DECISOES_AUDIO)}.")
+    if not justificativa.strip():
+        raise RevisaoInvalida("A justificativa é obrigatória.")
+    if not revisor.strip():
+        raise RevisaoInvalida("Informe quem ouviu o áudio.")
+    metadados = ler_metadados(config, id_execucao)
+    if "audio" not in metadados:
+        raise RevisaoInvalida("Esta minuta ainda não tem áudio.")
+    if "revisao_audio" in metadados:
+        raise RevisaoInvalida(f"Este áudio já foi revisado ({metadados['revisao_audio']['status']}).")
+    metadados["revisao_audio"] = {
+        "decisao": decisao,
+        "status": DECISOES_AUDIO[decisao],
+        "justificativa": justificativa.strip(),
+        "revisor": revisor.strip(),
+        "data_hora": agora_iso(),
+        "sha256_audio": hash_arquivo(config.raiz / metadados["audio"]),
+    }
+    gravar_metadados(config, metadados)
+    auditoria.registrar(
+        Evento(
+            id_execucao=id_execucao,
+            caso_id=metadados["caso_id"],
+            etapa="revisao_audio",
+            modalidade=metadados["modalidade"],
+            arquivo_origem=metadados["arquivo_origem"],
+            saida=metadados["audio"],
             decisao_humana=decisao,
             justificativa=justificativa.strip(),
             revisor=revisor.strip(),

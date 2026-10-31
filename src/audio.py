@@ -15,6 +15,7 @@ import subprocess
 import wave
 from pathlib import Path
 
+from .comparacao import comparar_texto
 from .config import Config
 from .entradas import ArquivoEntrada, ArquivoInvalido, validar_arquivo
 from .llm_client import ClienteLLM, RespostaMalformada
@@ -141,6 +142,21 @@ def preparar_locucao(texto: str) -> str:
     if not resultado:
         raise RevisaoInvalida('A minuta não contém texto para locução.')
     return resultado
+
+
+def verificar_locucao(texto_aprovado: str, wav: Path, *, cliente: ClienteLLM, config: Config) -> dict:
+    """RF07: transcreve o áudio gerado e compara com o texto falado esperado.
+
+    Acha acréscimos e omissões de palavras; números a transcrição também erra,
+    então protocolo e datas só se confirmam ouvindo.
+    """
+    esperado = preparar_locucao(texto_aprovado)
+    resposta = cliente.transcrever(modelo=config.modelo('transcricao'), nome_arquivo=wav.name,
+                                   conteudo=wav.read_bytes(), mime_type='audio/wav',
+                                   idiomas=config.dados.get('audio', {}).get('idiomas') or [])
+    return {'modelo_verificacao': resposta.modelo, 'texto_falado_esperado': esperado,
+            'transcricao_do_audio': resposta.texto, 'comparacao': comparar_texto(resposta.texto, esperado),
+            'resposta': resposta}
 
 
 def validar_wav(conteudo: bytes) -> dict:

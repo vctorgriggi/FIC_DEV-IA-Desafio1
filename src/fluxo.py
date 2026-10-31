@@ -65,6 +65,12 @@ def _anotar(evento: Evento, resposta: RespostaLLM | None, prompt: Prompt | None)
         evento.hash_prompt = prompt.hash
 
 
+def _sem_dados_pessoais(textos: list[str], config: Config) -> list[str]:
+    """O log guarda referências, não conteúdo (RF11, RF12); trechos lidos podem trazer CPF ou e-mail."""
+    tipos = config.dados["privacidade"]["mascarar_antes_de_enviar"]
+    return [mascarar(texto, tipos)[0] for texto in textos]
+
+
 def _gravar_json(caminho: Path, dados: dict) -> None:
     caminho.write_text(json.dumps(dados, ensure_ascii=False, indent=2), encoding="utf-8")
 
@@ -128,7 +134,7 @@ def preparar_caso(caso_id: str, *, config: Config, cliente: ClienteLLM, auditori
                 evento.extra = {
                     "similaridade_bruto": comparacao["bruto"]["similaridade"],
                     "similaridade_revisado": comparacao["revisado"]["similaridade"],
-                    "dados_criticos_nao_encontrados": comparacao["dados_criticos"]["nao_encontrados"],
+                    "dados_criticos_nao_encontrados": _sem_dados_pessoais(comparacao["dados_criticos"]["nao_encontrados"], config),
                 }
 
     with _etapa(auditoria, base, "compreensao") as evento:
@@ -214,6 +220,8 @@ def concluir_caso(
     if estado["exige_confirmacao"]:
         if campos_confirmados is None:
             raise RevisaoInvalida("Confirme os dados críticos antes de gerar a minuta.")
+        if not (revisor or "").strip():
+            raise RevisaoInvalida("Informe quem conferiu os dados críticos.")
         with _etapa(auditoria, base, "confirmacao_campos_criticos") as evento:
             for campo in CAMPOS_CRITICOS:
                 valor = str(campos_confirmados.get(campo) or "").strip()
@@ -225,7 +233,10 @@ def concluir_caso(
             campos["campos_ausentes"] = sorted(ausentes + [c for c in corrigidos if campos[c] == NAO_LOCALIZADO])
             evento.decisao_humana = "corrigido" if corrigidos else "confirmado"
             evento.revisor = revisor
-            evento.extra = {"campos_corrigidos": corrigidos, "trechos_incertos_exibidos": estado["trechos_incertos"]}
+            evento.extra = {
+                "campos_corrigidos": corrigidos,
+                "trechos_incertos_exibidos": _sem_dados_pessoais(estado["trechos_incertos"], config),
+            }
 
     _gravar_json(
         pasta / "extracao.json",
@@ -245,6 +256,8 @@ def concluir_caso(
         arquivo_minuta.write_text(minuta.texto, encoding="utf-8")
         _anotar(evento, minuta.resposta, minuta.prompt)
         evento.saida = config.relativo(arquivo_minuta)
+        # RF11: identifica o texto que o modelo gerou, mesmo depois de uma correção humana.
+        evento.extra = {"sha256_minuta_gerada": hash_arquivo(arquivo_minuta)}
 
     metadados = {
         **base,
@@ -268,6 +281,7 @@ def processar_caso(
     cliente: ClienteLLM,
     auditoria: Auditoria,
     confirmar: Callable[[dict, list[str]], tuple[dict, list[str]]] = confirmar_campos_criticos,
+    revisor: str | None = None,
 ) -> dict:
     """As duas fases em sequência, com a confirmação pelo terminal; devolve os metadados da minuta."""
     estado = preparar_caso(caso_id, config=config, cliente=cliente, auditoria=auditoria)
@@ -275,7 +289,8 @@ def processar_caso(
     if estado["exige_confirmacao"]:
         confirmados, _ = confirmar(estado["campos"], estado["trechos_incertos"])
     return concluir_caso(
-        estado["id_execucao"], campos_confirmados=confirmados, config=config, cliente=cliente, auditoria=auditoria
+        estado["id_execucao"], campos_confirmados=confirmados, revisor=revisor,
+        config=config, cliente=cliente, auditoria=auditoria,
     )
 
 
@@ -306,6 +321,32 @@ def sintetizar_minuta(id_execucao: str, *, config: Config, cliente: ClienteLLM, 
 
     metadados["audio"] = config.relativo(destino)
     metadados["sintese"] = configuracao
+    gravar_metadados(config, metadados)
+    return metadados
+
+
+def verificar_audio(id_execucao: str, *, config: Config, cliente: ClienteLLM, auditoria: Auditoria) -> dict:
+    """RF07: compara o áudio gerado com o texto aprovado; a decisão continua sendo de quem ouve."""
+    metadados = ler_metadados(config, id_execucao)
+    if "audio" not in metadados:
+        raise RevisaoInvalida("Esta minuta ainda não tem áudio.")
+    base = {k: metadados[k] for k in ("id_execucao", "caso_id", "modalidade", "arquivo_origem")}
+    destino = config.caminho("audios") / f"{id_execucao}_verificacao.json"
+    with _etapa(auditoria, base, "verificacao_audio") as evento:
+        resultado = audio.verificar_locucao(
+            (config.raiz / metadados["arquivo_minuta"]).read_text(encoding="utf-8"),
+            config.raiz / metadados["audio"], cliente=cliente, config=config,
+        )
+        _anotar(evento, resultado.pop("resposta"), None)
+        _gravar_json(destino, {"minuta": metadados["arquivo_minuta"], "audio": metadados["audio"], **resultado})
+        comparacao = resultado["comparacao"]
+        evento.saida = config.relativo(destino)
+        evento.extra = {
+            "similaridade": comparacao["similaridade"],
+            "taxa_acerto_palavras": comparacao["taxa_acerto_palavras"],
+            "diferencas": len(comparacao["erros"]),
+        }
+    metadados["verificacao_audio"] = config.relativo(destino)
     gravar_metadados(config, metadados)
     return metadados
 

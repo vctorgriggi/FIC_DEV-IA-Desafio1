@@ -14,6 +14,7 @@ from .entradas import ArquivoInvalido, validar_arquivo
 from .llm_client import ClienteLLM, ErroLLM
 from .image_generation import ErroPeca
 from .revisao import (
+    ATALHOS_AUDIO,
     ATALHOS_PECA,
     RevisaoInvalida,
     confirmar_campos_criticos,
@@ -21,6 +22,7 @@ from .revisao import (
     perguntar_checklist_peca,
     perguntar_decisao,
     registrar_decisao,
+    registrar_revisao_audio,
     registrar_revisao_peca,
     resumo_revisoes,
 )
@@ -75,14 +77,22 @@ def cmd_descartar(config: Config, args: argparse.Namespace) -> None:
     print(f"Execução {args.id_execucao} descartada; o registro fica no log.")
 
 
+def _perguntar(pergunta: str) -> str:
+    while not (resposta := input(pergunta).strip()):
+        pass
+    return resposta
+
+
 def _concluir(config: Config, estado: dict, cliente: ClienteLLM, auditoria: Auditoria) -> None:
-    confirmados = None
+    confirmados = revisor = None
     if estado["exige_confirmacao"] and estado["status"] == fluxo.AGUARDANDO_CONFIRMACAO:
         print(f"\nAbra o original e compare antes de confirmar: {estado['arquivo_origem']}")
         confirmados, _ = confirmar_campos_criticos(estado["campos"], estado["trechos_incertos"])
+        revisor = _perguntar("Quem conferiu (nome ou função fictícia): ")
     print("Gerando a minuta…", flush=True)
     metadados = fluxo.concluir_caso(
-        estado["id_execucao"], campos_confirmados=confirmados, config=config, cliente=cliente, auditoria=auditoria
+        estado["id_execucao"], campos_confirmados=confirmados, revisor=revisor,
+        config=config, cliente=cliente, auditoria=auditoria,
     )
     print(f"Minuta gerada: {metadados['arquivo_minuta']}")
     print(f"Revise com: python -m src.main revisar {metadados['id_execucao']}")
@@ -93,8 +103,13 @@ def cmd_revisar(config: Config, args: argparse.Namespace) -> None:
     print((config.raiz / metadados["arquivo_minuta"]).read_text(encoding="utf-8"))
     print(f"\nCampos ausentes: {', '.join(metadados['campos_ausentes']) or 'nenhum'}")
     decisao, justificativa, revisor = perguntar_decisao()
+    texto_corrigido = None
+    if decisao == "aprovar_com_correcao":
+        print(f"Corrija uma cópia de {metadados['arquivo_minuta']}, sem mexer no cabeçalho, e informe o caminho dela.")
+        texto_corrigido = _ler_texto(_perguntar("Arquivo com o texto corrigido: "))
     metadados = registrar_decisao(
-        config, Auditoria(config), args.id_execucao, decisao=decisao, justificativa=justificativa, revisor=revisor
+        config, Auditoria(config), args.id_execucao,
+        decisao=decisao, justificativa=justificativa, revisor=revisor, texto_corrigido=texto_corrigido,
     )
     print(f"Status: {metadados['status']}. Nada é enviado automaticamente ao cidadão.")
 
@@ -102,6 +117,28 @@ def cmd_revisar(config: Config, args: argparse.Namespace) -> None:
 def cmd_audio_minuta(config: Config, args: argparse.Namespace) -> None:
     metadados = fluxo.sintetizar_minuta(args.id_execucao, config=config, cliente=ClienteLLM(config), auditoria=Auditoria(config))
     print(f"Áudio gerado: {metadados['audio']}")
+
+
+def cmd_verificar_audio(config: Config, args: argparse.Namespace) -> None:
+    metadados = fluxo.verificar_audio(args.id_execucao, config=config, cliente=ClienteLLM(config), auditoria=Auditoria(config))
+    comparacao = json.loads((config.raiz / metadados["verificacao_audio"]).read_text(encoding="utf-8"))["comparacao"]
+    print(f"Palavras do texto aprovado reconhecidas no áudio: {comparacao['taxa_acerto_palavras']:.1%}")
+    for erro in comparacao["erros"]:
+        print(f"  - {erro['tipo']}: esperado {erro['esperado']!r}, ouvido {erro['obtido']!r}")
+    print("A transcrição também erra números: confira protocolo e datas ouvindo.")
+    print(f"Registre o que ouviu com: python -m src.main revisar-audio {args.id_execucao}")
+
+
+def cmd_revisar_audio(config: Config, args: argparse.Namespace) -> None:
+    metadados = ler_metadados(config, args.id_execucao)
+    if "audio" not in metadados:
+        raise RevisaoInvalida("Esta minuta ainda não tem áudio.")
+    print(f"Ouça {metadados['audio']} acompanhando o texto aprovado em {metadados['arquivo_minuta']}.")
+    decisao, justificativa, revisor = perguntar_decisao(atalhos=ATALHOS_AUDIO)
+    metadados = registrar_revisao_audio(
+        config, Auditoria(config), args.id_execucao, decisao=decisao, justificativa=justificativa, revisor=revisor
+    )
+    print(f"Áudio {metadados['revisao_audio']['status']}.")
 
 
 def cmd_avaliacao(config: Config, args: argparse.Namespace) -> None:
@@ -127,6 +164,13 @@ def cmd_avaliacao(config: Config, args: argparse.Namespace) -> None:
     print(f"Taxa de aprovação com correção: {resumo['taxa_aprovacao_com_correcao']:.1%}")
     casos = avaliacao.taxa_por_caso(config)
     print(f"Taxa por caso (decisão mais recente de cada um): {casos['taxa']:.1%} ({casos['aprovados']} de {casos['casos_revisados']} casos)")
+
+
+def _ler_texto(caminho: str) -> str:
+    try:
+        return Path(caminho).expanduser().read_text(encoding="utf-8")
+    except (FileNotFoundError, IsADirectoryError):
+        raise ArquivoInvalido(f"Arquivo não encontrado: {caminho}.") from None
 
 
 def ler_arquivo_json(caminho: str) -> dict:
@@ -228,6 +272,14 @@ def montar_parser() -> argparse.ArgumentParser:
     audio = sub.add_parser("audio-minuta", help="gera o áudio de uma minuta aprovada (RF07)")
     audio.add_argument("id_execucao")
     audio.set_defaults(funcao=cmd_audio_minuta)
+
+    verificar_audio = sub.add_parser("verificar-audio", help="compara o áudio da minuta com o texto aprovado (RF07)")
+    verificar_audio.add_argument("id_execucao")
+    verificar_audio.set_defaults(funcao=cmd_verificar_audio)
+
+    revisar_audio = sub.add_parser("revisar-audio", help="registra se o áudio ouvido corresponde ao texto aprovado (RF07)")
+    revisar_audio.add_argument("id_execucao")
+    revisar_audio.set_defaults(funcao=cmd_revisar_audio)
 
     sub.add_parser("avaliacao", help="esperado contra obtido por caso e taxa de aprovação (RF13)").set_defaults(funcao=cmd_avaliacao)
 

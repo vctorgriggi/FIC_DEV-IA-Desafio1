@@ -22,13 +22,13 @@ from .entradas import ArquivoInvalido
 from .image_generation import ErroPeca
 from .llm_client import ClienteLLM, ErroLLM
 from .revisao import (
-    AGUARDANDO,
     CAMPOS_CRITICOS,
     CHECKLIST_PECA,
     DECISOES,
     RevisaoInvalida,
     ler_metadados,
     registrar_decisao,
+    registrar_revisao_audio,
     registrar_revisao_peca,
     resumo_revisoes,
 )
@@ -55,6 +55,12 @@ class Decisao(BaseModel):
     justificativa: str
     revisor: str
     texto_corrigido: str | None = None
+
+
+class DecisaoAudio(BaseModel):
+    decisao: str
+    justificativa: str
+    revisor: str
 
 
 class DecisaoPeca(BaseModel):
@@ -154,6 +160,7 @@ def criar_app(config: Config, *, fabrica_cliente: Callable[[], ClienteLLM] | Non
     def minuta(id_execucao: str) -> dict:
         metadados = ler_metadados(config, id_execucao)
         extracao = json.loads((config.raiz / metadados["extracao"]).read_text(encoding="utf-8"))
+        verificacao = metadados.get("verificacao_audio")
         return {
             **metadados,
             "texto": (config.raiz / metadados["arquivo_minuta"]).read_text(encoding="utf-8"),
@@ -161,30 +168,31 @@ def criar_app(config: Config, *, fabrica_cliente: Callable[[], ClienteLLM] | Non
             "campos_corrigidos_por_humano": extracao.get("campos_corrigidos_por_humano", []),
             "avaliacao": avaliacao.avaliar_minuta(metadados, config),
             "decisoes": list(DECISOES),
+            "verificacao": verificacao and json.loads((config.raiz / verificacao).read_text(encoding="utf-8"))["comparacao"],
         }
 
     @app.post("/api/minutas/{id_execucao}/decisao")
     def decidir_minuta(id_execucao: str, corpo: Decisao) -> dict:
-        metadados = ler_metadados(config, id_execucao)
-        # Checado antes de gravar a correção: minuta revisada não pode mudar de texto.
-        if metadados["status"] != AGUARDANDO:
-            raise RevisaoInvalida(f"Esta minuta já foi revisada (status: {metadados['status']}).")
-        if corpo.decisao not in DECISOES or not corpo.justificativa.strip() or not corpo.revisor.strip():
-            raise RevisaoInvalida("Escolha uma decisão válida e informe justificativa e revisor.")
-        if corpo.decisao == "aprovar_com_correcao":
-            if not (corpo.texto_corrigido or "").strip():
-                raise RevisaoInvalida("Aprovar com correção exige o texto corrigido.")
-            (config.raiz / metadados["arquivo_minuta"]).write_text(corpo.texto_corrigido.strip() + "\n", encoding="utf-8")
-        elif corpo.texto_corrigido is not None:
-            raise RevisaoInvalida("Texto corrigido só é aceito com a decisão aprovar_com_correcao.")
         return registrar_decisao(
             config, Auditoria(config), id_execucao,
             decisao=corpo.decisao, justificativa=corpo.justificativa, revisor=corpo.revisor,
+            texto_corrigido=corpo.texto_corrigido,
         )
 
     @app.post("/api/minutas/{id_execucao}/audio")
     def audio_minuta(id_execucao: str) -> dict:
         return fluxo.sintetizar_minuta(id_execucao, config=config, cliente=novo_cliente(), auditoria=Auditoria(config))
+
+    @app.post("/api/minutas/{id_execucao}/audio/verificar")
+    def verificar_audio(id_execucao: str) -> dict:
+        return fluxo.verificar_audio(id_execucao, config=config, cliente=novo_cliente(), auditoria=Auditoria(config))
+
+    @app.post("/api/minutas/{id_execucao}/audio/decisao")
+    def decidir_audio(id_execucao: str, corpo: DecisaoAudio) -> dict:
+        return registrar_revisao_audio(
+            config, Auditoria(config), id_execucao,
+            decisao=corpo.decisao, justificativa=corpo.justificativa, revisor=corpo.revisor,
+        )
 
     @app.post("/api/pecas")
     def gerar_peca(corpo: PedidoPeca) -> dict:

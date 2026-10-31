@@ -739,3 +739,13 @@ textarea {
   margin: 0;
   font-size: 0.9rem;
 }
+
+.audio-revisao {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+.audio-revisao audio {
+  width: 100%;
+}

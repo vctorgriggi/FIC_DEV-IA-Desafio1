@@ -281,7 +281,7 @@ class AudioSimuladoTest(unittest.TestCase):
             confirmados.append(campos.copy())
             return campos, []
         meta = fluxo.processar_caso('audio-01', config=self.config, cliente=self.cliente,
-                                   auditoria=self.auditoria, confirmar=confirmar)
+                                   auditoria=self.auditoria, confirmar=confirmar, revisor='Revisor fictício')
         self.assertEqual(len(confirmados), 1)
         pasta = self.raiz / meta['extracao']; comparacao = json.loads(pasta.with_name('comparacao_gabarito.json').read_text())
         self.assertEqual(comparacao['dados_criticos']['nao_encontrados'], [])
@@ -289,8 +289,10 @@ class AudioSimuladoTest(unittest.TestCase):
         with self.assertRaises(RevisaoInvalida):
             fluxo.sintetizar_minuta(meta['id_execucao'], config=self.config, cliente=self.cliente, auditoria=self.auditoria)
         self.assertEqual(len(sdk.chamadas), 3)
-        registrar_decisao(self.config, self.auditoria, meta['id_execucao'], decisao='aprovar_com_correcao', justificativa='Teste simulado', revisor='Revisor fictício')
-        minuta = self.raiz / meta['arquivo_minuta']; original = minuta.read_text()
+        minuta = self.raiz / meta['arquivo_minuta']
+        registrar_decisao(self.config, self.auditoria, meta['id_execucao'], decisao='aprovar_com_correcao', justificativa='Teste simulado',
+                          revisor='Revisor fictício', texto_corrigido=minuta.read_text())
+        original = minuta.read_text()
         minuta.write_text(original + ' alterado')
         with self.assertRaises(RevisaoInvalida):
             fluxo.sintetizar_minuta(meta['id_execucao'], config=self.config, cliente=self.cliente, auditoria=self.auditoria)
@@ -307,7 +309,7 @@ class AudioSimuladoTest(unittest.TestCase):
     def test_pipeline_nao_compara_gabarito_nao_validado(self, _):
         self.preparar_pipeline(validado=False)
         meta = fluxo.processar_caso('audio-01', config=self.config, cliente=self.cliente,
-                                   auditoria=self.auditoria, confirmar=lambda c, i: (c, []))
+                                   auditoria=self.auditoria, confirmar=lambda c, i: (c, []), revisor='Revisor fictício')
         self.assertIn('pendente', self.auditoria.eventos(etapa='comparacao_gabarito')[0]['extra']['aviso'])
         self.assertFalse((self.raiz / meta['extracao']).with_name('comparacao_gabarito.json').exists())
 
@@ -315,7 +317,7 @@ class AudioSimuladoTest(unittest.TestCase):
     def test_rejeitada_nao_sintetiza(self, _):
         sdk = self.preparar_pipeline()
         meta = fluxo.processar_caso('audio-01', config=self.config, cliente=self.cliente,
-                                   auditoria=self.auditoria, confirmar=lambda c, i: (c, []))
+                                   auditoria=self.auditoria, confirmar=lambda c, i: (c, []), revisor='Revisor fictício')
         registrar_decisao(self.config, self.auditoria, meta['id_execucao'], decisao='rejeitar',
                          justificativa='Teste simulado', revisor='Fictício')
         with self.assertRaises(RevisaoInvalida):
@@ -326,13 +328,45 @@ class AudioSimuladoTest(unittest.TestCase):
     def test_sintetizador_sem_arquivo_nao_registra_sucesso(self, _):
         self.preparar_pipeline()
         meta = fluxo.processar_caso('audio-01', config=self.config, cliente=self.cliente,
-                                   auditoria=self.auditoria, confirmar=lambda c, i: (c, []))
+                                   auditoria=self.auditoria, confirmar=lambda c, i: (c, []), revisor='Revisor fictício')
         registrar_decisao(self.config, self.auditoria, meta['id_execucao'], decisao='aprovar',
                          justificativa='Teste simulado', revisor='Fictício')
         with patch('src.audio.sintetizar', return_value={}), self.assertRaises(ArquivoInvalido):
             fluxo.sintetizar_minuta(meta['id_execucao'], config=self.config, cliente=self.cliente, auditoria=self.auditoria)
         self.assertNotIn('audio', ler_metadados(self.config, meta['id_execucao']))
         self.assertIsNotNone(self.auditoria.eventos(etapa='sintese_voz')[0]['erro'])
+
+    @patch('src.audio.inspecionar_audio', return_value={})
+    def test_verificacao_e_revisao_do_audio(self, _):
+        from src.revisao import registrar_revisao_audio
+        sdk = self.preparar_pipeline()
+        meta = fluxo.processar_caso('audio-01', config=self.config, cliente=self.cliente,
+                                   auditoria=self.auditoria, confirmar=lambda c, i: (c, []), revisor='Revisor fictício')
+        with self.assertRaisesRegex(RevisaoInvalida, 'ainda não tem áudio'):
+            fluxo.verificar_audio(meta['id_execucao'], config=self.config, cliente=self.cliente, auditoria=self.auditoria)
+        registrar_decisao(self.config, self.auditoria, meta['id_execucao'], decisao='aprovar',
+                          justificativa='Teste simulado', revisor='Fictício')
+        fluxo.sintetizar_minuta(meta['id_execucao'], config=self.config, cliente=self.cliente, auditoria=self.auditoria)
+        falado = audio.preparar_locucao((self.raiz / meta['arquivo_minuta']).read_text())
+        sdk._resposta = falsos.transcricao(falado.replace('2026-000001', '2026 00001'))
+        meta = fluxo.verificar_audio(meta['id_execucao'], config=self.config, cliente=self.cliente, auditoria=self.auditoria)
+        verificacao = json.loads((self.raiz / meta['verificacao_audio']).read_text())
+        self.assertEqual(verificacao['texto_falado_esperado'], falado)
+        self.assertEqual(verificacao['comparacao']['erros'][0]['esperado'], '2026-000001')
+        evento = self.auditoria.eventos(etapa='verificacao_audio')[0]
+        self.assertEqual(evento['extra']['diferencas'], len(verificacao['comparacao']['erros']))
+        self.assertNotIn('2026 00001', json.dumps(evento))
+
+        with self.assertRaises(RevisaoInvalida):
+            registrar_revisao_audio(self.config, self.auditoria, meta['id_execucao'], decisao='talvez',
+                                    justificativa='x', revisor='Fictício')
+        meta = registrar_revisao_audio(self.config, self.auditoria, meta['id_execucao'], decisao='rejeitar',
+                                       justificativa='Protocolo falado com um zero a menos.', revisor='Fictício')
+        self.assertEqual(meta['revisao_audio']['status'], 'rejeitado')
+        self.assertEqual(self.auditoria.eventos(etapa='revisao_audio')[0]['decisao_humana'], 'rejeitar')
+        with self.assertRaisesRegex(RevisaoInvalida, 'já foi revisado'):
+            registrar_revisao_audio(self.config, self.auditoria, meta['id_execucao'], decisao='aprovar',
+                                    justificativa='x', revisor='Fictício')
 
     def test_erro_inspecao_auditado(self):
         with patch('src.audio.shutil.which', return_value=None), self.assertRaises(ArquivoInvalido):
