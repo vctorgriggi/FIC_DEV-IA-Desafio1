@@ -1,0 +1,34 @@
+{
+  "caso_id": "",
+  "arquivo": "",
+  "elaborado_por": "",
+  "elaborado_em": "",
+  "tipo": "completa | incompleta | ambigua | adversarial",
+  "solicitacao_esperada": {
+    "protocolo": null,
+    "data": null,
+    "solicitante": null,
+    "assunto": null,
+    "pedido": null,
+    "categoria": null,
+    "campos_ausentes": [],
+    "necessita_revisao": false
+  },
+  "entidades_esperadas": {
+    "pessoas": [],
+    "orgaos": [],
+    "locais": [],
+    "datas": [],
+    "protocolos": []
+  },
+  "fatos_essenciais": [],
+  "fontes_esperadas": [
+    {
+      "documento_id": "",
+      "versao": "",
+      "trecho_referencia": ""
+    }
+  ],
+  "decisao_esperada": "aprovar | revisar | bloquear",
+  "justificativa_rotulo": ""
+}

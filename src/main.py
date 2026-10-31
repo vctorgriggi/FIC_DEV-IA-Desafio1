@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import subprocess
 import sys
 from pathlib import Path
 
@@ -241,6 +242,17 @@ def cmd_interface(config: Config, args: argparse.Namespace) -> None:
     uvicorn.run(criar_app(config), host="127.0.0.1", port=args.porta, log_level="warning")
 
 
+def cmd_assistente(config: Config, args: argparse.Namespace) -> None:
+    app = config.raiz / "src" / "app.py"
+    print(f"Assistente de documentos em http://127.0.0.1:{args.porta}  (Ctrl+C para encerrar)", flush=True)
+    # python -m streamlit põe a raiz do projeto no sys.path, e o app importa o pacote src.
+    subprocess.run(
+        [sys.executable, "-m", "streamlit", "run", str(app), "--server.address", "127.0.0.1",
+         "--server.port", str(args.porta), "--server.headless", "true", "--browser.gatherUsageStats", "false"],
+        cwd=config.raiz, check=False,
+    )
+
+
 def montar_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="python -m src.main", description="Central Inteligente de Atendimento — Desafio 1")
     sub = parser.add_subparsers(dest="comando", required=True)
@@ -300,6 +312,10 @@ def montar_parser() -> argparse.ArgumentParser:
     interface = sub.add_parser("interface", help="abre a interface gráfica local no navegador")
     interface.add_argument("--porta", type=int, default=8000)
     interface.set_defaults(funcao=cmd_interface)
+
+    assistente = sub.add_parser("assistente", help="abre o assistente de documentos do Desafio 2 (Streamlit, RF20)")
+    assistente.add_argument("--porta", type=int, default=8501)
+    assistente.set_defaults(funcao=cmd_assistente)
 
     revisar_peca = sub.add_parser("revisar-peca", help="checklist e decisão sobre uma peça visual (RF10)")
     revisar_peca.add_argument("id_execucao")

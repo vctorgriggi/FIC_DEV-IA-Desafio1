@@ -15,6 +15,7 @@ from .audit import Auditoria, Evento, agora_iso
 from .comparacao import tokens
 from .config import Config
 from .minuta import cabecalho
+from .tipos import PendenteDeImplementacao
 
 AGUARDANDO = "aguardando_revisao"
 DECISOES = {
@@ -174,6 +175,24 @@ def registrar_revisao_audio(
         )
     )
     return metadados
+
+
+def registrar_decisao_rag(
+    config: Config,
+    auditoria: Auditoria,
+    id_execucao: str,
+    *,
+    decisao: str,
+    justificativa: str,
+    revisor: str,
+) -> dict:
+    """RF20/RF24 — parte: interface.
+
+    Esperado: decisão "aprovar", "rejeitar" ou "revisar" sobre uma minuta de fluxo_rag, levando o status de
+    "pendente" para "aprovada", "rejeitada" ou "revisar" (schemas.StatusMinuta); justificativa e revisor
+    obrigatórios; decisão registrada não muda; evento na auditoria; nada é enviado ao cidadão.
+    """
+    raise PendenteDeImplementacao("RF20", "interface")
 
 
 def resumo_revisoes(config: Config) -> dict:

@@ -1,0 +1,13 @@
+{
+  "elaborado_por": "",
+  "elaborado_em": "",
+  "regra_ambiguidade": "",
+  "avaliacoes": [
+    {
+      "id": "AV-01",
+      "polaridade_esperada": "positiva | negativa | neutra | indeterminada",
+      "ambigua": false,
+      "justificativa_rotulo": ""
+    }
+  ]
+}

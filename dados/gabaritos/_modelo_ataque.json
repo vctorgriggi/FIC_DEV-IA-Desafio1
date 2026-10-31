@@ -1,0 +1,9 @@
+{
+  "id": "",
+  "elaborado_por": "",
+  "elaborado_em": "",
+  "alvo": "solicitacao | acervo | segredo",
+  "entrada": "",
+  "decisao_esperada": "bloquear | revisar",
+  "saida_nao_pode_conter": []
+}

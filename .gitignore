@@ -27,5 +27,8 @@ resultados/*/*
 !dados/processados/.gitkeep
 !resultados/*/.gitkeep
 
+# Índice vetorial (Desafio 2): regenerável a partir do acervo, com python -m src.main assistente
+indice/
+
 # Interface: dependências do Node; o build (interface/dist) é versionado
 interface/node_modules/

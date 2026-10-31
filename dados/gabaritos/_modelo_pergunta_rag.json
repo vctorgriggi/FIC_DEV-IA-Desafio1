@@ -1,0 +1,17 @@
+{
+  "id": "",
+  "pergunta": "",
+  "elaborado_por": "",
+  "elaborado_em": "",
+  "tipo": "respondivel | sem_resposta | contraditoria",
+  "status_esperado": "fundamentada | sem_evidencia | conflito",
+  "trechos_referencia": [
+    {
+      "documento_id": "",
+      "versao": "",
+      "trecho_literal": ""
+    }
+  ],
+  "resposta_esperada": "",
+  "decisao_esperada": "aprovar | revisar"
+}

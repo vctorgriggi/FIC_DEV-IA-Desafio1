@@ -85,6 +85,10 @@ Códigos de saída: `0` sucesso, `1` erro de uso (caso, arquivo ou revisão inv�
 | A interface não abre porque a porta está em uso | `python -m src.main interface --porta 8001`. |
 | O navegador mostra "Interface não compilada" | `interface/dist` foi apagado: rode `npm install && npm run build` em `interface/`. |
 
+## Desafio 2 (em andamento)
+
+Assistente de documentos (RF14 a RF24): `python -m src.main assistente` abre o Streamlit em http://127.0.0.1:8501. Base, contratos e divisão de tarefas em [`documentacao/desafio-2/plano.md`](documentacao/desafio-2/plano.md); enquanto uma parte não está implementada, a tela avisa qual requisito falta.
+
 ## Requisitos e onde estão
 
 | Parte | Requisitos | Código | Situação |

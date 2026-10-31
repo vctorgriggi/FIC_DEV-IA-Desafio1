@@ -31,6 +31,17 @@ class Config:
     def modelo(self, tarefa: str) -> str:
         return self.dados["modelos"][tarefa]
 
+    def perfil_geracao(self, nome: str | None = None) -> dict:
+        """RF21: provedor e modelo de geração do perfil pedido, ou do ativo no config.
+
+        Trocar de perfil não toca o índice: embeddings têm modelo próprio (modelos.embeddings).
+        """
+        geracao = self.dados["geracao"]
+        nome = nome or geracao["perfil_ativo"]
+        if nome not in geracao["perfis"]:
+            raise KeyError(f"Perfil de geração '{nome}' não existe. Perfis: {', '.join(geracao['perfis'])}.")
+        return {"nome": nome, **geracao["perfis"][nome]}
+
     def caso(self, caso_id: str) -> dict:
         for caso in self.dados["casos"]:
             if caso["id"] == caso_id:

@@ -79,6 +79,16 @@ class RespostaLLM:
     bruta: Any = field(repr=False, default=None)
 
 
+@dataclass
+class RespostaEmbeddings:
+    vetores: list[list[float]]
+    modelo: str
+    dimensao: int
+    duracao_s: float
+    tokens_entrada: int | None
+    custo_estimado_usd: float | None
+
+
 class ClienteLLM:
     def __init__(self, config: Config, *, chave: str | None = None, sdk: Any = None):
         self.config = config
@@ -237,6 +247,27 @@ class ClienteLLM:
             parametros=parametros,
             conteudo=base64.b64decode(dados),
             bruta=resposta,
+        )
+
+    def gerar_embeddings(self, *, modelo: str, textos: list[str]) -> RespostaEmbeddings:
+        """Embeddings de uma lista de textos (RF17), na mesma ordem da entrada."""
+        if not textos:
+            raise ValueError("Nenhum texto para gerar embeddings.")
+        resposta, duracao = self._executar(
+            lambda: self._sdk.embeddings.create(model=modelo, input=textos, timeout=self._timeout())
+        )
+        dados = sorted(getattr(resposta, "data", None) or [], key=lambda item: item.index)
+        if len(dados) != len(textos):
+            raise RespostaMalformada(f"O provedor devolveu {len(dados)} embeddings para {len(textos)} textos.")
+        vetores = [list(item.embedding) for item in dados]
+        tokens = getattr(getattr(resposta, "usage", None), "prompt_tokens", None)
+        return RespostaEmbeddings(
+            vetores=vetores,
+            modelo=modelo,
+            dimensao=len(vetores[0]),
+            duracao_s=duracao,
+            tokens_entrada=tokens,
+            custo_estimado_usd=_custo([(tokens, self._preco(modelo).get("entrada"))]),
         )
 
     def _timeout(self) -> float:

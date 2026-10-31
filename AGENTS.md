@@ -29,8 +29,13 @@ src/              # base compartilhada + uma parte por modalidade (tabela no REA
 prompts/          # <nome>_v<N>.md; prompt alterado é versão nova, nunca edição
 dados/originais/  # entradas do desafio; nunca alterar (o hash vai para o log)
 dados/gabaritos/  # resultado esperado, escrito antes de executar o caso
+dados/acervo/     # acervo do Desafio 2; acervo.json é o manifesto (id, título, versão)
+indice/           # índice Chroma, fora do git; recria-se a partir do acervo
 interface/        # front-end Vite/React; dist/ é versionado e servido por src/web.py
 ```
+
+Desafio 2 em andamento: base, contratos e divisão por estudante em
+`documentacao/desafio-2/plano.md`.
 
 ## Nunca fazer
 
@@ -47,6 +52,9 @@ interface/        # front-end Vite/React; dist/ é versionado e servido por src/
 - Contrato entre modalidades: `TextoExtraido` (`tipos.py`) e o esquema de
   `extracao.py`. Mudança só com acordo do grupo, e no mesmo commit que ajusta
   `normalizar_extracao` e os testes — três partes dependem dele.
+- Contrato do Desafio 2: `src/schemas.py` (`ESQUEMA_VERSAO`) e as
+  assinaturas dos esqueletos. Mudança combinada no grupo, versão nova do
+  esquema e, no mesmo commit, quem produz e quem consome o tipo.
 - Erros: falha do provedor vira subclasse de `ErroLLM`; `main.py` traduz em
   mensagem e código de saída. Parte não implementada levanta
   `PendenteDeImplementacao`.
@@ -60,6 +68,8 @@ interface/        # front-end Vite/React; dist/ é versionado e servido por src/
   escrito pelo grupo. Commits não levam trailer de coautoria de IA.
 - Interface: só chama funções de fluxo.py e revisao.py; regra de negócio não
   mora no front-end. Mudou interface/src → `npm run build` e commite dist/.
+  O Streamlit do Desafio 2 (`src/app.py`) segue a mesma regra com
+  `fluxo_rag.py`, as partes e `revisao.py`.
 - Identificadores e mensagens em português.
 
 ## Gotchas

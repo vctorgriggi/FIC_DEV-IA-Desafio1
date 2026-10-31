@@ -28,6 +28,11 @@ def imagem(b64: str | None, *, texto=None, imagem_entrada=None, saida=None):
     return SimpleNamespace(data=[SimpleNamespace(b64_json=b64)] if b64 is not None else [], usage=uso)
 
 
+def embeddings(vetores: list[list[float]], *, tokens=7, embaralhar=False):
+    dados = [SimpleNamespace(index=i, embedding=v) for i, v in enumerate(vetores)]
+    return SimpleNamespace(data=list(reversed(dados)) if embaralhar else dados, usage=SimpleNamespace(prompt_tokens=tokens))
+
+
 class SDKFalso:
     """Imita o cliente OpenAI (responses, audio, images), sem rede.
 
@@ -45,6 +50,7 @@ class SDKFalso:
             transcriptions=SimpleNamespace(create=self._operacao("audio.transcriptions.create")),
             speech=SimpleNamespace(create=self._operacao("audio.speech.create")),
         )
+        self.embeddings = SimpleNamespace(create=self._operacao("embeddings.create"))
         self.images = SimpleNamespace(
             generate=self._operacao("images.generate"), edit=self._operacao("images.edit")
         )

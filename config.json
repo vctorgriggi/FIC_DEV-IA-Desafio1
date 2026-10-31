@@ -5,10 +5,18 @@
     "transcricao": "gpt-transcribe",
     "visao": "gpt-6.1-terra",
     "tts": "gpt-4o-mini-tts",
-    "imagem": "gpt-image-2.5-flare"
+    "imagem": "gpt-image-2.5-flare",
+    "embeddings": "text-embedding-3-small"
   },
   "parametros_geracao": {
     "max_output_tokens": 25000
+  },
+  "geracao": {
+    "perfil_ativo": "principal",
+    "perfis": {
+      "principal": { "provedor": "openai", "modelo": "gpt-6.1-terra" },
+      "alternativo": { "provedor": "openai", "modelo": "gpt-6-luna" }
+    }
   },
   "audio": {
     "timeout_inspecao_s": 30,
@@ -20,6 +28,8 @@
   "armazenar_no_provedor": false,
   "precos_usd_por_milhao_tokens": {
     "gpt-6.1-terra": { "entrada": 1.0, "saida": 5.0 },
+    "gpt-6-luna": { "entrada": 0.1, "saida": 0.5 },
+    "text-embedding-3-small": { "entrada": 0.02 },
     "gpt-image-2.5-flare": { "entrada": 5.0, "entrada_imagem": 8.0, "saida": 30.0 }
   },
   "precos_usd_por_minuto_audio": {
@@ -40,6 +50,29 @@
   "privacidade": {
     "mascarar_antes_de_enviar": ["cpf", "rg", "email", "telefone"]
   },
+  "acervo": {
+    "manifesto": "dados/acervo/acervo.json",
+    "extensoes": [".txt", ".pdf"],
+    "tamanho_max_mb": 5
+  },
+  "indice": {
+    "colecao": "acervo",
+    "top_k": 4,
+    "chunking_ativo": "A",
+    "chunking": {
+      "A": { "unidade": "caracteres", "tamanho": 800, "sobreposicao": 100 },
+      "B": { "unidade": "caracteres", "tamanho": 1600, "sobreposicao": 200 }
+    }
+  },
+  "limites": {
+    "max_caracteres_solicitacao": 8000,
+    "max_chamadas_por_execucao": 8,
+    "max_tokens_por_execucao": 60000,
+    "repeticoes_falha_transitoria": 1
+  },
+  "sentimentos": {
+    "polaridades": ["positiva", "negativa", "neutra", "indeterminada"]
+  },
   "imagem_institucional": "dados/originais/brasao.png",
   "caminhos": {
     "originais": "dados/originais",
@@ -47,9 +80,14 @@
     "processados": "dados/processados",
     "prompts": "prompts",
     "minutas": "resultados/minutas",
+    "minutas_rag": "resultados/minutas_rag",
     "audios": "resultados/audios",
     "imagens": "resultados/imagens",
     "experimentos": "resultados/experimentos",
+    "acervo": "dados/acervo",
+    "avaliacoes": "dados/avaliacoes",
+    "indice": "indice",
+    "metricas": "resultados/metricas",
     "logs": "resultados/logs"
   },
   "casos": [
