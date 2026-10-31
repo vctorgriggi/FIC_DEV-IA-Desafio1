@@ -181,7 +181,7 @@ def test_peca_visual_guarda_prompt_modelo_data_e_proveniencia(config, auditoria,
     def gerar(especificacao, destino, **_):
         destino.write_bytes(b"png")
         return PecaVisual(
-            caminho=destino, prompt="cartaz", modelo="gemini-3.1-flash-lite-image",
+            caminho=destino, prompt="cartaz", modelo="gpt-image-2.5-flare",
             data_geracao="2026-10-17", nota_proveniencia="Imagem gerada por IA",
         )
 
@@ -191,7 +191,7 @@ def test_peca_visual_guarda_prompt_modelo_data_e_proveniencia(config, auditoria,
     )
     metadados = json.loads(peca.caminho.with_suffix(".json").read_text(encoding="utf-8"))
     assert metadados["prompt"] == "cartaz"
-    assert metadados["modelo"] == "gemini-3.1-flash-lite-image"
+    assert metadados["modelo"] == "gpt-image-2.5-flare"
     assert metadados["data_geracao"] == "2026-10-17"
     assert metadados["nota_proveniencia"] == "Imagem gerada por IA"
     assert metadados["especificacao"] == {"sujeito": "cartaz"}

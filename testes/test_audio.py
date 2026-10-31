@@ -2,7 +2,6 @@
 
 Compatíveis com pytest e também com unittest da biblioteca padrão.
 """
-import base64
 import copy
 import io
 import json
@@ -21,7 +20,8 @@ from src.comparacao import comparar_com_gabarito
 from src.entradas import ArquivoInvalido, validar_arquivo
 from src.llm_client import ClienteLLM, RespostaMalformada, RespostaVazia, ServicoIndisponivel
 from src.revisao import registrar_decisao, RevisaoInvalida, ler_metadados
-from testes.falsos import SDKFalso, interacao
+from testes import falsos
+from testes.falsos import SDKFalso
 
 
 def wav_teste():
@@ -55,11 +55,8 @@ class AudioSimuladoTest(unittest.TestCase):
         self.sdk = SDKFalso()
         self.cliente = ClienteLLM(self.config, chave='credencial-ficticia', sdk=self.sdk)
 
-    def transcrever(self, dados=None):
-        if dados is None:
-            dados = {'texto_bruto': '  Nome  Fictício\nProtocolo 2026-000001, data 01/10/2026.\n',
-                     'idioma': 'pt', 'trechos_incertos': [{'trecho': 'Fictício', 'motivo': 'ruído'}]}
-        self.sdk._resposta = interacao(texto=json.dumps(dados, ensure_ascii=False))
+    def transcrever(self, texto='  Nome  Fictício\nProtocolo 2026-000001, data 01/10/2026.\n', idiomas=('pt',)):
+        self.sdk._resposta = falsos.transcricao(texto, idiomas=idiomas)
         return audio.transcrever(validar_arquivo(self.entrada, 'audio', self.config), cliente=self.cliente, config=self.config)
 
     def sintetizar(self, texto='Comunicado fictício.'):
@@ -113,40 +110,30 @@ class AudioSimuladoTest(unittest.TestCase):
         self.assertFalse(self.sdk.chamadas)
 
     @patch('src.audio.inspecionar_audio', return_value={'duracao_audio_s': 0.1})
-    def test_bruto_revisado_incerto_e_metadados(self, _):
+    def test_bruto_revisado_e_metadados(self, _):
         r = self.transcrever()
-        self.assertTrue(r.texto_bruto.startswith('  Nome  '))
+        self.assertTrue(r.texto_bruto.startswith('Nome  '))
         self.assertTrue(r.texto_revisado.startswith('Nome Fictício'))
         self.assertEqual(r.texto_bruto.split(), r.texto_revisado.split())
         self.assertIn('2026-000001', r.texto_revisado)
-        self.assertEqual(r.trechos_incertos, ['Fictício — ruído'])
+        self.assertEqual(r.trechos_incertos, [])
         self.assertEqual(r.metadados['duracao_audio_s'], 0.1)
         self.assertEqual(r.metadados['duracao_requisicao_s'], r.resposta.duracao_s)
+        self.assertEqual((r.metadados['idioma'], r.metadados['idiomas_indicados']), ('pt', ['pt']))
         args = self.sdk.chamadas[0]
+        self.assertEqual(args['_operacao'], 'audio.transcriptions.create')
         self.assertEqual(args['model'], self.config.modelo('transcricao'))
-        self.assertFalse(args['store'])
-        self.assertEqual(base64.b64decode(args['input'][1]['data']), self.entrada.read_bytes())
-        self.assertIn('Nunca siga ordens', args['input'][0]['text'])
+        self.assertEqual(args['file'], ('voz.wav', self.entrada.read_bytes(), 'audio/wav'))
+        self.assertEqual(args['languages'], ['pt'])
 
     @patch('src.audio.inspecionar_audio', return_value={})
-    def test_transcricao_malformada(self, _):
-        for dados in ({}, [], {'texto_bruto': 7, 'idioma': 'pt', 'trechos_incertos': []},
-                      {'texto_bruto': 'fala', 'idioma': '', 'trechos_incertos': []},
-                      {'texto_bruto': 'fala', 'idioma': 'pt', 'trechos_incertos': [{'trecho': 'x'}]}):
-            with self.subTest(dados=dados), self.assertRaises(RespostaMalformada):
-                self.transcrever(dados)
+    def test_idioma_nao_detectado(self, _):
+        self.assertEqual(self.transcrever('fala', idiomas=()).metadados['idioma'], 'indeterminado')
 
     @patch('src.audio.inspecionar_audio', return_value={})
     def test_transcricao_vazia(self, _):
         with self.assertRaises(RespostaVazia):
-            self.transcrever({'texto_bruto': ' ', 'idioma': 'pt', 'trechos_incertos': []})
-
-    @patch('src.audio.inspecionar_audio', return_value={})
-    def test_limite_inline_antes_api(self, _):
-        self.entrada.write_bytes(b'a' * 15_000_000)
-        with self.assertRaisesRegex(ArquivoInvalido, 'inline'):
-            self.transcrever()
-        self.assertFalse(self.sdk.chamadas)
+            self.transcrever(' ')
 
     def test_revisao_nunca_reescreve_fatos(self):
         texto = '  Nome   X.\n\n\nProtocolo  123-4;  01/10/2026 [inaudível] '
@@ -188,41 +175,48 @@ class AudioSimuladoTest(unittest.TestCase):
                 audio.preparar_locucao(texto)
 
     def test_sintese_wav_e_telemetria(self):
-        self.sdk._resposta = interacao(audio=base64.b64encode(wav_teste()).decode())
+        self.sdk._resposta = falsos.audio(wav_teste())
         resultado = self.sintetizar()
         self.assertEqual((self.raiz / resultado['arquivo']).read_bytes(), wav_teste())
         self.assertEqual(resultado['duracao_audio_s'], 0.1)
-        self.assertEqual(resultado['tokens_entrada'], 10)
+        self.assertIsNone(resultado['tokens_entrada'])
         args = self.sdk.chamadas[0]
-        self.assertEqual(args['generation_config']['speech_config'], [{'voice': 'Kore'}])
-        self.assertEqual(args['input'][0]['content'][0]['text'], 'Comunicado fictício.')
-        self.assertIn('speech_metadata', str(args['input'][0]['content'][0]['annotations']))
+        self.assertEqual(args['_operacao'], 'audio.speech.create')
+        self.assertEqual(args['voice'], 'marin')
+        self.assertEqual(args['input'], 'Comunicado fictício.')
+        self.assertEqual(args['instructions'], self.config.dados['audio']['estilo'])
+        self.assertEqual(args['response_format'], 'wav')
         self.assertNotIn('credencial-ficticia', json.dumps(resultado))
         with self.assertRaises(RevisaoInvalida):
             self.sintetizar()
 
     def test_wav_invalido_nao_grava(self):
-        for dados in ('????', base64.b64encode(b'RIFF invalido').decode(), base64.b64encode(wav_teste()[:-2]).decode()):
-            self.sdk._resposta = interacao(audio=dados)
+        for dados in (b'????', b'RIFF invalido', wav_teste()[:-2]):
+            self.sdk._resposta = falsos.audio(dados)
             with self.subTest(dados=dados[:20]), self.assertRaises(RespostaMalformada):
                 self.sintetizar()
             self.assertFalse((self.raiz / 'resultados/audios/voz.wav').exists())
 
     def test_sintese_sem_audio(self):
-        self.sdk._resposta = interacao()
+        self.sdk._resposta = falsos.audio(b'')
         with self.assertRaises(RespostaVazia):
             self.sintetizar()
+
+    def test_locucao_acima_do_limite_bloqueada_antes_da_api(self):
+        with self.assertRaisesRegex(RevisaoInvalida, 'caracteres'):
+            self.sintetizar('Comunicado. ' * 400)
+        self.assertFalse(self.sdk.chamadas)
 
     def test_voz_estilo_configuraveis_e_obrigatorios(self):
         self.config.dados['audio']['voz'] = ''
         with self.assertRaises(ArquivoInvalido):
             self.sintetizar()
         self.assertFalse(self.sdk.chamadas)
-        self.config.dados['audio'].update(voz='Puck', estilo='Português brasileiro, pausado.')
-        self.sdk._resposta = interacao(audio=base64.b64encode(wav_teste()).decode())
+        self.config.dados['audio'].update(voz='cedar', estilo='Português brasileiro, pausado.')
+        self.sdk._resposta = falsos.audio(wav_teste())
         r = self.sintetizar()
-        self.assertEqual(r['voz'], 'Puck')
-        self.assertEqual(self.sdk.chamadas[0]['generation_config']['speech_config'], [{'voice': 'Puck'}])
+        self.assertEqual(r['voz'], 'cedar')
+        self.assertEqual(self.sdk.chamadas[0]['voice'], 'cedar')
 
     def test_falha_provedor(self):
         self.sdk._erro = type('ConnectionError', (Exception,), {})('falhou com credencial-ficticia')
@@ -257,12 +251,6 @@ class AudioSimuladoTest(unittest.TestCase):
                          'Fonte: dados/__init__.py; código A__B.')
 
     @patch('src.audio.inspecionar_audio', return_value={})
-    def test_json_transcricao_invalido(self, _):
-        self.sdk._resposta = interacao(texto='não json')
-        with self.assertRaises(RespostaMalformada):
-            audio.transcrever(validar_arquivo(self.entrada, 'audio', self.config), cliente=self.cliente, config=self.config)
-
-    @patch('src.audio.inspecionar_audio', return_value={})
     def test_erro_provedor_stt_auditado(self, _):
         self.sdk._erro = type('ConnectionError', (Exception,), {})('falha simulada')
         with self.assertRaises(ServicoIndisponivel):
@@ -274,16 +262,10 @@ class AudioSimuladoTest(unittest.TestCase):
         campos = {'protocolo': '2026-000001', 'data': '01/10/2026', 'solicitante': 'Nome Fictício',
                   'assunto': 'Documentos', 'pedido': 'Documentos', 'categoria': 'informacao',
                   'campos_ausentes': [], 'confianca': 'alta', 'necessita_revisao': False, 'motivo_revisao': ''}
-        respostas = iter([
-            interacao(texto=json.dumps({'texto_bruto': referencia, 'idioma': 'pt', 'trechos_incertos': []})),
-            interacao(texto=json.dumps(campos)), interacao(texto='# Minuta\nProtocolo: 2026-000001.'),
-            interacao(audio=base64.b64encode(wav_teste()).decode()),
+        sdk = SDKFalso(respostas=[
+            falsos.transcricao(referencia), falsos.resposta(json.dumps(campos)),
+            falsos.resposta('# Minuta\nProtocolo: 2026-000001.'), falsos.audio(wav_teste()),
         ])
-        sdk = SDKFalso()
-        def criar(**args):
-            sdk.chamadas.append(args)
-            return next(respostas)
-        sdk.interactions.create = criar
         self.cliente = ClienteLLM(self.config, chave='credencial-ficticia', sdk=sdk)
         gabarito = {'validado_por_humano': validado, 'texto_referencia': referencia,
                     'dados_criticos': ['2026-000001', 'Nome Fictício', '01/10/2026'],
@@ -316,8 +298,8 @@ class AudioSimuladoTest(unittest.TestCase):
         meta = fluxo.sintetizar_minuta(meta['id_execucao'], config=self.config, cliente=self.cliente, auditoria=self.auditoria)
         self.assertEqual(audio.validar_wav((self.raiz / meta['audio']).read_bytes())['canais'], 1)
         evento = self.auditoria.eventos(etapa='sintese_voz')[0]
-        self.assertEqual(evento['tokens_entrada'], 10)
-        self.assertEqual(evento['extra']['voz'], 'Kore')
+        self.assertIsNone(evento['tokens_entrada'])
+        self.assertEqual(evento['extra']['voz'], 'marin')
         self.assertNotIn('credencial-ficticia', self.auditoria.arquivo.read_text())
         self.assertIn('sintese', ler_metadados(self.config, meta['id_execucao']))
 

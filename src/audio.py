@@ -5,8 +5,6 @@ A autorização oficial de TTS pertence a fluxo.sintetizar_minuta, não a esta p
 """
 from __future__ import annotations
 
-import base64
-import binascii
 import hashlib
 import io
 import json
@@ -19,25 +17,14 @@ from pathlib import Path
 
 from .config import Config
 from .entradas import ArquivoEntrada, ArquivoInvalido, validar_arquivo
-from .llm_client import ClienteLLM, RespostaMalformada, RespostaVazia, formato_json, ler_json
+from .llm_client import ClienteLLM, RespostaMalformada
 from .minuta import AVISO_LACUNAS
-from .prompts import carregar_prompt
 from .revisao import RevisaoInvalida
 from .tipos import TextoExtraido
 
 VERSAO_LOCUCAO = 'markdown_conservador_v1'
-ESQUEMA_TRANSCRICAO = {
-    'type': 'object',
-    'properties': {
-        'texto_bruto': {'type': 'string'},
-        'idioma': {'type': 'string'},
-        'trechos_incertos': {'type': 'array', 'items': {
-            'type': 'object', 'properties': {'trecho': {'type': 'string'}, 'motivo': {'type': 'string'}},
-            'required': ['trecho', 'motivo'],
-        }},
-    },
-    'required': ['texto_bruto', 'idioma', 'trechos_incertos'],
-}
+# Limite de entrada da Speech API (fonte: docs oficiais OpenAI API, audio/speech, out/2026).
+LIMITE_LOCUCAO = 4096
 FORMATOS = {'.mp3': {'mp3'}, '.wav': {'wav'}, '.m4a': {'mov', 'mp4', 'm4a'},
             '.ogg': {'ogg'}, '.flac': {'flac'}}
 
@@ -104,38 +91,21 @@ def transcrever(arquivo: ArquivoEntrada, *, cliente: ClienteLLM, config: Config)
     conteudo_original = arquivo.ler_bytes()
     if hashlib.sha256(conteudo_original).hexdigest() != arquivo.sha256:
         raise ArquivoInvalido('O áudio mudou durante a inspeção. Valide e processe novamente.')
-    tarefa = carregar_prompt(config, 'transcricao', 1)
-    sistema = carregar_prompt(config, 'sistema_seguro', 1)
-    entrada = [{'type': 'text', 'text': tarefa.texto},
-               {'type': 'audio', 'data': base64.b64encode(conteudo_original).decode('ascii'),
-                'mime_type': arquivo_atual.mime_type}]
-    # Reserva para envelope, esquema, parâmetros e cabeçalhos; sem Files API implícita.
-    tamanho = len(json.dumps({'input': entrada, 'system_instruction': sistema.texto,
-                             'response_format': formato_json(ESQUEMA_TRANSCRICAO)},
-                            ensure_ascii=False).encode('utf-8')) + 65536
-    if tamanho > 20_000_000:
-        raise ArquivoInvalido('Áudio excede o limite seguro de 20 MB da requisição inline. Use um arquivo menor; upload não implementado.')
-    resposta = cliente.gerar(modelo=config.modelo('transcricao'), entrada=entrada,
-                            instrucao_sistema=sistema.texto,
-                            formato_resposta=formato_json(ESQUEMA_TRANSCRICAO))
-    dados = ler_json(resposta)
-    bruto, idioma, incertos = (dados.get(k) for k in ('texto_bruto', 'idioma', 'trechos_incertos'))
-    if not isinstance(bruto, str) or not isinstance(idioma, str) or not idioma.strip() or not isinstance(incertos, list):
-        raise RespostaMalformada('Transcrição fora do esquema esperado.')
-    if not bruto.strip():
-        raise RespostaVazia('Nenhuma fala transcrita. Confira se o áudio contém fala inteligível.')
-    if any(not isinstance(i, dict) or not isinstance(i.get('trecho'), str)
-           or not i['trecho'].strip() or not isinstance(i.get('motivo'), str)
-           or not i['motivo'].strip() for i in incertos):
-        raise RespostaMalformada('Trechos incertos fora do esquema esperado.')
+    idiomas_indicados = config.dados.get('audio', {}).get('idiomas') or []
+    resposta = cliente.transcrever(modelo=config.modelo('transcricao'), nome_arquivo=arquivo.caminho.name,
+                                   conteudo=conteudo_original, mime_type=arquivo_atual.mime_type,
+                                   idiomas=idiomas_indicados)
+    detectados = [i.code for i in getattr(resposta.bruta, 'languages', None) or [] if getattr(i, 'code', None)]
+    bruto = resposta.texto
     return TextoExtraido(
         texto_bruto=bruto, texto_revisado=revisar_transcricao(bruto),
-        trechos_incertos=[f"{i['trecho']} — {i['motivo']}" for i in incertos],
-        metadados={**info, 'idioma': idioma.strip(), 'modelo': resposta.modelo,
+        # gpt-transcribe não aponta leituras duvidosas; a conferência humana dos dados críticos cobre a lacuna.
+        trechos_incertos=[],
+        metadados={**info, 'idioma': ', '.join(detectados) or 'indeterminado',
+                   'idiomas_indicados': idiomas_indicados, 'modelo': resposta.modelo,
                    'duracao_requisicao_s': resposta.duracao_s, 'sha256_original': arquivo.sha256,
-                   'revisao': 'espaços e quebras de linha; sem alteração de palavras',
-                   'prompt_sistema': sistema.identificador, 'hash_prompt_sistema': sistema.hash},
-        resposta=resposta, prompt=tarefa,
+                   'revisao': 'espaços e quebras de linha; sem alteração de palavras'},
+        resposta=resposta,
     )
 
 
@@ -196,25 +166,17 @@ def validar_wav(conteudo: bytes) -> dict:
 def sintetizar(texto_aprovado: str, destino: Path, *, cliente: ClienteLLM, config: Config) -> dict:
     """Primitiva TTS; produção oficial deve entrar por fluxo.sintetizar_minuta."""
     texto = preparar_locucao(texto_aprovado)
+    if len(texto) > LIMITE_LOCUCAO:
+        raise RevisaoInvalida(f'A locução tem {len(texto)} caracteres; a síntese aceita até {LIMITE_LOCUCAO}. '
+                              'Encurte a minuta e aprove de novo.')
     if destino.suffix.lower() != '.wav' or destino.exists():
         raise RevisaoInvalida('O destino deve ser WAV novo; um áudio anterior não será sobrescrito.')
     opcoes = config.dados.get('audio', {})
     voz, estilo = opcoes.get('voz'), opcoes.get('estilo')
     if not all(isinstance(v, str) and v.strip() for v in (voz, estilo)):
         raise ArquivoInvalido('Configure audio.voz e audio.estilo com valores não vazios em config.json.')
-    entrada = [{'type': 'user_input', 'content': [{'type': 'text', 'text': texto,
-                'annotations': [{'type': 'speech_metadata', 'style': estilo}]}]}]
-    resposta = cliente.gerar(modelo=config.modelo('tts'), entrada=entrada,
-                            formato_resposta={'type': 'audio'},
-                            parametros={'speech_config': [{'voice': voz}]}, saida='audio')
-    saida = getattr(resposta.bruta, 'output_audio', None)
-    dados = getattr(saida, 'data', None)
-    if not dados:
-        raise RespostaVazia('O provedor não retornou áudio inline para gravação.')
-    try:
-        conteudo = base64.b64decode(dados, validate=True)
-    except (binascii.Error, ValueError, TypeError):
-        raise RespostaMalformada('O áudio retornado não possui base64 válido.') from None
+    resposta = cliente.sintetizar_voz(modelo=config.modelo('tts'), texto=texto, voz=voz, instrucoes=estilo)
+    conteudo = resposta.conteudo
     formato = validar_wav(conteudo)
     try:
         destino.parent.mkdir(parents=True, exist_ok=True)

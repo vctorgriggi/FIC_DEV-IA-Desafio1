@@ -1,25 +1,20 @@
 """Cliente único do provedor de modelos (RF04).
 
-Todas as chamadas ao Gemini passam por aqui: modelo, parâmetros, timeout e
+Todas as chamadas à OpenAI passam por aqui: modelo, parâmetros, timeout e
 armazenamento no provedor vêm do config.json; a chave vem do .env.
 """
 
 from __future__ import annotations
 
+import base64
 import json
 import threading
 import time
 from dataclasses import dataclass, field
-from typing import Any
+from typing import Any, Callable
 
 from .config import Config, carregar_chave
 from .privacidade import ocultar_segredos
-
-
-STATUS_REPETIVEIS = (500, 502, 503, 504)
-
-# Campo da Interaction onde cada tipo de saída chega.
-CAMPOS_SAIDA = {"texto": "output_text", "audio": "output_audio", "imagem": "output_image"}
 
 
 class ErroLLM(Exception):
@@ -34,11 +29,11 @@ class ErroLLM(Exception):
 
 
 class ChaveAusente(ErroLLM):
-    mensagem_padrao = "Chave da API não configurada. Copie .env.example para .env e preencha GEMINI_API_KEY."
+    mensagem_padrao = "Chave da API não configurada. Copie .env.example para .env e preencha OPENAI_API_KEY."
 
 
 class AutenticacaoInvalida(ErroLLM):
-    mensagem_padrao = "O provedor recusou a chave da API. Confira GEMINI_API_KEY no .env."
+    mensagem_padrao = "O provedor recusou a chave da API. Confira OPENAI_API_KEY no .env."
 
 
 class LimiteRequisicoes(ErroLLM):
@@ -78,7 +73,9 @@ class RespostaLLM:
     tokens_saida: int | None
     custo_estimado_usd: float | None
     parametros: dict = field(default_factory=dict)
-    # Interaction do SDK: áudio (output_audio) e imagem (output_image) saem daqui.
+    # Áudio da síntese de voz e imagem gerada chegam aqui, já em bytes.
+    conteudo: bytes | None = field(repr=False, default=None)
+    # Objeto devolvido pelo SDK, para metadados que só uma tarefa usa (ex.: idiomas da transcrição).
     bruta: Any = field(repr=False, default=None)
 
 
@@ -89,15 +86,12 @@ class ClienteLLM:
         if sdk is None:
             if not self._chave:
                 raise ChaveAusente()
-            from google import genai
-            from google.genai import types
+            from openai import OpenAI
 
-            # google-genai 2.31.0: a Interactions API repete a chamada esperando o
-            # Retry-After do servidor sem teto (num 429 de cota esgotada, a CLI
-            # travava por minutos), e attempts=0 vira 1. Repetir só em 5xx deixa o 429
-            # voltar na hora; o prazo de relógio em _chamar cobre o resto.
-            repeticao = types.HttpRetryOptions(attempts=1, http_status_codes=list(STATUS_REPETIVEIS))
-            sdk = genai.Client(api_key=self._chave, http_options=types.HttpOptions(retry_options=repeticao))
+            # O SDK repete 408, 409, 429 e 5xx duas vezes por padrão; num 429 de cota
+            # esgotada isso só atrasa a mesma recusa. Sem repetição, o 429 volta na
+            # hora como LimiteRequisicoes, e o prazo de relógio em _chamar cobre o resto.
+            sdk = OpenAI(api_key=self._chave, max_retries=0)
         self._sdk = sdk
 
     def gerar(
@@ -108,97 +102,189 @@ class ClienteLLM:
         instrucao_sistema: str | None = None,
         formato_resposta: dict | None = None,
         parametros: dict | None = None,
-        saida: str = "texto",
     ) -> RespostaLLM:
-        """Faz uma chamada ao provedor e devolve texto, tempo, tokens e custo estimado.
+        """Gera texto pela Responses API e devolve texto, tempo, tokens e custo estimado.
 
-        `entrada` é texto puro ou a lista de partes da Interactions API, por exemplo
-        [{"type": "text", "text": ...}, {"type": "audio", "data": <base64>, "mime_type": "audio/mp3"}].
-        `saida` diz o que precisa vir na resposta ("texto", "audio" ou "imagem");
-        sem isso, levanta RespostaVazia. Áudio e imagem se leem em `bruta`.
+        `entrada` é texto puro ou a lista de mensagens da Responses API (ver
+        entrada_com_anexo). `formato_resposta` vem de formato_json.
         """
-        if saida not in CAMPOS_SAIDA:
-            raise ValueError(f"saida deve ser uma de {sorted(CAMPOS_SAIDA)}, não {saida!r}.")
-        argumentos: dict[str, Any] = {
-            "model": modelo,
-            "input": entrada,
+        parametros = {
             "store": self.config.dados["armazenar_no_provedor"],
-            "timeout": self.config.dados["timeout_segundos"],
+            **self.config.dados.get("parametros_geracao", {}),
+            **(parametros or {}),
         }
-        parametros = {**self.config.dados.get("parametros_geracao", {}), **(parametros or {})}
-        if parametros:
-            argumentos["generation_config"] = parametros
+        argumentos: dict[str, Any] = {"model": modelo, "input": entrada, **parametros}
         if instrucao_sistema:
-            argumentos["system_instruction"] = instrucao_sistema
+            argumentos["instructions"] = instrucao_sistema
         if formato_resposta:
-            argumentos["response_format"] = formato_resposta
+            argumentos["text"] = formato_resposta
+            parametros["formato_resposta"] = formato_resposta["format"]["name"]
 
+        resposta, duracao = self._executar(lambda: self._sdk.responses.create(**argumentos, timeout=self._timeout()))
+
+        status = getattr(resposta, "status", "completed")
+        if status == "incomplete":
+            motivo = getattr(getattr(resposta, "incomplete_details", None), "reason", None)
+            # O raciocínio conta no max_output_tokens; quando ele estoura, o JSON chega cortado.
+            if motivo == "max_output_tokens":
+                raise RespostaIncompleta()
+            raise RespostaIncompleta(f"A resposta do modelo veio incompleta (motivo: {motivo or 'não informado'}).")
+        if status == "failed":
+            raise ServicoIndisponivel(detalhe=self._ocultar(str(getattr(resposta, "error", ""))))
+        texto = (getattr(resposta, "output_text", None) or "").strip()
+        if not texto:
+            raise RespostaVazia()
+        uso = getattr(resposta, "usage", None)
+        entrada_tokens, saida_tokens = getattr(uso, "input_tokens", None), getattr(uso, "output_tokens", None)
+        preco = self._preco(modelo)
+        return RespostaLLM(
+            texto=texto,
+            modelo=modelo,
+            duracao_s=duracao,
+            tokens_entrada=entrada_tokens,
+            tokens_saida=saida_tokens,
+            # output_tokens já inclui o raciocínio, que é cobrado como saída.
+            custo_estimado_usd=_custo([(entrada_tokens, preco.get("entrada")), (saida_tokens, preco.get("saida"))]),
+            parametros=parametros,
+            bruta=resposta,
+        )
+
+    def transcrever(
+        self, *, modelo: str, nome_arquivo: str, conteudo: bytes, mime_type: str, idiomas: list[str] | None = None
+    ) -> RespostaLLM:
+        """Speech-to-text (RF06): devolve o texto; os idiomas detectados ficam em `bruta.languages`."""
+        parametros: dict[str, Any] = {"languages": idiomas} if idiomas else {}
+        resposta, duracao = self._executar(
+            lambda: self._sdk.audio.transcriptions.create(
+                model=modelo, file=(nome_arquivo, conteudo, mime_type), **parametros, timeout=self._timeout()
+            )
+        )
+        texto = (getattr(resposta, "text", None) or "").strip()
+        if not texto:
+            raise RespostaVazia("Nenhuma fala transcrita. Confira se o áudio contém fala inteligível.")
+        uso = getattr(resposta, "usage", None)
+        tokens = getattr(uso, "type", None) == "tokens"
+        segundos = getattr(uso, "seconds", None) if getattr(uso, "type", None) == "duration" else None
+        por_minuto = self.config.dados.get("precos_usd_por_minuto_audio", {}).get(modelo)
+        return RespostaLLM(
+            texto=texto,
+            modelo=modelo,
+            duracao_s=duracao,
+            tokens_entrada=getattr(uso, "input_tokens", None) if tokens else None,
+            tokens_saida=getattr(uso, "output_tokens", None) if tokens else None,
+            custo_estimado_usd=round(segundos / 60 * por_minuto, 6) if segundos is not None and por_minuto else None,
+            parametros=parametros,
+            bruta=resposta,
+        )
+
+    def sintetizar_voz(self, *, modelo: str, texto: str, voz: str, instrucoes: str) -> RespostaLLM:
+        """Text-to-speech (RF07): devolve o WAV em `conteudo`.
+
+        A Speech API não informa tokens; o custo fica sem estimativa.
+        """
+        parametros = {"voice": voz, "instructions": instrucoes, "response_format": "wav"}
+        resposta, duracao = self._executar(
+            lambda: self._sdk.audio.speech.create(model=modelo, input=texto, **parametros, timeout=self._timeout())
+        )
+        conteudo = getattr(resposta, "content", None)
+        if not conteudo:
+            raise RespostaVazia("O provedor não retornou áudio.")
+        return RespostaLLM(
+            texto="",
+            modelo=modelo,
+            duracao_s=duracao,
+            tokens_entrada=None,
+            tokens_saida=None,
+            custo_estimado_usd=None,
+            parametros=parametros,
+            conteudo=conteudo,
+            bruta=resposta,
+        )
+
+    def gerar_imagem(
+        self, *, modelo: str, prompt: str, tamanho: str, imagem_base: tuple[str, bytes, str] | None = None
+    ) -> RespostaLLM:
+        """Gera uma imagem PNG, ou edita `imagem_base` (nome, bytes, mime), e a devolve em `conteudo`."""
+        parametros = {"size": tamanho, "output_format": "png", "n": 1}
+        if imagem_base is None:
+            chamada, extra = self._sdk.images.generate, {}
+        else:
+            chamada, extra = self._sdk.images.edit, {"image": imagem_base}
+        resposta, duracao = self._executar(
+            lambda: chamada(model=modelo, prompt=prompt, **extra, **parametros, timeout=self._timeout())
+        )
+        imagens = getattr(resposta, "data", None) or []
+        dados = getattr(imagens[0], "b64_json", None) if imagens else None
+        if not dados:
+            raise RespostaVazia("O provedor não retornou imagem.")
+        uso = getattr(resposta, "usage", None)
+        detalhes = getattr(uso, "input_tokens_details", None)
+        preco = self._preco(modelo)
+        return RespostaLLM(
+            texto="",
+            modelo=modelo,
+            duracao_s=duracao,
+            tokens_entrada=getattr(uso, "input_tokens", None),
+            tokens_saida=getattr(uso, "output_tokens", None),
+            custo_estimado_usd=_custo(
+                [
+                    (getattr(detalhes, "text_tokens", None), preco.get("entrada")),
+                    (getattr(detalhes, "image_tokens", None), preco.get("entrada_imagem")),
+                    (getattr(uso, "output_tokens", None), preco.get("saida")),
+                ]
+            ),
+            parametros=parametros,
+            conteudo=base64.b64decode(dados),
+            bruta=resposta,
+        )
+
+    def _timeout(self) -> float:
+        return self.config.dados["timeout_segundos"]
+
+    def _preco(self, modelo: str) -> dict:
+        return self.config.dados.get("precos_usd_por_milhao_tokens", {}).get(modelo) or {}
+
+    def _ocultar(self, texto: str) -> str:
+        return ocultar_segredos(texto, [self._chave or ""])[:500]
+
+    def _executar(self, operacao: Callable[[], Any]) -> tuple[Any, float]:
         inicio = time.perf_counter()
         try:
-            interacao = self._chamar(argumentos)
+            resultado = self._chamar(operacao)
         except Exception as erro:
             convertido = self._converter_erro(erro)
             if convertido is None:
                 raise
             # from None: o encadeamento levaria a requisição original para o traceback.
             raise convertido from None
-        duracao = time.perf_counter() - inicio
+        return resultado, round(time.perf_counter() - inicio, 3)
 
-        # O raciocínio conta no max_output_tokens; quando ele estoura, o JSON chega cortado.
-        if getattr(interacao, "status", "completed") in ("incomplete", "budget_exceeded"):
-            raise RespostaIncompleta()
-        texto = (getattr(interacao, "output_text", None) or "").strip()
-        if not _tem_saida(interacao, saida):
-            raise RespostaVazia()
-        tokens_entrada, tokens_saida = _tokens(getattr(interacao, "usage", None))
-        return RespostaLLM(
-            texto=texto,
-            modelo=modelo,
-            duracao_s=round(duracao, 3),
-            tokens_entrada=tokens_entrada,
-            tokens_saida=tokens_saida,
-            custo_estimado_usd=self._custo(modelo, tokens_entrada, tokens_saida, saida),
-            parametros={k: v for k, v in argumentos.items() if k not in ("model", "input", "system_instruction")},
-            bruta=interacao,
-        )
-
-    def _chamar(self, argumentos: dict) -> Any:
+    def _chamar(self, operacao: Callable[[], Any]) -> Any:
         """Chama o SDK com prazo de relógio de timeout_segundos, seja qual for o motivo da demora."""
         resultado: dict[str, Any] = {}
 
         def alvo() -> None:
             try:
-                resultado["interacao"] = self._sdk.interactions.create(**argumentos)
+                resultado["resposta"] = operacao()
             except BaseException as erro:  # devolvido à thread principal logo abaixo
                 resultado["erro"] = erro
 
         # daemon: se o SDK seguir preso, a thread não impede o processo de terminar.
         linha = threading.Thread(target=alvo, daemon=True)
         linha.start()
-        linha.join(self.config.dados["timeout_segundos"])
+        linha.join(self._timeout())
         if linha.is_alive():
             raise TempoEsgotado()
         if "erro" in resultado:
             raise resultado["erro"]
-        return resultado["interacao"]
-
-    def _custo(self, modelo: str, entrada: int | None, saida: int | None, tipo_saida: str) -> float | None:
-        preco = self.config.dados.get("precos_usd_por_milhao_tokens", {}).get(modelo)
-        if not preco or entrada is None or saida is None:
-            return None
-        if tipo_saida == "imagem" and "por_imagem_1k" in preco:
-            # Imagem gerada é cobrada por unidade; o config só tem o preço da resolução 1K.
-            return round(entrada * preco["entrada"] / 1_000_000 + preco["por_imagem_1k"], 6)
-        return round((entrada * preco["entrada"] + saida * preco["saida"]) / 1_000_000, 6)
+        return resultado["resposta"]
 
     def _converter_erro(self, erro: Exception) -> ErroLLM | None:
-        # As classes de erro da Interactions API ficam num módulo privado do SDK
-        # (google.genai._gaos.lib.compat_errors); classificar por atributo evita
-        # depender desse caminho. testes/test_llm_client.py usa as classes reais.
+        # Classificar por atributo (status_code, nome da classe) mantém os testes sem rede;
+        # testes/test_llm_client.py usa as classes reais do SDK.
         nome = type(erro).__name__
         status = getattr(erro, "status_code", None)
-        corpo = str(getattr(erro, "body", "") or "")
-        detalhe = ocultar_segredos(str(erro), [self._chave or ""])[:500]
+        detalhe = self._ocultar(str(erro))
 
         if "Timeout" in nome:
             return TempoEsgotado(detalhe=detalhe)
@@ -206,8 +292,7 @@ class ClienteLLM:
             return ServicoIndisponivel(detalhe=detalhe)
         if status is None:
             return None
-        # Chave inválida chega como 400 INVALID_ARGUMENT com reason API_KEY_INVALID.
-        if status in (401, 403) or "API_KEY_INVALID" in corpo:
+        if status in (401, 403):
             return AutenticacaoInvalida(status=status, detalhe=detalhe)
         if status == 429:
             return LimiteRequisicoes(status=status, detalhe=detalhe)
@@ -227,26 +312,38 @@ def ler_json(resposta: RespostaLLM) -> dict:
     return dados
 
 
-def formato_json(esquema: dict) -> dict:
-    """response_format para saída JSON validada por esquema (docs Gemini API, structured output)."""
-    return {"type": "text", "mime_type": "application/json", "schema": esquema}
+def formato_json(esquema: dict, nome: str) -> dict:
+    """Parâmetro `text` para saída JSON validada por esquema (Structured Outputs, modo estrito).
+
+    O modo estrito exige additionalProperties false em todo objeto; o esquema
+    das partes fica sem isso e é ajustado aqui.
+    """
+    return {"format": {"type": "json_schema", "name": nome, "schema": _estrito(esquema), "strict": True}}
 
 
-def _tem_saida(interacao: Any, saida: str) -> bool:
-    if saida == "texto":
-        return bool((getattr(interacao, "output_text", None) or "").strip())
-    conteudo = getattr(interacao, CAMPOS_SAIDA[saida], None)
-    return bool(getattr(conteudo, "data", None) or getattr(conteudo, "uri", None))
+def entrada_com_anexo(texto: str, *, nome_arquivo: str, mime_type: str, conteudo: bytes) -> list[dict]:
+    """Mensagem com instrução e um anexo inline: PDF como input_file, imagem como input_image."""
+    url = f"data:{mime_type};base64,{base64.b64encode(conteudo).decode('ascii')}"
+    if mime_type == "application/pdf":
+        anexo = {"type": "input_file", "filename": nome_arquivo, "file_data": url}
+    else:
+        anexo = {"type": "input_image", "image_url": url}
+    return [{"role": "user", "content": [{"type": "input_text", "text": texto}, anexo]}]
 
 
-def _tokens(uso: Any) -> tuple[int | None, int | None]:
-    if uso is None:
-        return None, None
-    entrada = getattr(uso, "total_input_tokens", None)
-    saida = getattr(uso, "total_output_tokens", None)
-    # A tabela de preços cobra o raciocínio como saída; não confirmamos se
-    # total_output_tokens já o inclui, então somamos explicitamente.
-    pensamento = getattr(uso, "total_thought_tokens", None) or 0
-    if saida is not None:
-        saida += pensamento
-    return entrada, saida
+def _estrito(esquema: Any) -> Any:
+    if isinstance(esquema, list):
+        return [_estrito(item) for item in esquema]
+    if not isinstance(esquema, dict):
+        return esquema
+    ajustado = {chave: _estrito(valor) for chave, valor in esquema.items()}
+    if ajustado.get("type") == "object":
+        ajustado["additionalProperties"] = False
+    return ajustado
+
+
+def _custo(partes: list[tuple[int | None, float | None]]) -> float | None:
+    """Soma tokens × preço por milhão; sem algum dos números, não há estimativa."""
+    if not partes or any(tokens is None or preco is None for tokens, preco in partes):
+        return None
+    return round(sum(tokens * preco for tokens, preco in partes) / 1_000_000, 6)

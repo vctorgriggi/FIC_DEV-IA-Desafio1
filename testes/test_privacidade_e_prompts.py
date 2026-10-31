@@ -28,8 +28,8 @@ def test_mascara_so_os_tipos_pedidos():
     assert contagem == {"email": 1}
 
 
-def test_oculta_segredo_informado_e_formato_de_chave_google():
-    chave = "AIza" + "A1_-" * 8 + "abc"
+def test_oculta_segredo_informado_e_formato_de_chave_openai():
+    chave = "sk-proj-" + "A1_-" * 8 + "abc"
     texto = ocultar_segredos(f"x {chave} y segredo-local z", ["segredo-local"])
     assert chave not in texto and "segredo-local" not in texto
 

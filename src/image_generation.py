@@ -7,7 +7,6 @@ frequência, e aqui o texto vem dos dados do caso e precisa sair exato.
 
 from __future__ import annotations
 
-import base64
 import io
 from dataclasses import dataclass
 from pathlib import Path
@@ -20,16 +19,27 @@ from .entradas import TIPOS_MIME
 from .llm_client import ClienteLLM, RespostaLLM
 
 CAMPOS_ESPECIFICACAO = ("sujeito", "composicao", "estilo", "iluminacao", "proporcao", "restricoes", "texto")
-PROPORCOES = ("1:1", "2:3", "3:2", "3:4", "4:3", "4:5", "5:4", "9:16", "16:9", "21:9")
+# A API recebe tamanho, não proporção: lados múltiplos de 16, proporção entre 1:3 e 3:1
+# (fonte: docs oficiais OpenAI API, image-generation, out/2026).
+TAMANHOS = {
+    "1:1": "1024x1024",
+    "2:3": "1024x1536",
+    "3:2": "1536x1024",
+    "3:4": "1152x1536",
+    "4:3": "1536x1152",
+    "4:5": "1024x1280",
+    "5:4": "1280x1024",
+    "9:16": "864x1536",
+    "16:9": "1536x864",
+    "21:9": "1792x768",
+}
+PROPORCOES = tuple(TAMANHOS)
 # Valem para toda peça, mesmo que a especificação esqueça (RF10 e seção 13 do enunciado).
 RESTRICOES_OBRIGATORIAS = (
     "sem texto, letras ou números na imagem (o texto é aplicado depois)",
     "sem pessoas reais, rostos identificáveis ou figuras públicas",
     "sem brasões, bandeiras, logotipos ou símbolos oficiais",
 )
-# Só a resolução 1K tem preço por imagem no config.json.
-TAMANHO_IMAGEM = "1K"
-
 LARGURA_PECA = 1080
 MARGEM = 64
 CORES = {"fundo": "#ffffff", "titulo": "#0b3d6e", "corpo": "#1f2933", "faixa": "#1f2933", "faixa_texto": "#ffffff"}
@@ -110,39 +120,29 @@ def gerar_peca(
 ) -> PecaVisual:
     """Gera (ou edita `imagem_base`) a ilustração e compõe a peça final em `destino` (PNG).
 
-    A ilustração devolvida pelo modelo fica intacta ao lado, como `<destino>_ilustracao_ia.<ext>`.
-    Formato da chamada (fonte: docs oficiais Gemini API, image-generation, out/2026):
-    response_format {"type": "image", "aspect_ratio", "image_size"} e a imagem em
-    output_image.data (base64). As imagens geradas levam marca d'água SynthID.
+    A ilustração devolvida pelo modelo fica intacta ao lado, como `<destino>_ilustracao_ia.png`.
     """
     validar_especificacao(especificacao)
     prompt = montar_prompt(especificacao, edicao=imagem_base is not None)
-    entrada: str | list[dict] = prompt
+    base = None
     if imagem_base is not None:
         mime = TIPOS_MIME.get(imagem_base.suffix.lower(), "")
         if not mime.startswith("image/"):
             raise ErroPeca(f"Só imagem pode ser editada; {imagem_base.name} não é.")
-        dados_base = base64.b64encode(imagem_base.read_bytes()).decode("ascii")
-        entrada = [{"type": "text", "text": prompt}, {"type": "image", "data": dados_base, "mime_type": mime}]
+        base = (imagem_base.name, imagem_base.read_bytes(), mime)
 
     modelo = config.modelo("imagem")
-    resposta = cliente.gerar(
-        modelo=modelo,
-        entrada=entrada,
-        formato_resposta={"type": "image", "aspect_ratio": especificacao["proporcao"], "image_size": TAMANHO_IMAGEM},
-        saida="imagem",
+    resposta = cliente.gerar_imagem(
+        modelo=modelo, prompt=prompt, tamanho=TAMANHOS[especificacao["proporcao"]], imagem_base=base
     )
-    saida = resposta.bruta.output_image
-    conteudo = base64.b64decode(saida.data)
-    extensao = ".jpg" if getattr(saida, "mime_type", "") == "image/jpeg" else ".png"
-    original = destino.with_name(f"{destino.stem}_ilustracao_ia{extensao}")
+    conteudo = resposta.conteudo
+    original = destino.with_name(f"{destino.stem}_ilustracao_ia.png")
     original.write_bytes(conteudo)
 
     data_geracao = agora_iso()
     nota = (
-        f"Ilustração {'editada' if imagem_base else 'gerada'} por IA ({modelo}, Google Gemini) em {data_geracao}; "
-        "texto aplicado por código a partir dos dados do caso fictício. Conteúdo sintético, sem pessoas reais. "
-        "A ilustração do modelo carrega marca d'água SynthID."
+        f"Ilustração {'editada' if imagem_base else 'gerada'} por IA ({modelo}, OpenAI) em {data_geracao}; "
+        "texto aplicado por código a partir dos dados do caso fictício. Conteúdo sintético, sem pessoas reais."
     )
     selo = f"Ilustração {'editada' if imagem_base else 'gerada'} por IA ({modelo}) — conteúdo sintético, material fictício."
     with Image.open(io.BytesIO(conteudo)) as ilustracao:

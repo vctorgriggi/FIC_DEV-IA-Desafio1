@@ -6,7 +6,7 @@ Protótipo local que recebe solicitações fictícias em texto, áudio e imagem,
 
 ## Instalação
 
-Requer Python 3.10 ou mais recente (exigência do SDK `google-genai`). Testado com Python 3.14.8. Confira com `python3 --version`; o Python que vem com o macOS é 3.9 e não serve. Nesse caso, use o executável de uma versão nova no primeiro comando (por exemplo `python3.14 -m venv .venv`, com Python instalado pelo Homebrew ou por python.org).
+Requer Python 3.10 ou mais recente (exigência do SDK `openai`). Testado com Python 3.14.8. Confira com `python3 --version`; o Python que vem com o macOS é 3.9 e não serve. Nesse caso, use o executável de uma versão nova no primeiro comando (por exemplo `python3.14 -m venv .venv`, com Python instalado pelo Homebrew ou por python.org).
 
 O caso de áudio também precisa do FFmpeg (`ffprobe` no PATH): `brew install ffmpeg` no macOS, `sudo apt install ffmpeg` no Linux ou o instalador de ffmpeg.org no Windows. Confira com `ffprobe -version`.
 
@@ -14,7 +14,7 @@ O caso de áudio também precisa do FFmpeg (`ffprobe` no PATH): `brew install ff
 python3 -m venv .venv
 source .venv/bin/activate          # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-cp .env.example .env               # Windows: copy .env.example .env; preencha GEMINI_API_KEY (Google AI Studio)
+cp .env.example .env               # Windows: copy .env.example .env; preencha OPENAI_API_KEY (chave da API da OpenAI)
 python -m src.main verificar       # mostra e registra versões, chave e arquivos dos casos
 python -m src.main verificar --chamar-api   # opcional: uma chamada curta para testar a chave
 ```
@@ -35,7 +35,7 @@ Pela interface (`python -m src.main interface`, em http://127.0.0.1:8000):
 2. **Conferir os dados críticos** (só áudio e imagem). Compare protocolo, data e solicitante com o original exibido ao lado, corrija o que estiver errado, informe quem conferiu e clique em **Confirmar e gerar minuta**. O modelo pode errar sem marcar dúvida: confira olhando o original.
 3. **Revisar a minuta.** Leia a minuta ao lado do original, veja a conferência automática com o gabarito e escolha **Aprovar**, **Aprovar com correção** (abre um editor do texto), **Rejeitar** ou **Pedir nova geração**, com justificativa e revisor. Nada é enviado ao cidadão.
 4. **Áudio da minuta** (só minuta aprovada). Botão **Gerar áudio** na página da minuta (RF07).
-5. **Peça visual.** **Gerar peça visual** no cartão do caso (modelo pago, cerca de US$ 0,03); depois responda ao checklist e registre a decisão.
+5. **Peça visual.** **Gerar peça visual** no cartão do caso (cobrada por tokens; a estimativa fica no log); depois responda ao checklist e registre a decisão.
 6. **Indicadores.** O painel mostra a taxa de aprovação; `python -m src.main avaliacao` grava o esperado contra obtido em `resultados/logs/avaliacao.json`.
 
 O mesmo fluxo pelo terminal:
@@ -72,10 +72,10 @@ Códigos de saída: `0` sucesso, `1` erro de uso (caso, arquivo ou revisão inv�
 
 | Sintoma | Causa e solução |
 |---|---|
-| `pip install` falha no `google-genai` | Python abaixo de 3.10 (o do macOS é 3.9). Crie o `.venv` com um Python novo, como em Instalação. |
-| "Chave da API não configurada" | Falta o `.env`. Copie o `.env.example` e preencha `GEMINI_API_KEY` com uma chave criada em https://aistudio.google.com/api-keys. |
-| "O provedor recusou a chave da API" | Chave errada ou revogada no `.env`. |
-| "Limite de requisições ou cota do provedor atingido" ao gerar a peça visual | Geração de imagem não tem cota gratuita: no Google AI Studio, abra o projeto da chave e use **Set up billing**. Nas outras etapas, aguarde alguns minutos. |
+| `pip install` falha no `openai` | Python abaixo de 3.10 (o do macOS é 3.9). Crie o `.venv` com um Python novo, como em Instalação. |
+| "Chave da API não configurada" | Falta o `.env`. Copie o `.env.example` e preencha `OPENAI_API_KEY` com uma chave da API da OpenAI. |
+| "O provedor recusou a chave da API" | Chave errada ou revogada no `.env`, ou sem acesso ao modelo configurado. |
+| "Limite de requisições ou cota do provedor atingido" | A API não tem camada gratuita: confira o faturamento do projeto da chave. Com faturamento ativo, é limite de taxa: aguarde alguns minutos. |
 | "A resposta do modelo foi cortada pelo limite de tokens" | Aumente `max_output_tokens` em `parametros_geracao` no `config.json`. |
 | "ffprobe não encontrado" ao processar áudio | Falta o FFmpeg: instale como em Instalação e confira com `ffprobe -version`. |
 | A interface não abre porque a porta está em uso | `python -m src.main interface --porta 8001`. |
@@ -87,7 +87,7 @@ Códigos de saída: `0` sucesso, `1` erro de uso (caso, arquivo ou revisão inv�
 |---|---|---|---|
 | Base | RF01, RF03 (delimitação e prompt de sistema), RF04, RF11, RF12 (mascaramento), RF13 | `config.py`, `llm_client.py`, `prompts.py`, `audit.py`, `privacidade.py`, `entradas.py`, `revisao.py`, `avaliacao.py`, `fluxo.py`, `main.py`, `web.py` | pronta, com testes |
 | Texto | RF02, RF03 (caso de prompt injection), RF05, RF09 | `extracao.py`, `minuta.py`, `experimento.py`, `prompts/` | pronta, com testes |
-| Áudio | RF06, RF07 | `audio.py`, `prompts/transcricao_v1.md` | pronta, com testes; transcrição e voz validadas com a API |
+| Áudio | RF06, RF07 | `audio.py` | pronta, com testes |
 | Imagem | RF08, RF10 | `vision.py`, `comparacao.py`, `image_generation.py`, `prompts/ocr_v1.md`, `prompts/peca_visual_v1.json` | pronta, com testes |
 
 As três modalidades terminam na mesma extração de campos e na mesma minuta. O contrato entre elas é o formato de `TextoExtraido` (`tipos.py`) e o esquema de `extracao.py`.
@@ -114,27 +114,32 @@ Cada caso tem um resultado esperado escrito antes da execução (seção 6 do en
 
 ## Decisões e limitações
 
-- **Provedor:** Gemini (Google), via Interactions API do SDK `google-genai` 2.31.0. Modelos em `config.json`: `gemini-3.8-flash` para texto, transcrição e visão; `gemini-3.8-flash-tts` para voz; `gemini-3.1-flash-lite-image` para imagem.
-- **Camada gratuita e LGPD:** na camada gratuita o Google usa o conteúdo enviado para melhorar seus produtos; na paga, não (fonte: docs oficiais Gemini API, pricing, out/2026). Os dados do desafio são fictícios. Mesmo assim, o texto é mascarado antes do envio: CPF, RG, e-mail e telefone viram marcadores; a lista fica em `privacidade.mascarar_antes_de_enviar`. Áudio e imagem seguem sem máscara, porque o conteúdo bruto é a própria entrada.
-- **Timeout (RF04):** `timeout_segundos` é um prazo de relógio sobre a chamada inteira, aplicado pelo `llm_client.py`. O SDK 2.31.0 repete chamadas esperando o `Retry-After` do servidor sem teto, e `attempts=0` vira 1; num 429 de cota esgotada a CLI travava por minutos. Por isso o cliente só deixa o SDK repetir erros 5xx: o 429 volta na hora como "limite de requisições".
-- **Sem armazenamento no provedor:** as chamadas usam `store=False` (`armazenar_no_provedor` no config).
-- **Parâmetros do experimento (RF02):** os modelos Gemini 3.6 ou mais recentes ignoram `temperature`, `top_p` e `top_k` (fonte: docs oficiais Gemini API, text-generation, out/2026). O controle disponível é `max_output_tokens`, `seed` e `thinking_level`.
-- **Custos estimados:** calculados com os preços da camada paga em `precos_usd_por_milhao_tokens`. Valores vigentes até 31/12/2026 (fonte: docs oficiais Gemini API, pricing, out/2026); a página anuncia preços em dobro para `gemini-3.8-flash` e para os TTS a partir de 01/01/2027. O custo de raciocínio entra como saída. Geração de imagem não tem cota gratuita: US$ 0,0336 por imagem 1K. Custos medidos de cada execução: `documentacao/relatorio_tecnico.md`.
-- **Erros do provedor:** a Interactions API levanta exceções de um módulo privado do SDK. `llm_client.py` as classifica por atributo (`status_code`, nome da classe), e `testes/test_llm_client.py` importa as classes reais para avisar se o SDK mudar.
-- **Chave inválida** chega como HTTP 400 com `API_KEY_INVALID`, não como 401.
+- **Provedor:** OpenAI, via SDK `openai` 3.41.0. Modelos em `config.json`: `gpt-6.1-terra` para texto e visão (Responses API); `gpt-transcribe` para transcrição; `gpt-4o-mini-tts` para voz; `gpt-image-2.5-flare` para imagem.
+- **Execução real pendente:** a rodada de 18/10/2026 em `resultados/`, `dados/processados/` e `documentacao/` foi feita com o provedor anterior (Gemini). O código atual ainda não foi executado contra a API da OpenAI; os testes usam um SDK falso.
+- **Dados enviados e LGPD:** por padrão, a OpenAI não usa dados enviados pela API para treinar modelos, e guarda registros por até 30 dias para monitoramento de abuso (fonte: docs oficiais OpenAI API, your-data, out/2026). Os dados do desafio são fictícios. Mesmo assim, o texto é mascarado antes do envio: CPF, RG, e-mail e telefone viram marcadores; a lista fica em `privacidade.mascarar_antes_de_enviar`. Áudio e imagem seguem sem máscara, porque o conteúdo bruto é a própria entrada.
+- **Timeout (RF04):** `timeout_segundos` é um prazo de relógio sobre a chamada inteira, aplicado pelo `llm_client.py`. O cliente é criado com `max_retries=0`: por padrão o SDK repete 408, 409, 429 e 5xx, e num 429 de cota esgotada isso só atrasa a mesma recusa. O 429 volta na hora como "limite de requisições".
+- **Sem armazenamento no provedor:** a Responses API recebe `store=False` (`armazenar_no_provedor` no config). Transcrição, voz e imagem não têm esse parâmetro.
+- **Parâmetros do experimento (RF02):** os três prompts usam o mesmo modelo, o mesmo prompt de sistema e o mesmo `max_output_tokens`. Não verificamos se `gpt-6.1-terra` aceita `temperature`; o raciocínio é controlado por `reasoning.effort`, que fica no padrão do modelo.
+- **Custos estimados:** calculados com os preços padrão em `precos_usd_por_milhao_tokens` (texto e imagem, por token) e `precos_usd_por_minuto_audio` (transcrição), conforme a tabela de preços consultada em out/2026 (fonte: docs oficiais OpenAI API, pricing, out/2026). A API não tem camada gratuita para esses modelos. O raciocínio já vem contado em `output_tokens` e é cobrado como saída. A voz (Speech API) não informa tokens, então fica sem estimativa; a imagem só tem estimativa quando a resposta traz `usage`.
+- **Erros do provedor:** `llm_client.py` classifica as exceções do SDK por atributo (`status_code`, nome da classe), e `testes/test_llm_client.py` usa as classes reais do SDK.
+- **Saída JSON (RF05, RF08):** Structured Outputs em modo estrito. `formato_json` acrescenta `additionalProperties: false` a todo objeto do esquema, exigência do modo estrito.
 - **Rastreabilidade:** `resultados/logs/execucoes.jsonl` guarda referências (arquivo de origem, versão e hash do prompt, parâmetros, caminho da saída), não o conteúdo. Prompt alterado é arquivo novo em `prompts/` (`<nome>_v<N>.md`).
 - **Fluxo em duas fases:** `preparar_caso` vai até a extração dos campos e grava o estado; `concluir_caso` registra a confirmação humana e gera a minuta. Uma execução interrompida na confirmação pode ser retomada (`confirmar` ou interface).
-- **Limite de tokens:** `max_output_tokens` é 8192 porque o raciocínio do modelo conta no limite; com 4096, o JSON do OCR chegou cortado. Resposta cortada gera um erro próprio, e não "fora do formato".
+- **Limite de tokens:** `max_output_tokens` é 25000, a reserva que a documentação recomenda para raciocínio e saída, porque o raciocínio conta no limite (fonte: docs oficiais OpenAI API, reasoning, out/2026). Resposta cortada gera um erro próprio, e não "fora do formato".
 - **Revisão:** o áudio (RF07) só é gerado de minuta aprovada e com o mesmo hash registrado na aprovação. Dados críticos de áudio e imagem (protocolo, data, solicitante) passam por confirmação humana antes da minuta.
 - **Minuta (RF09):** o modelo redige só o corpo. Cabeçalho com brasão, órgão e dados de referência e a seção de fontes entram por código, então não dependem do modelo e reaproveitam os dados já confirmados. Os campos vão ao modelo dentro de `<conteudo_externo>` (RF03), sem `motivo_revisao` nem confiança. O prompt de produção é `minuta_v3`: o Prompt B do experimento sem as partes que o código assumiu e com a proibição de afirmar ações que não constam dos dados, como encaminhamento ou análise.
-- **Peça visual (RF10):** o modelo gera só a ilustração; o texto e o selo de conteúdo sintético são aplicados com Pillow, para o texto sair exato. Cada peça em `resultados/imagens/` tem ao lado a ilustração original do modelo e um `.json` com prompt, especificação, modelo, data, nota de proveniência e revisão. A composição usa Arial ou DejaVu Sans; sem nenhuma das duas, a peça não é gerada (a fonte embutida do Pillow não tem acentos).
+- **Peça visual (RF10):** o modelo gera só a ilustração; o texto e o selo de conteúdo sintético são aplicados com Pillow, para o texto sair exato. Cada peça em `resultados/imagens/` tem ao lado a ilustração original do modelo e um `.json` com prompt, especificação, modelo, data, nota de proveniência e revisão. A composição usa Arial ou DejaVu Sans; sem nenhuma das duas, a peça não é gerada (a fonte embutida do Pillow não tem acentos). A API recebe tamanho em pixels, não proporção: `image_generation.TAMANHOS` converte a proporção da especificação.
 - **Comparação com gabarito (RF06, RF08):** para áudio e imagem, quando o gabarito do caso tem `texto_referencia`, o fluxo grava `comparacao_gabarito.json` com similaridade, acertos por palavra, erros e dados críticos não encontrados.
 - **Resposta vazia (RF04):** a checagem vale para o tipo de saída pedido. TTS sem áudio ou geração sem imagem também é erro, mesmo que venha texto.
 
 ## Áudio (RF06 e RF07)
 
-Requer o FFmpeg (`ffprobe`), como em Instalação. O arquivo é inspecionado inteiro pelo `ffprobe` antes de qualquer envio. A versão revisada da transcrição só ajusta espaços, inclusive juntando dígitos ditados um a um, para que CPF, RG e protocolo sejam mascarados e comparados.
+Requer o FFmpeg (`ffprobe`), como em Instalação. O arquivo é inspecionado inteiro pelo `ffprobe` antes de qualquer envio; a duração registrada vem dele. A versão revisada da transcrição só ajusta espaços, inclusive juntando dígitos ditados um a um, para que CPF, RG e protocolo sejam mascarados e comparados.
 
-A voz sai só de minuta aprovada e inalterada. Se a minuta tem "não localizado", ela já é gerada com o aviso de lacunas, que é revisado e aprovado junto com o texto; sem o aviso, a síntese é bloqueada. Imagens não são lidas. A saída é um WAV validado que nunca sobrescreve áudio anterior.
+`gpt-transcribe` devolve o texto e os idiomas detectados, mas não aponta trechos incertos: `trechos_incertos` fica vazio no áudio, e a conferência humana dos dados críticos e a comparação com o gabarito cobrem essa lacuna. Os idiomas esperados vão ao modelo como dica (`audio.idiomas` no config).
+
+A voz sai só de minuta aprovada e inalterada. Se a minuta tem "não localizado", ela já é gerada com o aviso de lacunas, que é revisado e aprovado junto com o texto; sem o aviso, a síntese é bloqueada. Imagens não são lidas. A locução aceita até 4096 caracteres, limite da Speech API. A saída é um WAV validado que nunca sobrescreve áudio anterior.
+
+`gpt-4o-mini-tts` e os demais modelos da Speech API estão descontinuados e serão desligados em 06/01/2027; o substituto indicado (`gpt-realtime-2.1-mini`) só funciona pela Realtime API (fonte: docs oficiais OpenAI API, text-to-speech, out/2026). Depois dessa data, o RF07 precisa de outra rota.
 
 O gabarito `dados/gabaritos/audio-01.json` foi validado por quem ouviu o original (`validado_por_humano: true`); sem essa marca, a comparação fica registrada como pendente. Regras, resultados reais e limites em [`documentacao/audio_e_acessibilidade.md`](documentacao/audio_e_acessibilidade.md).

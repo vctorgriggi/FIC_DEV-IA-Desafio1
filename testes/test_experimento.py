@@ -6,20 +6,20 @@ import pytest
 from src.entradas import ArquivoInvalido
 from src.experimento import PROMPTS, executar_experimento, gerar_prompt_c
 from src.llm_client import ClienteLLM
-from testes.falsos import SDKFalso, interacao
+from testes.falsos import SDKFalso, resposta
 
 ENTRADA = json.loads((RAIZ / "dados/experimento_rf02/entrada_texto-01.json").read_text(encoding="utf-8"))
 
 
 def test_tres_prompts_com_mesmo_modelo_parametros_sistema_e_entrada(config, auditoria):
-    sdk = SDKFalso(interacao("Minuta", entrada=100, saida=200))
+    sdk = SDKFalso(resposta("Minuta", entrada=100, saida=200))
     metricas = executar_experimento(
         ENTRADA, origem="dados/experimento_rf02/entrada_texto-01.json",
         config=config, cliente=ClienteLLM(config, chave="c", sdk=sdk), auditoria=auditoria,
     )
 
     assert len(sdk.chamadas) == 3
-    for campo in ("model", "system_instruction", "generation_config", "timeout", "store"):
+    for campo in ("model", "instructions", "max_output_tokens", "timeout", "store"):
         assert len({json.dumps(c[campo], sort_keys=True) for c in sdk.chamadas}) == 1, campo
     # rindex: o prompt pode citar a etiqueta; o bloco anexado pelo sistema é o último.
     blocos = {c["input"][c["input"].rindex('<conteudo_externo origem="campos_extraidos">'):] for c in sdk.chamadas}
@@ -40,7 +40,7 @@ def test_tres_prompts_com_mesmo_modelo_parametros_sistema_e_entrada(config, audi
 
 def test_prompt_c_vem_do_metaprompt_e_nao_sobrescreve(config, auditoria):
     (config.caminho("prompts") / "minuta_c_v2.md").unlink(missing_ok=True)
-    sdk = SDKFalso(interacao("```markdown\n# PROMPT C\nRedija a minuta.\n```"))
+    sdk = SDKFalso(resposta("```markdown\n# PROMPT C\nRedija a minuta.\n```"))
     cliente = ClienteLLM(config, chave="c", sdk=sdk)
     destino = gerar_prompt_c(config=config, cliente=cliente, auditoria=auditoria)
 

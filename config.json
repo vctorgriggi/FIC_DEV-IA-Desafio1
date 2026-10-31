@@ -1,26 +1,29 @@
 {
-  "provedor": "gemini",
+  "provedor": "openai",
   "modelos": {
-    "texto": "gemini-3.8-flash",
-    "transcricao": "gemini-3.8-flash",
-    "visao": "gemini-3.8-flash",
-    "tts": "gemini-3.8-flash-tts",
-    "imagem": "gemini-3.1-flash-lite-image"
+    "texto": "gpt-6.1-terra",
+    "transcricao": "gpt-transcribe",
+    "visao": "gpt-6.1-terra",
+    "tts": "gpt-4o-mini-tts",
+    "imagem": "gpt-image-2.5-flare"
   },
   "parametros_geracao": {
-    "max_output_tokens": 8192
+    "max_output_tokens": 25000
   },
   "audio": {
     "timeout_inspecao_s": 30,
-    "voz": "Kore",
+    "idiomas": ["pt"],
+    "voz": "marin",
     "estilo": "Fale em português brasileiro, com tom institucional, claro, sério e acolhedor, em ritmo pausado. Articule nomes, datas e protocolos com clareza. Leia somente o texto fornecido, sem comentários ou acréscimos."
   },
   "timeout_segundos": 180,
   "armazenar_no_provedor": false,
   "precos_usd_por_milhao_tokens": {
-    "gemini-3.8-flash": { "entrada": 0.75, "saida": 3.75 },
-    "gemini-3.8-flash-tts": { "entrada": 0.5, "saida": 9.0 },
-    "gemini-3.1-flash-lite-image": { "entrada": 0.25, "saida": 1.5, "por_imagem_1k": 0.0336 }
+    "gpt-6.1-terra": { "entrada": 1.0, "saida": 5.0 },
+    "gpt-image-2.5-flare": { "entrada": 5.0, "entrada_imagem": 8.0, "saida": 30.0 }
+  },
+  "precos_usd_por_minuto_audio": {
+    "gpt-transcribe": 0.0045
   },
   "entradas": {
     "texto": { "extensoes": [".txt"], "tamanho_max_mb": 1 },

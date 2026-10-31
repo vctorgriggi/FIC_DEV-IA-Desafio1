@@ -17,7 +17,7 @@ from src.llm_client import ClienteLLM, RespostaMalformada, RespostaVazia
 from src.revisao import CHECKLIST_PECA, RevisaoInvalida, registrar_revisao_peca
 from src.tipos import PendenteDeImplementacao
 from src.vision import extrair_texto
-from testes.falsos import SDKFalso, interacao
+from testes.falsos import SDKFalso, imagem, resposta
 
 ESPECIFICACAO = json.loads((RAIZ / "prompts/peca_visual_v1.json").read_text(encoding="utf-8"))
 RESPOSTA_OCR = {
@@ -29,8 +29,8 @@ RESPOSTA_OCR = {
 }
 
 
-def cliente_com(config, resposta):
-    return ClienteLLM(config, chave="chave-teste", sdk=SDKFalso(resposta=resposta))
+def cliente_com(config, resposta_sdk):
+    return ClienteLLM(config, chave="chave-teste", sdk=SDKFalso(resposta_sdk))
 
 
 def png_base64(largura=400, altura=500):
@@ -44,15 +44,16 @@ def png_base64(largura=400, altura=500):
 
 def test_ocr_envia_pdf_como_documento_e_separa_bruto_revisado_incerto(config):
     arquivo = validar_arquivo(config.raiz / "dados/originais/entrada_pdf-imagem.pdf", "imagem", config)
-    sdk = SDKFalso(resposta=interacao(json.dumps(RESPOSTA_OCR)))
+    sdk = SDKFalso(resposta(json.dumps(RESPOSTA_OCR)))
     extraido = extrair_texto(arquivo, cliente=ClienteLLM(config, chave="chave-teste", sdk=sdk), config=config)
 
     chamada = sdk.chamadas[0]
     assert chamada["model"] == config.modelo("visao")
-    assert chamada["input"][1]["type"] == "document"
-    assert chamada["input"][1]["mime_type"] == "application/pdf"
-    assert "<conteudo_externo>" in chamada["system_instruction"]
-    assert chamada["response_format"]["mime_type"] == "application/json"
+    anexo = chamada["input"][0]["content"][1]
+    assert anexo["type"] == "input_file"
+    assert anexo["file_data"].startswith("data:application/pdf;base64,")
+    assert "<conteudo_externo>" in chamada["instructions"]
+    assert chamada["text"]["format"]["name"] == "ocr"
 
     assert extraido.texto_bruto == RESPOSTA_OCR["texto_bruto"]
     assert extraido.texto_revisado.endswith("VINÍCIUS")
@@ -65,9 +66,9 @@ def test_ocr_envia_pdf_como_documento_e_separa_bruto_revisado_incerto(config):
 def test_ocr_de_foto_envia_como_imagem(config):
     foto = config.raiz / "foto.png"
     foto.write_bytes(base64.b64decode(png_base64(10, 10)))
-    sdk = SDKFalso(resposta=interacao(json.dumps(RESPOSTA_OCR)))
+    sdk = SDKFalso(resposta(json.dumps(RESPOSTA_OCR)))
     extrair_texto(validar_arquivo(foto, "imagem", config), cliente=ClienteLLM(config, chave="c", sdk=sdk), config=config)
-    assert sdk.chamadas[0]["input"][1]["type"] == "image"
+    assert sdk.chamadas[0]["input"][0]["content"][1]["type"] == "input_image"
 
 
 @pytest.mark.parametrize(
@@ -77,7 +78,7 @@ def test_ocr_de_foto_envia_como_imagem(config):
 def test_ocr_sem_texto_ou_fora_do_formato_falha(config, texto, erro):
     arquivo = validar_arquivo(config.raiz / "dados/originais/entrada_pdf-imagem.pdf", "imagem", config)
     with pytest.raises(erro):
-        extrair_texto(arquivo, cliente=cliente_com(config, interacao(texto)), config=config)
+        extrair_texto(arquivo, cliente=cliente_com(config, resposta(texto)), config=config)
 
 
 def test_tokens_ignoram_caixa_e_acento_mas_preservam_dados():
@@ -115,7 +116,7 @@ def test_fluxo_imagem_compara_com_gabarito_antes_da_compreensao(config, auditori
     (config.raiz / "dados/gabaritos").mkdir(parents=True)
     (config.raiz / "dados/gabaritos/imagem-01.json").write_text(json.dumps(gabarito), encoding="utf-8")
 
-    cliente = cliente_com(config, interacao(json.dumps(RESPOSTA_OCR)))
+    cliente = cliente_com(config, resposta(json.dumps(RESPOSTA_OCR)))
     def _pendente(*args, **kwargs):
         raise PendenteDeImplementacao("RF05", "texto")
     monkeypatch.setattr(fluxo, "extrair_campos", _pendente)
@@ -165,13 +166,15 @@ def test_prompt_tem_os_campos_e_as_restricoes_obrigatorias_sem_repetir():
 
 def test_gera_peca_com_texto_e_selo_e_preserva_a_ilustracao_original(config):
     dados = png_base64()
-    sdk = SDKFalso(resposta=interacao("", imagem=dados))
+    sdk = SDKFalso(imagem(dados))
     destino = config.caminho("imagens") / "abc.png"
     peca = gerar_peca(ESPECIFICACAO, destino, imagem_base=None, cliente=ClienteLLM(config, chave="c", sdk=sdk), config=config)
 
-    formato = sdk.chamadas[0]["response_format"]
-    assert formato == {"type": "image", "aspect_ratio": ESPECIFICACAO["proporcao"], "image_size": "1K"}
-    assert sdk.chamadas[0]["model"] == config.modelo("imagem")
+    chamada = sdk.chamadas[0]
+    assert chamada["_operacao"] == "images.generate"
+    assert chamada["size"] == image_generation.TAMANHOS[ESPECIFICACAO["proporcao"]]
+    assert chamada["prompt"] == peca.prompt
+    assert chamada["model"] == config.modelo("imagem")
     assert peca.ilustracao_original.read_bytes() == base64.b64decode(dados)
     with Image.open(peca.caminho) as final:
         assert final.width == image_generation.LARGURA_PECA
@@ -183,10 +186,11 @@ def test_gera_peca_com_texto_e_selo_e_preserva_a_ilustracao_original(config):
 def test_edicao_envia_a_imagem_base_e_recusa_pdf(config):
     base = config.raiz / "base.png"
     base.write_bytes(base64.b64decode(png_base64(20, 20)))
-    sdk = SDKFalso(resposta=interacao("", imagem=png_base64()))
+    sdk = SDKFalso(imagem(png_base64()))
     cliente = ClienteLLM(config, chave="c", sdk=sdk)
     peca = gerar_peca(ESPECIFICACAO, config.caminho("imagens") / "e.png", imagem_base=base, cliente=cliente, config=config)
-    assert sdk.chamadas[0]["input"][1] == {"type": "image", "data": png_base64(20, 20), "mime_type": "image/png"}
+    assert sdk.chamadas[0]["_operacao"] == "images.edit"
+    assert sdk.chamadas[0]["image"] == ("base.png", base64.b64decode(png_base64(20, 20)), "image/png")
     assert "editada" in peca.nota_proveniencia
 
     with pytest.raises(ErroPeca, match="Só imagem"):
@@ -196,7 +200,7 @@ def test_edicao_envia_a_imagem_base_e_recusa_pdf(config):
 
 def test_sem_fonte_com_acento_para_em_vez_de_quebrar_o_texto(config, monkeypatch):
     monkeypatch.setattr(image_generation, "FONTES", {False: ("/nao/existe.ttf",), True: ("/nao/existe.ttf",)})
-    sdk = SDKFalso(resposta=interacao("", imagem=png_base64()))
+    sdk = SDKFalso(imagem(png_base64()))
     with pytest.raises(ErroPeca, match="fonte"):
         gerar_peca(ESPECIFICACAO, config.caminho("imagens") / "g.png", imagem_base=None,
                    cliente=ClienteLLM(config, chave="c", sdk=sdk), config=config)
@@ -204,7 +208,7 @@ def test_sem_fonte_com_acento_para_em_vez_de_quebrar_o_texto(config, monkeypatch
 
 @pytest.fixture
 def peca_gerada(config, auditoria):
-    sdk = SDKFalso(resposta=interacao("", imagem=png_base64()))
+    sdk = SDKFalso(imagem(png_base64()))
     peca = fluxo.gerar_peca_visual(
         "imagem-01", ESPECIFICACAO, imagem_base=None, config=config,
         cliente=ClienteLLM(config, chave="c", sdk=sdk), auditoria=auditoria,
@@ -243,3 +247,12 @@ def test_peca_com_item_reprovado_pode_ser_rejeitada(config, auditoria, peca_gera
     metadados = registrar_revisao_peca(config, auditoria, peca_gerada, checklist=checklist,
                                        decisao="nova_geracao", justificativa="Letra deformada", revisor="Servidor A")
     assert metadados["status"] == "nova_geracao_solicitada"
+
+
+def test_tamanhos_respeitam_a_proporcao_e_os_limites_da_api():
+    for proporcao, tamanho in image_generation.TAMANHOS.items():
+        largura, altura = map(int, tamanho.split("x"))
+        numerador, denominador = map(int, proporcao.split(":"))
+        assert largura % 16 == 0 and altura % 16 == 0, proporcao
+        assert largura * denominador == altura * numerador, proporcao
+        assert 1 / 3 <= largura / altura <= 3, proporcao

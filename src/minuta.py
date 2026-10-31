@@ -58,7 +58,6 @@ def gerar_minuta(campos: dict, *, fontes: list[str], cliente: ClienteLLM, config
         modelo=config.modelo("texto"),
         entrada=f"{prompt.texto}\n\n{contexto_minuta(campos)}",
         instrucao_sistema=sistema.texto,
-        saida="texto",
     )
     partes = [cabecalho(campos, config), resposta.texto.strip()]
     if NAO_LOCALIZADO in "\n".join(partes).casefold():

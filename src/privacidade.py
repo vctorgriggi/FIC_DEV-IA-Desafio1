@@ -13,8 +13,8 @@ PADROES_PESSOAIS = {
     "telefone": re.compile(r"\(?\b\d{2}\)?\s?9?\d{4}-\d{4}\b"),
 }
 
-# Formato das chaves do Google AI Studio; cobre a chave que não veio do .env.
-PADRAO_CHAVE_GOOGLE = re.compile(r"AIza[0-9A-Za-z_\-]{35}")
+# Formato das chaves da API da OpenAI (sk-..., sk-proj-...); cobre a chave que não veio do .env.
+PADRAO_CHAVE_OPENAI = re.compile(r"\bsk-[0-9A-Za-z_\-]{20,}")
 
 
 def mascarar(texto: str, tipos: list[str]) -> tuple[str, dict[str, int]]:
@@ -35,4 +35,4 @@ def ocultar_segredos(texto: str, segredos: list[str]) -> str:
     for segredo in segredos:
         if segredo:
             texto = texto.replace(segredo, "[SEGREDO OCULTADO]")
-    return PADRAO_CHAVE_GOOGLE.sub("[SEGREDO OCULTADO]", texto)
+    return PADRAO_CHAVE_OPENAI.sub("[SEGREDO OCULTADO]", texto)

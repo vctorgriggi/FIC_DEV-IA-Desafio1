@@ -95,14 +95,13 @@ def extrair_campos(texto: str, *, origem: str, cliente: ClienteLLM, config: Conf
 
     categorias = config.dados.get("categorias", [])
     esquema = esquema_extracao(categorias)
-    formato = formato_json(esquema)
+    formato = formato_json(esquema, "extracao")
 
     resposta = cliente.gerar(
         modelo=config.modelo("texto"),
         entrada=entrada,
         instrucao_sistema=prompt_sistema.texto,
         formato_resposta=formato,
-        saida="texto",
     )
 
     try:

@@ -90,7 +90,7 @@ def test_esquema_exige_todos_os_campos_e_limita_categorias():
 def test_extrair_campos_chamada_valida(config):
     from src.extracao import extrair_campos
     from src.llm_client import ClienteLLM
-    from testes.falsos import SDKFalso, interacao
+    from testes.falsos import SDKFalso, resposta
 
     payload = {
         "protocolo": "2026-000142",
@@ -104,7 +104,7 @@ def test_extrair_campos_chamada_valida(config):
         "necessita_revisao": False,
         "motivo_revisao": "",
     }
-    sdk = SDKFalso(interacao(json.dumps(payload)))
+    sdk = SDKFalso(resposta(json.dumps(payload)))
     cliente = ClienteLLM(config, chave="fake", sdk=sdk)
 
     resultado = extrair_campos("Texto da solicitacao", origem="entrada.txt", cliente=cliente, config=config)
@@ -114,14 +114,15 @@ def test_extrair_campos_chamada_valida(config):
     assert resultado.campos["necessita_revisao"] is False
     assert len(sdk.chamadas) == 1
     assert "conteudo_externo" in sdk.chamadas[0]["input"]
+    assert sdk.chamadas[0]["text"]["format"]["name"] == "extracao"
 
 
 def test_extrair_campos_trata_resposta_malformada(config):
     from src.extracao import extrair_campos
     from src.llm_client import ClienteLLM
-    from testes.falsos import SDKFalso, interacao
+    from testes.falsos import SDKFalso, resposta
 
-    sdk = SDKFalso(interacao("Texto sem JSON nenhum"))
+    sdk = SDKFalso(resposta("Texto sem JSON nenhum"))
     cliente = ClienteLLM(config, chave="fake", sdk=sdk)
 
     resultado = extrair_campos("Texto qualquer", origem="entrada.txt", cliente=cliente, config=config)
@@ -135,10 +136,10 @@ def test_minuta_delimita_campos_e_poe_cabecalho_e_fontes_por_codigo():
     from src.config import carregar_config
     from src.llm_client import ClienteLLM
     from src.minuta import gerar_minuta
-    from testes.falsos import SDKFalso, interacao
+    from testes.falsos import SDKFalso, resposta
 
     config = carregar_config()  # brasão real; gerar_minuta não grava arquivo
-    sdk = SDKFalso(interacao("Prezado Senhor,\n\nCorpo redigido pelo modelo.\n\nAtenciosamente,"))
+    sdk = SDKFalso(resposta("Prezado Senhor,\n\nCorpo redigido pelo modelo.\n\nAtenciosamente,"))
     campos = {
         "protocolo": "2026-000999",
         "data": NAO_LOCALIZADO,
@@ -155,7 +156,7 @@ def test_minuta_delimita_campos_e_poe_cabecalho_e_fontes_por_codigo():
                           cliente=ClienteLLM(config, chave="fake", sdk=sdk), config=config)
 
     chamada = sdk.chamadas[0]
-    assert chamada["system_instruction"].startswith("Você apoia o atendimento")
+    assert chamada["instructions"].startswith("Você apoia o atendimento")
     entrada = chamada["input"]
     abertura = entrada.index('<conteudo_externo origem="campos_extraidos">')
     assert entrada.count("</conteudo_externo>") == 1
@@ -192,18 +193,18 @@ def test_minuta_com_lacuna_traz_o_aviso_que_libera_a_voz():
     from src.config import carregar_config
     from src.llm_client import ClienteLLM
     from src.minuta import AVISO_LACUNAS, gerar_minuta
-    from testes.falsos import SDKFalso, interacao
+    from testes.falsos import SDKFalso, resposta
 
     config = carregar_config()
     campos = {"protocolo": "2026-000142", "data": NAO_LOCALIZADO, "solicitante": "Fulano", "assunto": "Matrícula",
               "pedido": "Documentos", "categoria": "matricula", "campos_ausentes": ["data"]}
     com_lacuna = gerar_minuta(campos, fontes=["dados/originais/x.txt"], config=config,
-                              cliente=ClienteLLM(config, chave="c", sdk=SDKFalso(interacao("Prazo: não localizado."))))
+                              cliente=ClienteLLM(config, chave="c", sdk=SDKFalso(resposta("Prazo: não localizado."))))
     assert com_lacuna.texto.count(AVISO_LACUNAS) == 1
     assert com_lacuna.texto.index(AVISO_LACUNAS) < com_lacuna.texto.index("### Fontes consultadas")
     audio.preparar_locucao(com_lacuna.texto)  # não levanta: a voz fica liberada
 
     completos = {**campos, "data": "14/10/2026", "campos_ausentes": []}
     sem_lacuna = gerar_minuta(completos, fontes=["dados/originais/x.txt"], config=config,
-                              cliente=ClienteLLM(config, chave="c", sdk=SDKFalso(interacao("Tudo informado."))))
+                              cliente=ClienteLLM(config, chave="c", sdk=SDKFalso(resposta("Tudo informado."))))
     assert AVISO_LACUNAS not in sem_lacuna.texto

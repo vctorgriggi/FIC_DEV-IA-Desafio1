@@ -15,7 +15,7 @@ from src.minuta import Minuta
 from src.revisao import CHECKLIST_PECA
 from src.tipos import TextoExtraido
 from src.web import criar_app
-from testes.falsos import SDKFalso, interacao
+from testes.falsos import SDKFalso, imagem
 
 CAMPOS = {"protocolo": "2024-000142", "data": "14/10/2026", "solicitante": "MARCUS", "assunto": "Matrícula",
           "pedido": "Matrícula", "categoria": "matricula", "campos_ausentes": []}
@@ -39,7 +39,7 @@ def test_painel_vazio_lista_casos(api):
 
 
 def test_arquivo_so_serve_dados_e_resultados(api, config):
-    (config.raiz / ".env").write_text("GEMINI_API_KEY=segredo", encoding="utf-8")
+    (config.raiz / ".env").write_text("OPENAI_API_KEY=segredo", encoding="utf-8")
     assert api.get("/api/arquivo", params={"caminho": "dados/originais/entrada_texto.txt"}).status_code == 200
     for caminho in (".env", "../.env", "dados/../.env", "prompts/sistema_seguro_v1.md", "/etc/passwd"):
         resposta = api.get("/api/arquivo", params={"caminho": caminho})
@@ -107,14 +107,14 @@ def test_erro_de_provedor_e_caso_inexistente_viram_mensagens(config):
 
     api = TestClient(criar_app(config, fabrica_cliente=sem_chave))
     resposta = api.post("/api/casos/texto-01/processar")
-    assert resposta.status_code == 502 and "GEMINI_API_KEY" in resposta.json()["erro"]
+    assert resposta.status_code == 502 and "OPENAI_API_KEY" in resposta.json()["erro"]
     assert api.post("/api/casos/nao-existe/processar").status_code == 400
 
 
 def test_peca_gerada_e_revisada_pela_api(config):
     buffer = io.BytesIO()
     Image.new("RGB", (40, 30), "#88aacc").save(buffer, format="PNG")
-    resposta_sdk = interacao("", imagem=base64.b64encode(buffer.getvalue()).decode("ascii"))
+    resposta_sdk = imagem(base64.b64encode(buffer.getvalue()).decode("ascii"))
     from src.llm_client import ClienteLLM
 
     api = TestClient(criar_app(config, fabrica_cliente=lambda: ClienteLLM(config, chave="c", sdk=SDKFalso(resposta_sdk))))

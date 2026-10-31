@@ -33,7 +33,7 @@ interface/        # front-end Vite/React; dist/ é versionado e servido por src/
 
 ## Nunca fazer
 
-- Nunca chamar o SDK do Gemini fora de `src/llm_client.py` — ali ficam
+- Nunca chamar o SDK da OpenAI fora de `src/llm_client.py` — ali ficam
   timeout, `store=False`, tradução de erros, tokens e custo; chamada direta
   escapa do RF04 e do RF11.
 - Nunca usar dado pessoal real, nem em teste — enunciado, RF12 e seção 13.
@@ -63,14 +63,14 @@ interface/        # front-end Vite/React; dist/ é versionado e servido por src/
 
 ## Gotchas
 
-- Agente escreve `client.models.generate_content` → a doc atual do Gemini usa
-  `client.interactions.create`; siga o formato das docstrings de `audio.py`,
-  `vision.py` e `image_generation.py`.
-- CLI parada por minutos após um 429 → o SDK repete esperando o `Retry-After`
-  sem teto, e `attempts=0` vira 1; `llm_client.py` só deixa repetir 5xx e
-  aplica prazo de relógio. Não troque isso por ajuste de `attempts`.
-- Atualizou o `google-genai` → rode os testes: as exceções da Interactions API
-  vêm de um módulo privado do SDK, e `testes/test_llm_client.py` quebra se ele mudar.
+- Agente escreve `client.chat.completions.create` → o projeto usa a Responses
+  API (`client.responses.create`); texto, transcrição, voz e imagem têm cada
+  um seu método em `ClienteLLM`.
+- Agente liga repetições do SDK → o cliente usa `max_retries=0` e prazo de
+  relógio: repetir um 429 de cota esgotada só atrasa a mesma recusa.
+- RF07 depois de 06/01/2027 → todos os modelos da Speech API desligam nessa
+  data; o substituto indicado só roda pela Realtime API. Trocar de modelo
+  dentro da Speech API não resolve.
 
 ## Decisões em aberto
 

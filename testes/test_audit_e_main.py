@@ -10,7 +10,7 @@ from src.llm_client import RespostaLLM
 def test_evento_tem_campos_fixos_e_oculta_segredo(config):
     auditoria = Auditoria(config, segredos=["segredo-123"])
     resposta = RespostaLLM(
-        texto="x", modelo="gemini-3.8-flash", duracao_s=1.2, tokens_entrada=3, tokens_saida=4,
+        texto="x", modelo="gpt-6.1-terra", duracao_s=1.2, tokens_entrada=3, tokens_saida=4,
         custo_estimado_usd=0.001, parametros={"store": False},
     )
     auditoria.registrar(Evento(id_execucao="e1", caso_id="texto-01", etapa="compreensao", erro="falhou com segredo-123").com_resposta(resposta))
@@ -18,7 +18,7 @@ def test_evento_tem_campos_fixos_e_oculta_segredo(config):
     linha = auditoria.arquivo.read_text(encoding="utf-8")
     assert "segredo-123" not in linha
     registro = json.loads(linha)
-    assert registro["provedor"] == "gemini"
+    assert registro["provedor"] == "openai"
     assert registro["parametros"] == {"store": False}
     assert {"id_evento", "data_hora", "versao_prompt", "decisao_humana", "custo_estimado_usd"} <= set(registro)
     assert auditoria.eventos(caso_id="texto-01")[0]["id_execucao"] == "e1"
@@ -36,7 +36,7 @@ def cli_isolada(config, monkeypatch):
 def test_verificar_registra_versoes_sem_chamar_api(cli_isolada, capsys):
     assert cli.main(["verificar"]) == 0
     ambiente = json.loads((cli_isolada.caminho("logs") / "ambiente.json").read_text(encoding="utf-8"))
-    assert ambiente["versoes"]["google-genai"] != "não instalada"
+    assert ambiente["versoes"]["openai"] != "não instalada"
     assert ambiente["chave_configurada"] is False
     assert "AUSENTE" in capsys.readouterr().out
 

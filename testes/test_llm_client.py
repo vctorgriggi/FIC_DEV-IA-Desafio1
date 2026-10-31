@@ -1,9 +1,8 @@
-import httpx
-import pytest
+import base64
 
-# Classes reais que o SDK levanta na Interactions API. Se o SDK mudar esse
-# módulo privado, este import quebra e avisa que a classificação precisa de revisão.
-from google.genai._gaos.lib import compat_errors as sdk_erros
+import httpx2
+import openai
+import pytest
 
 from src import llm_client
 from src.llm_client import (
@@ -12,63 +11,66 @@ from src.llm_client import (
     ClienteLLM,
     LimiteRequisicoes,
     RequisicaoInvalida,
+    RespostaIncompleta,
     RespostaVazia,
     ServicoIndisponivel,
     TempoEsgotado,
+    entrada_com_anexo,
     formato_json,
 )
-from testes.falsos import SDKFalso, interacao
+from testes.falsos import SDKFalso, audio, imagem, resposta, transcricao
 
-REQUISICAO = httpx.Request("POST", "https://generativelanguage.googleapis.com/v1beta/interactions")
-CHAVE_FALSA = "AIza" + "x" * 35
-
-
-def resposta_http(status):
-    return httpx.Response(status, request=REQUISICAO)
+REQUISICAO = httpx2.Request("POST", "https://api.openai.com/v1/responses")
+CHAVE_FALSA = "sk-proj-" + "x" * 40
 
 
 def erro_status(classe, status, corpo=None):
-    return classe(f"Error code: {status}", response=resposta_http(status), body=corpo)
-
-
-CORPO_CHAVE_INVALIDA = [
-    {"error": {"code": 400, "status": "INVALID_ARGUMENT", "details": [{"reason": "API_KEY_INVALID"}]}}
-]
+    return classe(f"Error code: {status}", response=httpx2.Response(status, request=REQUISICAO), body=corpo)
 
 
 @pytest.mark.parametrize(
     ("erro_sdk", "esperado"),
     [
-        (erro_status(sdk_erros.BadRequestError, 400, CORPO_CHAVE_INVALIDA), AutenticacaoInvalida),
-        (erro_status(sdk_erros.AuthenticationError, 401), AutenticacaoInvalida),
-        (erro_status(sdk_erros.PermissionDeniedError, 403), AutenticacaoInvalida),
-        (erro_status(sdk_erros.RateLimitError, 429), LimiteRequisicoes),
-        (erro_status(sdk_erros.InternalServerError, 500), ServicoIndisponivel),
-        (erro_status(sdk_erros.InternalServerError, 503), ServicoIndisponivel),
-        (sdk_erros.APITimeoutError(REQUISICAO), TempoEsgotado),
-        (sdk_erros.APIConnectionError(request=REQUISICAO), ServicoIndisponivel),
-        (erro_status(sdk_erros.NotFoundError, 404), RequisicaoInvalida),
-        (erro_status(sdk_erros.BadRequestError, 400, [{"error": {"status": "INVALID_ARGUMENT"}}]), RequisicaoInvalida),
+        (erro_status(openai.AuthenticationError, 401), AutenticacaoInvalida),
+        (erro_status(openai.PermissionDeniedError, 403), AutenticacaoInvalida),
+        (erro_status(openai.RateLimitError, 429), LimiteRequisicoes),
+        (erro_status(openai.InternalServerError, 500), ServicoIndisponivel),
+        (erro_status(openai.InternalServerError, 503), ServicoIndisponivel),
+        (openai.APITimeoutError(REQUISICAO), TempoEsgotado),
+        (openai.APIConnectionError(request=REQUISICAO), ServicoIndisponivel),
+        (erro_status(openai.NotFoundError, 404), RequisicaoInvalida),
+        (erro_status(openai.BadRequestError, 400), RequisicaoInvalida),
     ],
 )
 def test_erros_do_sdk_viram_erros_com_mensagem_para_o_operador(config, erro_sdk, esperado):
     cliente = ClienteLLM(config, chave=CHAVE_FALSA, sdk=SDKFalso(erro=erro_sdk))
     with pytest.raises(esperado) as capturado:
-        cliente.gerar(modelo="gemini-3.8-flash", entrada="oi")
+        cliente.gerar(modelo="gpt-6.1-terra", entrada="oi")
     assert str(capturado.value) == esperado.mensagem_padrao
+
+
+def test_erros_valem_para_todas_as_operacoes(config):
+    cliente = ClienteLLM(config, chave=CHAVE_FALSA, sdk=SDKFalso(erro=erro_status(openai.RateLimitError, 429)))
+    with pytest.raises(LimiteRequisicoes):
+        cliente.transcrever(modelo="gpt-transcribe", nome_arquivo="a.mp3", conteudo=b"x", mime_type="audio/mp3")
+    with pytest.raises(LimiteRequisicoes):
+        cliente.sintetizar_voz(modelo="gpt-4o-mini-tts", texto="oi", voz="marin", instrucoes="calmo")
+    with pytest.raises(LimiteRequisicoes):
+        cliente.gerar_imagem(modelo="gpt-image-2.5-flare", prompt="oi", tamanho="1024x1024")
 
 
 def test_erro_desconhecido_nao_e_engolido(config):
     cliente = ClienteLLM(config, chave=CHAVE_FALSA, sdk=SDKFalso(erro=TypeError("bug local")))
     with pytest.raises(TypeError):
-        cliente.gerar(modelo="gemini-3.8-flash", entrada="oi")
+        cliente.gerar(modelo="gpt-6.1-terra", entrada="oi")
 
 
 def test_chave_nao_aparece_no_erro(config):
-    vazamento = erro_status(sdk_erros.BadRequestError, 400, f"chave {CHAVE_FALSA} recusada")
+    vazamento = erro_status(openai.BadRequestError, 400, f"chave {CHAVE_FALSA} recusada")
+    vazamento.args = (f"Error code: 400 - chave {CHAVE_FALSA} recusada",)
     cliente = ClienteLLM(config, chave=CHAVE_FALSA, sdk=SDKFalso(erro=vazamento))
     with pytest.raises(RequisicaoInvalida) as capturado:
-        cliente.gerar(modelo="gemini-3.8-flash", entrada="oi")
+        cliente.gerar(modelo="gpt-6.1-terra", entrada="oi")
     assert CHAVE_FALSA not in str(capturado.value)
     assert CHAVE_FALSA not in capturado.value.detalhe
     assert capturado.value.__cause__ is None
@@ -81,102 +83,168 @@ def test_sem_chave_falha_antes_de_chamar(config, monkeypatch):
 
 
 def test_resposta_vazia(config):
-    cliente = ClienteLLM(config, chave=CHAVE_FALSA, sdk=SDKFalso(resposta=interacao("   ")))
+    cliente = ClienteLLM(config, chave=CHAVE_FALSA, sdk=SDKFalso(resposta("   ")))
     with pytest.raises(RespostaVazia):
-        cliente.gerar(modelo="gemini-3.8-flash", entrada="oi")
+        cliente.gerar(modelo="gpt-6.1-terra", entrada="oi")
 
 
 def test_audio_e_imagem_exigem_o_proprio_conteudo(config):
-    com_audio = ClienteLLM(config, chave=CHAVE_FALSA, sdk=SDKFalso(resposta=interacao("", audio="UklGRg==")))
-    assert com_audio.gerar(modelo="gemini-3.8-flash-tts", entrada="oi", saida="audio").texto == ""
-
-    so_texto = ClienteLLM(config, chave=CHAVE_FALSA, sdk=SDKFalso(resposta=interacao("desculpe")))
+    vazio = ClienteLLM(config, chave=CHAVE_FALSA, sdk=SDKFalso(audio(b"")))
     with pytest.raises(RespostaVazia):
-        so_texto.gerar(modelo="gemini-3.8-flash-tts", entrada="oi", saida="audio")
+        vazio.sintetizar_voz(modelo="gpt-4o-mini-tts", texto="oi", voz="marin", instrucoes="calmo")
+    sem_imagem = ClienteLLM(config, chave=CHAVE_FALSA, sdk=SDKFalso(imagem(None)))
     with pytest.raises(RespostaVazia):
-        so_texto.gerar(modelo="gemini-3.1-flash-lite-image", entrada="oi", saida="imagem")
-    with pytest.raises(ValueError):
-        so_texto.gerar(modelo="gemini-3.8-flash", entrada="oi", saida="video")
-
-
-def test_imagem_custa_por_unidade(config):
-    sdk = SDKFalso(resposta=interacao("", entrada=1000, saida=1290, imagem="iVBORw=="))
-    resposta = ClienteLLM(config, chave=CHAVE_FALSA, sdk=sdk).gerar(
-        modelo="gemini-3.1-flash-lite-image", entrada="oi", saida="imagem"
-    )
-    assert resposta.custo_estimado_usd == pytest.approx(1000 * 0.25 / 1_000_000 + 0.0336)
+        sem_imagem.gerar_imagem(modelo="gpt-image-2.5-flare", prompt="oi", tamanho="1024x1024")
+    sem_fala = ClienteLLM(config, chave=CHAVE_FALSA, sdk=SDKFalso(transcricao("  ")))
+    with pytest.raises(RespostaVazia):
+        sem_fala.transcrever(modelo="gpt-transcribe", nome_arquivo="a.mp3", conteudo=b"x", mime_type="audio/mp3")
 
 
 def test_parametros_vem_do_config_e_nao_armazena_no_provedor(config):
     sdk = SDKFalso()
     cliente = ClienteLLM(config, chave=CHAVE_FALSA, sdk=sdk)
-    resposta = cliente.gerar(
-        modelo="gemini-3.8-flash",
+    obtida = cliente.gerar(
+        modelo="gpt-6.1-terra",
         entrada="oi",
         instrucao_sistema="regras",
-        formato_resposta=formato_json({"type": "object"}),
-        parametros={"seed": 7},
+        formato_resposta=formato_json({"type": "object"}, "teste"),
+        parametros={"reasoning": {"effort": "low"}},
     )
     chamada = sdk.chamadas[0]
+    assert chamada["_operacao"] == "responses.create"
     assert chamada["store"] is False
     assert chamada["timeout"] == config.dados["timeout_segundos"]
-    assert chamada["generation_config"] == {**config.dados["parametros_geracao"], "seed": 7}
-    assert chamada["system_instruction"] == "regras"
-    assert chamada["response_format"]["mime_type"] == "application/json"
-    assert resposta.parametros["generation_config"]["seed"] == 7
-    assert "input" not in resposta.parametros
+    assert chamada["max_output_tokens"] == config.dados["parametros_geracao"]["max_output_tokens"]
+    assert chamada["reasoning"] == {"effort": "low"}
+    assert chamada["instructions"] == "regras"
+    assert chamada["text"]["format"]["type"] == "json_schema"
+    assert obtida.parametros["reasoning"] == {"effort": "low"}
+    assert obtida.parametros["formato_resposta"] == "teste"
+    assert "input" not in obtida.parametros
 
 
-def test_custo_estimado_conta_raciocinio_como_saida(config):
-    sdk = SDKFalso(resposta=interacao("ok", entrada=1000, saida=2000, pensamento=500))
-    resposta = ClienteLLM(config, chave=CHAVE_FALSA, sdk=sdk).gerar(modelo="gemini-3.8-flash", entrada="oi")
-    assert resposta.tokens_saida == 2500
-    assert resposta.custo_estimado_usd == pytest.approx((1000 * 0.75 + 2500 * 3.75) / 1_000_000)
+def test_formato_json_estrito_fecha_todos_os_objetos():
+    esquema = {
+        "type": "object",
+        "properties": {"lista": {"type": "array", "items": {"type": "object", "properties": {"a": {"type": "string"}}}}},
+    }
+    formato = formato_json(esquema, "teste")["format"]
+    assert formato["strict"] is True
+    assert formato["schema"]["additionalProperties"] is False
+    assert formato["schema"]["properties"]["lista"]["items"]["additionalProperties"] is False
+    assert "additionalProperties" not in esquema
+
+
+def test_anexo_pdf_vai_como_arquivo_e_imagem_como_imagem():
+    pdf = entrada_com_anexo("leia", nome_arquivo="ficha.pdf", mime_type="application/pdf", conteudo=b"%PDF")
+    partes = pdf[0]["content"]
+    assert partes[0] == {"type": "input_text", "text": "leia"}
+    assert partes[1]["type"] == "input_file" and partes[1]["filename"] == "ficha.pdf"
+    assert partes[1]["file_data"] == "data:application/pdf;base64," + base64.b64encode(b"%PDF").decode()
+    png = entrada_com_anexo("leia", nome_arquivo="f.png", mime_type="image/png", conteudo=b"PNG")
+    assert png[0]["content"][1] == {"type": "input_image", "image_url": "data:image/png;base64," + base64.b64encode(b"PNG").decode()}
+
+
+def test_custo_estimado_de_texto(config):
+    sdk = SDKFalso(resposta("ok", entrada=1000, saida=2500))
+    obtida = ClienteLLM(config, chave=CHAVE_FALSA, sdk=sdk).gerar(modelo="gpt-6.1-terra", entrada="oi")
+    assert obtida.tokens_saida == 2500
+    assert obtida.custo_estimado_usd == pytest.approx((1000 * 1.0 + 2500 * 5.0) / 1_000_000)
 
 
 def test_modelo_sem_preco_nao_inventa_custo(config):
-    resposta = ClienteLLM(config, chave=CHAVE_FALSA, sdk=SDKFalso()).gerar(modelo="modelo-sem-preco", entrada="oi")
-    assert resposta.custo_estimado_usd is None
+    obtida = ClienteLLM(config, chave=CHAVE_FALSA, sdk=SDKFalso()).gerar(modelo="modelo-sem-preco", entrada="oi")
+    assert obtida.custo_estimado_usd is None
 
 
-def test_cliente_real_so_repete_erro_de_servidor(config, monkeypatch):
-    from google import genai
+def test_transcricao_custa_por_minuto_e_repassa_idiomas(config):
+    sdk = SDKFalso(transcricao("Bom dia", segundos=120))
+    obtida = ClienteLLM(config, chave=CHAVE_FALSA, sdk=sdk).transcrever(
+        modelo="gpt-transcribe", nome_arquivo="a.mp3", conteudo=b"ID3", mime_type="audio/mp3", idiomas=["pt"]
+    )
+    chamada = sdk.chamadas[0]
+    assert chamada["_operacao"] == "audio.transcriptions.create"
+    assert chamada["file"] == ("a.mp3", b"ID3", "audio/mp3")
+    assert chamada["languages"] == ["pt"]
+    assert "store" not in chamada
+    assert obtida.texto == "Bom dia"
+    assert obtida.custo_estimado_usd == pytest.approx(2 * 0.0045)
 
+
+def test_sintese_pede_wav_com_voz_e_instrucoes(config):
+    sdk = SDKFalso(audio(b"RIFF"))
+    obtida = ClienteLLM(config, chave=CHAVE_FALSA, sdk=sdk).sintetizar_voz(
+        modelo="gpt-4o-mini-tts", texto="Prezado", voz="marin", instrucoes="tom institucional"
+    )
+    chamada = sdk.chamadas[0]
+    assert chamada["_operacao"] == "audio.speech.create"
+    assert (chamada["input"], chamada["voice"], chamada["instructions"], chamada["response_format"]) == (
+        "Prezado", "marin", "tom institucional", "wav"
+    )
+    assert obtida.conteudo == b"RIFF" and obtida.custo_estimado_usd is None
+
+
+def test_imagem_gerada_ou_editada_com_custo_por_token(config):
+    b64 = base64.b64encode(b"PNG").decode()
+    sdk = SDKFalso(imagem(b64, texto=100, imagem_entrada=200, saida=1000))
+    cliente = ClienteLLM(config, chave=CHAVE_FALSA, sdk=sdk)
+    gerada = cliente.gerar_imagem(modelo="gpt-image-2.5-flare", prompt="cartaz", tamanho="1536x1152")
+    assert gerada.conteudo == b"PNG"
+    assert gerada.custo_estimado_usd == pytest.approx((100 * 5.0 + 200 * 8.0 + 1000 * 30.0) / 1_000_000)
+    cliente.gerar_imagem(modelo="gpt-image-2.5-flare", prompt="cartaz", tamanho="1024x1024", imagem_base=("b.png", b"x", "image/png"))
+    assert [c["_operacao"] for c in sdk.chamadas] == ["images.generate", "images.edit"]
+    assert sdk.chamadas[0]["size"] == "1536x1152" and "image" not in sdk.chamadas[0]
+    assert sdk.chamadas[1]["image"] == ("b.png", b"x", "image/png")
+
+
+def test_imagem_sem_uso_informado_fica_sem_custo(config):
+    sdk = SDKFalso(imagem(base64.b64encode(b"PNG").decode()))
+    obtida = ClienteLLM(config, chave=CHAVE_FALSA, sdk=sdk).gerar_imagem(
+        modelo="gpt-image-2.5-flare", prompt="cartaz", tamanho="1024x1024"
+    )
+    assert obtida.custo_estimado_usd is None
+
+
+def test_cliente_real_nao_repete_chamadas(config, monkeypatch):
     criados = []
-    monkeypatch.setattr(genai, "Client", lambda **kwargs: criados.append(kwargs) or SDKFalso())
+    monkeypatch.setattr(openai, "OpenAI", lambda **kwargs: criados.append(kwargs) or SDKFalso())
     ClienteLLM(config, chave=CHAVE_FALSA)
     assert criados[0]["api_key"] == CHAVE_FALSA
-    repeticao = criados[0]["http_options"].retry_options
-    assert repeticao.attempts == 1
-    assert 429 not in repeticao.http_status_codes and set(repeticao.http_status_codes) == {500, 502, 503, 504}
+    assert criados[0]["max_retries"] == 0
 
 
 def test_prazo_de_relogio_independe_do_sdk(config):
     import threading
+    import time
+    from types import SimpleNamespace
 
     liberar = threading.Event()
 
-    class SDKPreso:
-        def __init__(self):
-            self.interactions = self
-
-        def create(self, **_):
-            liberar.wait(5)  # simula o SDK dormindo num Retry-After
+    def preso(**_):
+        liberar.wait(5)  # simula o SDK preso numa conexão lenta
 
     config.dados["timeout_segundos"] = 0.2
-    cliente = ClienteLLM(config, chave=CHAVE_FALSA, sdk=SDKPreso())
-    inicio = __import__("time").perf_counter()
+    cliente = ClienteLLM(config, chave=CHAVE_FALSA, sdk=SimpleNamespace(responses=SimpleNamespace(create=preso)))
+    inicio = time.perf_counter()
     with pytest.raises(TempoEsgotado):
-        cliente.gerar(modelo="gemini-3.8-flash", entrada="oi")
-    assert __import__("time").perf_counter() - inicio < 1
+        cliente.gerar(modelo="gpt-6.1-terra", entrada="oi")
+    assert time.perf_counter() - inicio < 1
     liberar.set()
 
 
-@pytest.mark.parametrize("status", ["incomplete", "budget_exceeded"])
-def test_resposta_cortada_pelo_limite_tem_erro_proprio(config, status):
-    from src.llm_client import RespostaIncompleta
-
-    cortada = interacao('{"texto_bruto": "CÓDIGO: 20')
-    cortada.status = status
+def test_resposta_cortada_pelo_limite_tem_erro_proprio(config):
+    cortada = resposta('{"texto_bruto": "CÓDIGO: 20', status="incomplete", motivo="max_output_tokens")
     with pytest.raises(RespostaIncompleta, match="max_output_tokens"):
-        ClienteLLM(config, chave=CHAVE_FALSA, sdk=SDKFalso(resposta=cortada)).gerar(modelo="gemini-3.8-flash", entrada="oi")
+        ClienteLLM(config, chave=CHAVE_FALSA, sdk=SDKFalso(cortada)).gerar(modelo="gpt-6.1-terra", entrada="oi")
+
+
+def test_resposta_incompleta_por_outro_motivo_diz_o_motivo(config):
+    filtrada = resposta("parcial", status="incomplete", motivo="content_filter")
+    with pytest.raises(RespostaIncompleta, match="content_filter"):
+        ClienteLLM(config, chave=CHAVE_FALSA, sdk=SDKFalso(filtrada)).gerar(modelo="gpt-6.1-terra", entrada="oi")
+
+
+def test_resposta_com_falha_do_provedor(config):
+    falhou = resposta("", status="failed")
+    with pytest.raises(ServicoIndisponivel):
+        ClienteLLM(config, chave=CHAVE_FALSA, sdk=SDKFalso(falhou)).gerar(modelo="gpt-6.1-terra", entrada="oi")
