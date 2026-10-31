@@ -3,17 +3,17 @@
   "audio": "resultados/audios/0b09035747ca.wav",
   "modelo_verificacao": "gpt-transcribe",
   "texto_falado_esperado": "GOVERNO DO ESTADO DE MATO GROSSO — CENTRAL DE ATENDIMENTO\nDados de referência\nProtocolo: 2026-000142\nData da solicitação: 14/10/2026\nInteressado(a): Marcos Vinícius de Almeida Santos\nAssunto: Matrícula no curso Técnico em Enfermagem e documentos necessários\nCorpo da Comunicação\nPrezado Senhor,\nConfirmamos o recebimento de sua solicitação de efetivação de matrícula no curso Técnico em Enfermagem, no turno noturno, e de informações sobre os documentos que ainda precisa apresentar.\nA verificação da possibilidade de efetivação da matrícula e dos documentos a serem apresentados depende da análise do setor competente.\nConforme declarado pelo próprio solicitante, a matrícula é cancelada automaticamente em caso de faltas sem justificativa comprovada nos dois primeiros dias de aula consecutivos ou em três dias de aula, consecutivos ou não, nos dez primeiros dias de aula.\nSinalização de Pendências e Dados Ausentes\nDocumentos já apresentados: não localizado.\nRelação de documentos necessários: não localizado.\nConfirmação de pendências documentais: depende da análise do setor competente.\nFecho Institucional\nAtenciosamente,\nLocal: não localizado\nData da comunicação: não localizado\nServidor Responsável\nOs campos identificados como não localizado representam informações ausentes no documento.\nFontes consultadas\ndados/originais/entrada_texto.txt",
-  "transcricao_do_audio": "Governo do Estado de Mato Grosso, Central de Atendimento. Dados de referência. Protocolo 2026 00042. Data da solicitação: 14/10/2026. Interessado: Marcos Vinícius de Almeida Santos. Assunto: matrícula no curso técnico em enfermagem e documentos necessários. Corpo da comunicação. Prezado senhor, confirmamos o recebimento de sua solicitação de efetivação de matrícula no curso técnico em enfermagem, no turno noturno, e de informações sobre os documentos que ainda precisa apresentar. A verificação da possibilidade de efetivação da matrícula e dos documentos a serem apresentados depende da análise do setor competente. Conforme declarado pelo próprio solicitante, a matrícula é cancelada automaticamente em caso de falta sem justificativa comprovada nos dois primeiros dias de aula consecutivos, ou em três dias de aula consecutivos ou não, nos dez primeiros dias de aula. Sinalização de pendências e dados ausentes. Documentos já apresentados: não localizado. Relação de documentos necessários: não localizado. Confirmação de pendências documentais depende da análise do setor competente. Fecho institucional. Atenciosamente, local não localizado. Data da comunicação: não localizado. Servidor responsável. Os campos identificados como não localizado representam informações ausentes no documento. Fontes consultadas: dados originais, entrada texto.txt.",
+  "transcricao_do_audio": "Governo do Estado de Mato Grosso, Central de Atendimento. Dados de referência. Protocolo 2026-00042. Data da solicitação: 14/10/2026. Interessado: Marcos Vinícius de Almeida Santos. Assunto: matrícula no curso técnico em enfermagem e documentos necessários. Corpo da comunicação. Prezado senhor, confirmamos o recebimento de sua solicitação de efetivação de matrícula no curso técnico em enfermagem, no turno noturno, e de informações sobre os documentos que ainda precisa apresentar. A verificação da possibilidade de efetivação da matrícula e dos documentos a serem apresentados depende da análise do setor competente. Conforme declarado pelo próprio solicitante, a matrícula é cancelada automaticamente em caso de falta sem justificativa comprovada nos dois primeiros dias de aula consecutivos, ou em três dias de aula consecutivos ou não, nos dez primeiros dias de aula. Sinalização de pendências e dados ausentes. Documentos já apresentados: não localizado. Relação de documentos necessários: não localizado. Confirmação de pendências documentais: depende da análise do setor competente. Fecho institucional. Atenciosamente, local não localizado. Data da comunicação: não localizado. Servidor responsável. Os campos identificados como não localizado representam informações ausentes no documento. Fontes consultadas: dados originais, entrada texto .txt.",
   "comparacao": {
-    "similaridade": 0.973,
+    "similaridade": 0.967,
     "palavras_referencia": 182,
-    "palavras_corretas": 178,
-    "taxa_acerto_palavras": 0.978,
+    "palavras_corretas": 177,
+    "taxa_acerto_palavras": 0.973,
     "erros": [
       {
         "tipo": "substituicao",
         "esperado": "2026-000142",
-        "obtido": "2026 00042"
+        "obtido": "2026-00042"
       },
       {
         "tipo": "omissao",
@@ -27,8 +27,8 @@
       },
       {
         "tipo": "substituicao",
-        "esperado": "dados/originais/entrada",
-        "obtido": "dados originais entrada"
+        "esperado": "dados/originais/entrada texto.txt",
+        "obtido": "dados originais entrada texto txt"
       }
     ]
   }

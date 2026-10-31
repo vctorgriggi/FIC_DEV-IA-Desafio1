@@ -24,7 +24,7 @@ Todos os dados do desafio são fictícios. A tabela mostra o que cada campo seri
 
 - **Mascaramento antes do envio:** CPF, RG, e-mail e telefone viram `[CPF removido]` etc. (`privacidade.mascarar_antes_de_enviar` no `config.json`). Na transcrição, os dígitos ditados um a um são juntados antes, porque separados ("1 2 3 4 5 6 7 8 9 - 0 0") escapariam do padrão. O telefone do caso `texto-injection`, (65) 99888-7766, também é fictício. Na rodada de 31/10/2026, `texto-01` e `audio-01` tiveram CPF, RG e e-mail mascarados; `texto-injection`, CPF e telefone; `imagem-01`, CPF, RG e e-mail nas execuções em que o CPF foi lido inteiro. O texto original fica só na máquina local, em `dados/processados/`.
 - **Sem armazenamento no provedor:** as chamadas de texto e visão (Responses API) usam `store=False`; transcrição, voz e imagem não têm esse parâmetro.
-- **Log sem conteúdo:** `resultados/logs/execucoes.jsonl` guarda caminhos, versões e hashes, não o texto.
+- **Log sem conteúdo:** `resultados/logs/execucoes.jsonl` guarda caminhos, versões e hashes, não o texto. Os trechos incertos e os dados críticos não encontrados, que vão para os extras do log, passam pelo mesmo mascaramento do envio. Na rodada de 31/10/2026, três eventos anteriores a esse ajuste (as confirmações e uma comparação do `imagem-01`) registraram o CPF fictício da ficha.
 - **Sem credenciais:** a chave fica só no `.env`, fora do git. A varredura do repositório, das saídas e do histórico de commits, feita em 31/10/2026, não encontrou a chave nem o `.env`.
 - **Minuta mínima:** a minuta recebe só os campos do pedido; CPF, RG, filiação e contatos não chegam a ela.
 

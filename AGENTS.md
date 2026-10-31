@@ -7,7 +7,7 @@ texto, áudio e imagem e gera minutas para revisão humana. Enunciado em
 ## Como rodar
 
 ```bash
-source .venv/bin/activate      # Python >= 3.10; o 3.9 do macOS não instala o SDK
+source .venv/bin/activate      # Python >= 3.11 (Pillow 13); o 3.9 do macOS não instala
 python -m pytest               # não chama a API
 python -m src.main verificar   # versões, chave e arquivos dos casos
 python -m src.main interface   # interface local em http://127.0.0.1:8000

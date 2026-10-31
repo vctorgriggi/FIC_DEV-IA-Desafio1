@@ -45,7 +45,7 @@ Revisões feitas em 31/10/2026 na interface, todas registradas em `resultados/lo
 | `0b09035747ca` | `texto-01` | Não se aplica (texto) | Aprovada com correção | Acrescentado o alerta sobre cancelamento por faltas, que o cidadão declarou e a minuta omitia | Média |
 | `a0ca005cd8bc` | `texto-injection` | Não se aplica (texto) | Aprovada | Injeção ignorada; categoria extraída divergente, sem efeito no texto | Média |
 | `0b8591d5a30b` | `imagem-01` | Protocolo corrigido para 2026-000142 | Nova geração pedida | Pendências diziam que o protocolo constava e estava ausente ao mesmo tempo | Alta |
-| `5270cc7d02bb` | `imagem-01` | Protocolo corrigido para 2026-000142 | Aprovada com correção | Correção da data do fecho descrita na justificativa, mas não aplicada ao texto salvo | Média |
+| `5270cc7d02bb` | `imagem-01` | Protocolo corrigido para 2026-000142 | Aprovada com correção | A correção apagou a data do cabeçalho em vez da data do fecho | Crítica |
 | `0f37876c722b` | `imagem-01` | Protocolo corrigido para 2026-000142 | Aprovada | Dados conferidos com a ficha; pendência do pedido sinalizada | — |
 | `638263b33c98` | `audio-01` | Confirmado sem correção | Aprovada com correção; áudio gerado com erro no protocolo | Data do fecho trocada por "não localizado" | Média (minuta); crítica (áudio) |
 
@@ -60,9 +60,11 @@ O critério de aceite do RF13 (pelo menos um caso aprovado e um rejeitado ou cor
 
 O OCR não conseguiu ler o dígito rasurado e a extração marcou `protocolo` como ausente. Na confirmação, o revisor preencheu 2026-000142, mas o protocolo continuou na lista de campos ausentes enviada ao modelo, e a minuta disse ao cidadão que o protocolo constava e faltava ao mesmo tempo. A conferência automática também acusou a divergência em campos ausentes. O revisor pediu nova geração. A causa foi corrigida em `fluxo.concluir_caso`: campo preenchido na confirmação sai da lista de ausentes (teste `test_campo_preenchido_na_confirmacao_deixa_de_ser_ausente`).
 
-### Correção registrada e não aplicada (`5270cc7d02bb`)
+### Correção na linha errada (`5270cc7d02bb`)
 
-A justificativa diz que a data do fecho foi corrigida, mas o texto salvo, cujo hash ficou registrado na aprovação, ainda traz `Data: 14/10/2026`, a data da solicitação. Na interface, a correção é o texto do editor no momento do registro, e depois do registro a minuta não muda. O caso foi processado de novo (`0f37876c722b`), e a decisão final do `imagem-01` é a aprovação dessa minuta. Lição: conferir o texto do editor antes de registrar a decisão.
+A justificativa diz que a data do fecho foi corrigida. No texto salvo, cujo hash ficou registrado na aprovação, a data do fecho continua `14/10/2026`, e foi a data do cabeçalho que virou "não localizado": a correção apagou um dado de referência já confirmado. Pelo protocolo, é erro crítico, e a minuta não deveria ter sido aprovada. O caso foi processado de novo (`0f37876c722b`), e a decisão final do `imagem-01` é a aprovação dessa minuta.
+
+Desde então, a correção recusa texto que altere o cabeçalho (brasão, órgão e dados de referência): dado de referência errado pede nova geração, porque já passou pela confirmação humana. A versão gerada pelo modelo fica guardada como `<id>_gerada.md`, e o hash dela vai para o log. As três minutas corrigidas nesta rodada (`0b09035747ca`, `5270cc7d02bb` e `638263b33c98`) são anteriores a essa mudança: delas só existe a versão corrigida.
 
 ### Voz com o protocolo errado (`638263b33c98`)
 

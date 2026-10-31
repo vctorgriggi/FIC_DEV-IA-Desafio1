@@ -55,16 +55,17 @@ Custo estimado pela tabela padrão da OpenAI (`precos_usd_por_milhao_tokens` e `
 | Prompt C gerado pelo metaprompt | 1 | 0,0048 |
 | Experimento de prompts (A, B, C) | 3 | 0,0087 |
 | Peça visual (1536x1152) | 1 | 0,0229 |
-| **Total registrado no log** | 23 | **0,1017** |
+| Verificação dos dois áudios contra o texto aprovado (transcrição de cada WAV) | 2 | 0,0136 |
+| **Total registrado no log** | 25 | **0,1153** |
 
-Fora do log ficaram a verificação dos dois áudios contra o texto aprovado (uma transcrição de cada WAV, US$ 0,0136 estimado) e oito sínteses curtas de teste da leitura do protocolo, cada uma com sua transcrição.
+Fora do log ficaram oito sínteses curtas de teste da leitura do protocolo, cada uma com sua transcrição.
 
 ## Riscos e mitigações
 
 | Risco | Mitigação | Evidência |
 |---|---|---|
-| Alucinação | Regra "não invente" e "não localizado" no prompt de sistema; dados de referência da minuta copiados dos campos por código; revisão humana | `avaliacao.md`: campos exatos conferem nos casos de texto; datas atribuídas no fecho foram pegas na revisão |
-| Prompt injection | Conteúdo externo delimitado, com a etiqueta de fechamento neutralizada; minuta sem `motivo_revisao`; conferência de `minuta_nao_pode_conter` | Caso `texto-injection`: nada do ataque na minuta, tentativa sinalizada |
+| Alucinação | Regra "não invente" e "não localizado" no prompt de sistema; dados de referência da minuta copiados dos campos por código; revisão humana | `avaliacao.md`: protocolo, data e solicitante conferem nos casos de texto; datas atribuídas no fecho foram pegas na revisão |
+| Prompt injection | Conteúdo externo delimitado, com a etiqueta de fechamento neutralizada; minuta sem `motivo_revisao`; conferência de `minuta_nao_pode_conter` | Caso `texto-injection`: nada do ataque na minuta, tentativa sinalizada; a categoria extraída saiu errada, como o ataque pedia, sem efeito no texto |
 | Erro de leitura (OCR, transcrição) | Texto bruto preservado, trechos incertos, comparação com gabarito, confirmação humana dos dados críticos | `visao_e_imagem.md`: protocolo rasurado marcado como ilegível e preenchido na confirmação |
 | Erro da voz sintética | Áudio só de texto aprovado; verificação por transcrição; escuta humana antes do uso | `audio_e_acessibilidade.md`: voz omitiu um zero do protocolo no `audio-01`, pego na verificação e confirmado ouvindo |
 | Exposição de dados | Mascaramento, `store=False`, log sem conteúdo, chave só no `.env` | `lgpd_campos.md` |

@@ -117,7 +117,7 @@ Apresente apenas a minuta, em Markdown, sem explicações sobre o processo de el
 
 ## 3. Entrada (`dados/experimento_rf02/entrada_texto-01.json`)
 
-Campos extraídos do caso `texto-01`:
+Campos do caso `texto-01`, fixados num arquivo para que as rodadas do experimento usem a mesma entrada; vêm de uma extração anterior e diferem em `assunto` e `pedido` da extração da rodada final (`dados/processados/texto-01/0b09035747ca/extracao.json`):
 
 ```json
 {

@@ -6,7 +6,7 @@ Protótipo local que recebe solicitações fictícias em texto, áudio e imagem,
 
 ## Instalação
 
-Requer Python 3.10 ou mais recente (exigência do SDK `openai`). Testado com Python 3.14.8. Confira com `python3 --version`; o Python que vem com o macOS é 3.9 e não serve. Nesse caso, use o executável de uma versão nova no primeiro comando (por exemplo `python3.14 -m venv .venv`, com Python instalado pelo Homebrew ou por python.org).
+Requer Python 3.11 ou mais recente (exigência do Pillow 13 e do Starlette; o SDK `openai` aceita 3.10). Testado com Python 3.14.8. Confira com `python3 --version`; o Python que vem com o macOS é 3.9 e não serve. Nesse caso, use o executável de uma versão nova no primeiro comando (por exemplo `python3.14 -m venv .venv`, com Python instalado pelo Homebrew ou por python.org).
 
 O caso de áudio também precisa do FFmpeg (`ffprobe` no PATH): `brew install ffmpeg` no macOS, `sudo apt install ffmpeg` no Linux ou o instalador de ffmpeg.org no Windows. Confira com `ffprobe -version`.
 
@@ -33,8 +33,8 @@ Pela interface (`python -m src.main interface`, em http://127.0.0.1:8000):
 
 1. **Processar um caso.** No painel, clique em **Processar** no cartão do caso. Leva cerca de 30 s.
 2. **Conferir os dados críticos** (só áudio e imagem). Compare protocolo, data e solicitante com o original exibido ao lado, corrija o que estiver errado, informe quem conferiu e clique em **Confirmar e gerar minuta**. O modelo pode errar sem marcar dúvida: confira olhando o original.
-3. **Revisar a minuta.** Leia a minuta ao lado do original, veja a conferência automática com o gabarito e escolha **Aprovar**, **Aprovar com correção** (abre um editor do texto), **Rejeitar** ou **Pedir nova geração**, com justificativa e revisor. Nada é enviado ao cidadão.
-4. **Áudio da minuta** (só minuta aprovada). Botão **Gerar áudio** na página da minuta (RF07).
+3. **Revisar a minuta.** Leia a minuta ao lado do original, veja a conferência automática com o gabarito e escolha **Aprovar**, **Aprovar com correção** (abre um editor do texto; o cabeçalho não pode ser alterado, e a versão gerada pelo modelo fica guardada como `<id>_gerada.md`), **Rejeitar** ou **Pedir nova geração**, com justificativa e revisor. Nada é enviado ao cidadão.
+4. **Áudio da minuta** (só minuta aprovada). Botão **Gerar áudio** na página da minuta (RF07). Depois, **Comparar áudio com o texto aprovado**, ouça o áudio inteiro, com atenção a protocolo e datas, e registre se ele confere.
 5. **Peça visual.** **Gerar peça visual** no cartão do caso (cobrada por tokens; a estimativa fica no log); depois responda ao checklist e registre a decisão.
 6. **Indicadores.** O painel mostra a taxa de aprovação; `python -m src.main avaliacao` grava o esperado contra obtido em `resultados/logs/avaliacao.json`.
 
@@ -44,6 +44,8 @@ O mesmo fluxo pelo terminal:
 python -m src.main processar imagem-01        # lê, extrai, pergunta os dados críticos e gera a minuta
 python -m src.main revisar <id_execucao>      # o id aparece no fim do comando anterior
 python -m src.main audio-minuta <id_execucao>
+python -m src.main verificar-audio <id_execucao>
+python -m src.main revisar-audio <id_execucao>
 python -m src.main avaliacao
 ```
 
@@ -56,8 +58,10 @@ python -m src.main casos                      # lista os casos do config.json
 python -m src.main processar texto-01         # entrada -> extração -> compreensão -> minuta
 python -m src.main confirmar <id_execucao>    # retoma uma execução parada na confirmação dos dados críticos
 python -m src.main descartar <id_execucao> --justificativa "..." --revisor "..."  # tira da fila uma execução parada, com registro no log
-python -m src.main revisar <id_execucao>      # aprovar, aprovar com correção, rejeitar ou pedir nova geração
+python -m src.main revisar <id_execucao>      # aprovar, aprovar com correção (texto corrigido lido de um arquivo), rejeitar ou pedir nova geração
 python -m src.main audio-minuta <id_execucao>  # áudio da minuta aprovada (RF07)
+python -m src.main verificar-audio <id_execucao>  # transcreve o áudio e compara com o texto aprovado (RF07)
+python -m src.main revisar-audio <id_execucao>    # registra se o áudio ouvido confere (RF07)
 python -m src.main avaliacao                  # esperado contra obtido por caso e taxa de aprovação (RF13)
 python -m src.main gerar-prompt-c              # gera o Prompt C a partir do metaprompt (RF02), se ainda não existir
 python -m src.main experimento-prompts --entrada dados/experimento_rf02/entrada_texto-01.json  # prompts A, B e C (RF02)
@@ -72,7 +76,7 @@ Códigos de saída: `0` sucesso, `1` erro de uso (caso, arquivo ou revisão inv�
 
 | Sintoma | Causa e solução |
 |---|---|
-| `pip install` falha no `openai` | Python abaixo de 3.10 (o do macOS é 3.9). Crie o `.venv` com um Python novo, como em Instalação. |
+| `pip install` falha no `pillow` ou no `openai` | Python abaixo de 3.11 (o do macOS é 3.9). Crie o `.venv` com um Python novo, como em Instalação. |
 | "Chave da API não configurada" | Falta o `.env`. Copie o `.env.example` e preencha `OPENAI_API_KEY` com uma chave da API da OpenAI. |
 | "O provedor recusou a chave da API" | Chave errada ou revogada no `.env`, ou sem acesso ao modelo configurado. |
 | "Limite de requisições ou cota do provedor atingido" | A API não tem camada gratuita: confira o faturamento do projeto da chave. Com faturamento ativo, é limite de taxa: aguarde alguns minutos. |
