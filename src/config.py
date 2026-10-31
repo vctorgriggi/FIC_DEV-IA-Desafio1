@@ -40,7 +40,11 @@ class Config:
         nome = nome or geracao["perfil_ativo"]
         if nome not in geracao["perfis"]:
             raise KeyError(f"Perfil de geração '{nome}' não existe. Perfis: {', '.join(geracao['perfis'])}.")
-        return {"nome": nome, **geracao["perfis"][nome]}
+        perfil = {"nome": nome, **geracao["perfis"][nome]}
+        # Só há um adaptador (ClienteLLM, OpenAI); outro provedor pede outro adaptador, não só outro nome.
+        if perfil["provedor"] != self.dados["provedor"]:
+            raise KeyError(f"Perfil '{nome}' usa o provedor '{perfil['provedor']}', sem adaptador neste projeto.")
+        return perfil
 
     def caso(self, caso_id: str) -> dict:
         for caso in self.dados["casos"]:

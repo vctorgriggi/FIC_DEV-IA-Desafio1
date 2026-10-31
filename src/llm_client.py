@@ -90,8 +90,10 @@ class RespostaEmbeddings:
 
 
 class ClienteLLM:
-    def __init__(self, config: Config, *, chave: str | None = None, sdk: Any = None):
+    def __init__(self, config: Config, *, chave: str | None = None, sdk: Any = None, controle: Any = None):
+        """`controle` (guardrails.ControleRecursos, RF16) é avisado antes de cada chamada e recebe os tokens depois."""
         self.config = config
+        self.controle = controle
         self._chave = chave or carregar_chave()
         if sdk is None:
             if not self._chave:
@@ -146,6 +148,7 @@ class ClienteLLM:
             raise RespostaVazia()
         uso = getattr(resposta, "usage", None)
         entrada_tokens, saida_tokens = getattr(uso, "input_tokens", None), getattr(uso, "output_tokens", None)
+        self._contabilizar(entrada_tokens, saida_tokens)
         preco = self._preco(modelo)
         return RespostaLLM(
             texto=texto,
@@ -174,6 +177,7 @@ class ClienteLLM:
             raise RespostaVazia("Nenhuma fala transcrita. Confira se o áudio contém fala inteligível.")
         uso = getattr(resposta, "usage", None)
         tokens = getattr(uso, "type", None) == "tokens"
+        self._contabilizar(getattr(uso, "total_tokens", None) if tokens else None)
         segundos = getattr(uso, "seconds", None) if getattr(uso, "type", None) == "duration" else None
         por_minuto = self.config.dados.get("precos_usd_por_minuto_audio", {}).get(modelo)
         return RespostaLLM(
@@ -200,6 +204,7 @@ class ClienteLLM:
         if not conteudo:
             raise RespostaVazia("O provedor não retornou áudio.")
         conteudo = _wav_com_tamanhos(conteudo)
+        self._contabilizar()
         return RespostaLLM(
             texto="",
             modelo=modelo,
@@ -230,6 +235,7 @@ class ClienteLLM:
             raise RespostaVazia("O provedor não retornou imagem.")
         uso = getattr(resposta, "usage", None)
         detalhes = getattr(uso, "input_tokens_details", None)
+        self._contabilizar(getattr(uso, "input_tokens", None), getattr(uso, "output_tokens", None))
         preco = self._preco(modelo)
         return RespostaLLM(
             texto="",
@@ -261,6 +267,7 @@ class ClienteLLM:
             raise RespostaMalformada(f"O provedor devolveu {len(dados)} embeddings para {len(textos)} textos.")
         vetores = [list(item.embedding) for item in dados]
         tokens = getattr(getattr(resposta, "usage", None), "prompt_tokens", None)
+        self._contabilizar(tokens)
         return RespostaEmbeddings(
             vetores=vetores,
             modelo=modelo,
@@ -280,16 +287,30 @@ class ClienteLLM:
         return ocultar_segredos(texto, [self._chave or ""])[:500]
 
     def _executar(self, operacao: Callable[[], Any]) -> tuple[Any, float]:
-        inicio = time.perf_counter()
-        try:
-            resultado = self._chamar(operacao)
-        except Exception as erro:
-            convertido = self._converter_erro(erro)
-            if convertido is None:
-                raise
-            # from None: o encadeamento levaria a requisição original para o traceback.
-            raise convertido from None
-        return resultado, round(time.perf_counter() - inicio, 3)
+        # RF16: no máximo limites.repeticoes_falha_transitoria novas tentativas, só para 5xx e conexão.
+        # 429 e timeout não se repetem: o primeiro só atrasaria a mesma recusa, o segundo dobraria a espera.
+        tentativas = 1 + self.config.dados.get("limites", {}).get("repeticoes_falha_transitoria", 0)
+        for tentativa in range(tentativas):
+            if self.controle is not None:
+                self.controle.antes_da_chamada()
+            inicio = time.perf_counter()
+            try:
+                resultado = self._chamar(operacao)
+            except Exception as erro:
+                convertido = self._converter_erro(erro)
+                if convertido is None:
+                    raise
+                transitoria = isinstance(convertido, ServicoIndisponivel) and not isinstance(convertido, TempoEsgotado)
+                if transitoria and tentativa + 1 < tentativas:
+                    continue
+                # from None: o encadeamento levaria a requisição original para o traceback.
+                raise convertido from None
+            return resultado, round(time.perf_counter() - inicio, 3)
+        raise AssertionError("inalcançável: a última tentativa devolve ou levanta")
+
+    def _contabilizar(self, *tokens: int | None) -> None:
+        if self.controle is not None:
+            self.controle.registrar(sum(t for t in tokens if t) or None)
 
     def _chamar(self, operacao: Callable[[], Any]) -> Any:
         """Chama o SDK com prazo de relógio de timeout_segundos, seja qual for o motivo da demora."""
@@ -364,13 +385,26 @@ def entrada_com_anexo(texto: str, *, nome_arquivo: str, mime_type: str, conteudo
 
 
 def _estrito(esquema: Any) -> Any:
+    """Todo objeto fechado e com todas as propriedades obrigatórias, como o modo estrito pede.
+
+    Valor padrão do Pydantic sai do esquema: o modelo preenche sempre todos os campos,
+    e ausência é null, não omissão.
+    """
     if isinstance(esquema, list):
         return [_estrito(item) for item in esquema]
     if not isinstance(esquema, dict):
         return esquema
-    ajustado = {chave: _estrito(valor) for chave, valor in esquema.items()}
+    ajustado: dict = {}
+    for chave, valor in esquema.items():
+        if chave == "default":
+            continue
+        if chave in ("properties", "$defs"):
+            ajustado[chave] = {nome: _estrito(sub) for nome, sub in valor.items()}
+        else:
+            ajustado[chave] = _estrito(valor)
     if ajustado.get("type") == "object":
         ajustado["additionalProperties"] = False
+        ajustado["required"] = list(ajustado.get("properties", {}))
     return ajustado
 
 

@@ -6,7 +6,7 @@ from .config import Config
 from .embeddings import IndiceVetorial
 from .llm_client import ClienteLLM
 from .schemas import RespostaRAG, SolicitacaoEstruturada
-from .tipos import PendenteDeImplementacao
+from .tipos import PendenteDeImplementacao, Resultado
 
 
 def responder(
@@ -16,15 +16,16 @@ def responder(
     cliente: ClienteLLM,
     config: Config,
     perfil: str | None = None,
-) -> RespostaRAG:
+) -> Resultado[RespostaRAG]:
     """RF19 — parte: RAG.
 
     Esperado:
-    - buscar no índice e mandar ao modelo só os trechos recuperados, cada um dentro de prompts.delimitar com o id do trecho;
-    - modelo pelo perfil de geração (config.perfil_geracao(perfil)); prompt versionado em prompts/;
+    - consulta mascarada (privacidade.mascarar) antes de ir ao embedding e ao modelo (RF24, minimização);
+    - mandar ao modelo só os trechos recuperados, cada um dentro de prompts.delimitar com o id do trecho;
+    - saída restrita por schemas.RespostaGerada, com modelo de config.perfil_geracao(perfil) e prompt versionado;
     - status "sem_evidencia" quando nenhum trecho sustenta a resposta, sem texto institucional inventado;
     - status "conflito" quando trechos divergem sem vigência ou prioridade que resolva (DocumentoAcervo.substitui);
-    - toda afirmação institucional cita ids de trechos que estão em `trechos`.
+    - cada afirmação cita ids de trechos que estão em `trechos`.
     """
     raise PendenteDeImplementacao("RF19", "RAG")
 
@@ -37,12 +38,13 @@ def minuta_fundamentada(
     cliente: ClienteLLM,
     config: Config,
     perfil: str | None = None,
-) -> RespostaRAG:
+) -> Resultado[RespostaRAG]:
     """RF19 — parte: RAG.
 
     Esperado:
+    - consulta montada da solicitação (assunto e pedido), mascarada antes de sair da máquina;
     - fatos do caso só da solicitação; orientações institucionais só do acervo; os dois em blocos delimitados separados;
-    - a mesma regra de status de `responder`; sem evidência, a minuta diz o que falta e pede revisão;
+    - a mesma regra de status e de citação por afirmação de `responder`; sem evidência, a minuta diz o que falta;
     - o texto vai para revisão humana (estado "pendente"), nunca para envio.
     """
     raise PendenteDeImplementacao("RF19", "RAG")

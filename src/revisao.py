@@ -15,6 +15,7 @@ from .audit import Auditoria, Evento, agora_iso
 from .comparacao import tokens
 from .config import Config
 from .minuta import cabecalho
+from .schemas import RegistroMinutaRAG
 from .tipos import PendenteDeImplementacao
 
 AGUARDANDO = "aguardando_revisao"
@@ -177,6 +178,24 @@ def registrar_revisao_audio(
     return metadados
 
 
+def caminho_registro_rag(config: Config, id_execucao: str) -> Path:
+    return config.caminho("minutas_rag") / f"{id_execucao}.json"
+
+
+def ler_registro_rag(config: Config, id_execucao: str) -> RegistroMinutaRAG:
+    """Registro de uma minuta do assistente (Desafio 2), validado pelo contrato."""
+    caminho = caminho_registro_rag(config, id_execucao)
+    if not caminho.is_file():
+        raise RevisaoInvalida(f"Nenhuma minuta do assistente com id {id_execucao}.")
+    return RegistroMinutaRAG.model_validate_json(caminho.read_text(encoding="utf-8"))
+
+
+def gravar_registro_rag(config: Config, registro: RegistroMinutaRAG) -> None:
+    caminho = caminho_registro_rag(config, registro.id_execucao)
+    caminho.parent.mkdir(parents=True, exist_ok=True)
+    caminho.write_text(registro.model_dump_json(indent=2), encoding="utf-8")
+
+
 def registrar_decisao_rag(
     config: Config,
     auditoria: Auditoria,
@@ -185,12 +204,13 @@ def registrar_decisao_rag(
     decisao: str,
     justificativa: str,
     revisor: str,
-) -> dict:
+) -> RegistroMinutaRAG:
     """RF20/RF24 — parte: interface.
 
-    Esperado: decisão "aprovar", "rejeitar" ou "revisar" sobre uma minuta de fluxo_rag, levando o status de
-    "pendente" para "aprovada", "rejeitada" ou "revisar" (schemas.StatusMinuta); justificativa e revisor
-    obrigatórios; decisão registrada não muda; evento na auditoria; nada é enviado ao cidadão.
+    Esperado: ler_registro_rag; só status "pendente" aceita decisão ("bloqueada" não tem minuta para decidir);
+    "aprovar", "rejeitar" ou "revisar" levam a "aprovada", "rejeitada" ou "revisar" (schemas.StatusMinuta);
+    justificativa e revisor obrigatórios, em DecisaoOperador; decisão registrada não muda; gravar_registro_rag;
+    evento na auditoria; nada é enviado ao cidadão.
     """
     raise PendenteDeImplementacao("RF20", "interface")
 

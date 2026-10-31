@@ -3,9 +3,13 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from typing import Generic, TypeVar
 
 from .llm_client import RespostaLLM
 from .prompts import Prompt
+
+
+T = TypeVar("T")
 
 
 class PendenteDeImplementacao(NotImplementedError):
@@ -30,4 +34,17 @@ class TextoExtraido:
     # Ex.: idioma e duração do áudio (RF06), páginas do documento (RF08).
     metadados: dict = field(default_factory=dict)
     resposta: RespostaLLM | None = None
+    prompt: Prompt | None = None
+
+
+@dataclass
+class Resultado(Generic[T]):
+    """Saída de uma parte do Desafio 2 com o que a auditoria precisa (RF21).
+
+    `respostas` traz tempo, tokens e custo de cada chamada (mais de uma quando houve
+    a tentativa de correção do RF14); `prompt` dá versão e hash para o log.
+    """
+
+    valor: T
+    respostas: list[RespostaLLM] = field(default_factory=list)
     prompt: Prompt | None = None

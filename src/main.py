@@ -242,15 +242,17 @@ def cmd_interface(config: Config, args: argparse.Namespace) -> None:
     uvicorn.run(criar_app(config), host="127.0.0.1", port=args.porta, log_level="warning")
 
 
-def cmd_assistente(config: Config, args: argparse.Namespace) -> None:
+def cmd_assistente(config: Config, args: argparse.Namespace) -> int:
     app = config.raiz / "src" / "app.py"
     print(f"Assistente de documentos em http://127.0.0.1:{args.porta}  (Ctrl+C para encerrar)", flush=True)
     # python -m streamlit põe a raiz do projeto no sys.path, e o app importa o pacote src.
-    subprocess.run(
+    processo = subprocess.run(
         [sys.executable, "-m", "streamlit", "run", str(app), "--server.address", "127.0.0.1",
          "--server.port", str(args.porta), "--server.headless", "true", "--browser.gatherUsageStats", "false"],
         cwd=config.raiz, check=False,
     )
+    # Porta ocupada ou Streamlit ausente não pode sair com código de sucesso.
+    return processo.returncode
 
 
 def montar_parser() -> argparse.ArgumentParser:
@@ -326,7 +328,7 @@ def montar_parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     args = montar_parser().parse_args(argv)
     try:
-        args.funcao(carregar_config(), args)
+        codigo = args.funcao(carregar_config(), args)
     except PendenteDeImplementacao as erro:
         print(f"Pendente: {erro}", file=sys.stderr)
         return SAIDA_PENDENTE
@@ -339,7 +341,7 @@ def main(argv: list[str] | None = None) -> int:
     except (KeyboardInterrupt, EOFError):
         print("\nOperação cancelada; nada foi registrado como decisão.", file=sys.stderr)
         return SAIDA_CANCELADA
-    return 0
+    return codigo or 0
 
 
 if __name__ == "__main__":

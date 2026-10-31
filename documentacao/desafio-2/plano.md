@@ -9,15 +9,27 @@ Entrega: **02/11/2026, 23h59** (ver `enunciado/desafio-2/README.md`). Enunciado 
 | Dependências (Chroma, Streamlit, pypdf, Pydantic) | `requirements.txt` | Pronta |
 | Embeddings, perfis de geração (principal `gpt-6.1-terra`, alternativo `gpt-6-luna`), pastas, chunking A e B, limites | `config.json`, `Config.perfil_geracao` | Pronta |
 | Embeddings pelo cliente único | `ClienteLLM.gerar_embeddings` | Pronta, com teste |
-| Contratos entre as partes | `src/schemas.py` (`ESQUEMA_VERSAO = "2.0"`) | Pronta, com teste |
-| Leitura e validação do manifesto do acervo | `ingestion.ler_manifesto` | Pronta, com teste |
+| Repetição única em falha transitória (5xx, conexão) e gancho de limites | `ClienteLLM(controle=...)` | Pronta, com teste; o controle em si é do Estudante 3 |
+| Contratos entre as partes, com esquema estrito para o modelo | `src/schemas.py` (`ESQUEMA_VERSAO = "2.0"`), `llm_client.formato_json` | Pronta, com teste |
+| Registro da minuta do assistente (pendente, aprovada, rejeitada, revisar, bloqueada) | `schemas.RegistroMinutaRAG`, `revisao.ler_registro_rag` e `gravar_registro_rag` | Pronta, com teste |
+| Saída das partes com respostas e prompt para a auditoria | `tipos.Resultado` | Pronta |
+| Exemplos válidos de cada contrato, para testar uma parte sem esperar as outras | `testes/exemplos.py` | Prontos |
+| Leitura validada das avaliações | `sentiment.ler_avaliacoes` | Pronta, com teste |
+| Leitura e validação do manifesto do acervo (inclusive `substitui`) | `ingestion.ler_manifesto` | Pronta, com teste |
 | Proporção com numerador e denominador (sem divisão por zero) | `metrics.proporcao` | Pronta, com teste |
 | Assistente Streamlit com as quatro telas ligadas às partes | `src/app.py`, `python -m src.main assistente` | Pronta; cada tela avisa a parte que falta |
-| Esqueletos de cada parte, com o que se espera na docstring | `nlp.py`, `ingestion.py`, `embeddings.py`, `rag.py`, `fluxo_rag.py`, `guardrails.py`, `sentiment.py`, `metrics.py`, `revisao.registrar_decisao_rag` | Levantam `PendenteDeImplementacao` |
+| Esqueletos de cada parte, com o que se espera na docstring | `nlp.py`, `ingestion.py`, `embeddings.py`, `rag.py`, `fluxo_rag.py`, `guardrails.py`, `sentiment.py`, `metrics.py` (uma função reservada por parte), `revisao.registrar_decisao_rag` | Levantam `PendenteDeImplementacao` |
 | Modelos de gabarito | `dados/gabaritos/_modelo_*.json` | Prontos |
 | Pastas | `dados/acervo/` (manifesto vazio), `dados/avaliacoes/`, `resultados/minutas_rag/`, `resultados/metricas/`, `indice/` (fora do git) | Prontas |
 
-Implementar uma parte é trocar o `raise PendenteDeImplementacao` pelo código, com testes que usem `testes/falsos.py` (nenhum teste chama a API). `testes/test_base_desafio2.py::test_partes_pendentes_avisam_qual_requisito_falta` lista as funções pendentes: tire da lista o que você implementar.
+Implementar uma parte é trocar o `raise PendenteDeImplementacao` pelo código, com testes que usem `testes/falsos.py` e `testes/exemplos.py` (nenhum teste chama a API). Cada estudante tem o seu arquivo de pendências: `testes/test_d2_nlp.py`, `test_d2_indice_rag.py` e `test_d2_guardrails_sentimentos.py`. Ao implementar uma função, apague a linha dela ali.
+
+Como as partes se encaixam:
+
+- Toda função que gera texto recebe `perfil` (de `config.perfil_geracao`) e devolve `tipos.Resultado` com o valor, as respostas do provedor e o prompt; é daí que o fluxo tira tokens, custo, latência e versão do prompt para a auditoria (RF21).
+- O esquema de saída pedido ao modelo sai do próprio modelo Pydantic: `formato_json(SolicitacaoEstruturada.model_json_schema(), "solicitacao")`. A validação usa `model_validate_json`, que não converte `"true"` em booleano (RF14).
+- Categoria e entidades vêm só da `SolicitacaoEstruturada`; a `FichaCompreensao` acrescenta resumo e inferências.
+- O fluxo do Estudante 2 grava um `RegistroMinutaRAG`; a revisão do Estudante 3 lê e atualiza esse mesmo registro. Cada um testa com `exemplos.registro(...)` sem esperar o outro.
 
 ## Divisão (seção 5 do enunciado)
 
@@ -31,17 +43,17 @@ Implementar uma parte é trocar o `raise PendenteDeImplementacao` pelo código, 
 - 12 avaliações em `dados/avaliacoes/avaliacoes.json` (`[{"id", "texto"}]`): 3 positivas, 3 negativas, 3 neutras, 3 ambíguas ou mistas. Gabarito: `_modelo_sentimentos.json`, com a regra de ambiguidade escrita.
 - 3 ataques: instrução maliciosa na solicitação, no acervo e tentativa de obter segredo. Gabarito: `_modelo_ataque.json`.
 
-**Depois:** `src/nlp.py` (extração validada com no máximo uma correção, regras de negócio, comparação JSON sintático e esquema, ficha de compreensão) e os prompts versionados em `prompts/`. Testes do enunciado: T01, T02, T03. Métrica: acurácia de categoria com `metrics.proporcao`.
+**Depois:** `src/nlp.py` (extração validada com no máximo uma correção, regras de negócio, comparação JSON sintático e esquema, ficha de compreensão), `metrics.acuracia_categorias` e os prompts versionados em `prompts/`. Testes do enunciado: T01, T02, T03. Métrica: acurácia de categoria com `metrics.proporcao`.
 
 ### Estudante 2 — embeddings, índice, RAG e abstração de provedor (RF17, RF18, RF19, RF21)
 
-`ingestion.extrair_texto` e `dividir`, `embeddings.IndiceVetorial` (Chroma persistente, upsert sem duplicar, exclusão por documento), `rag.responder` e `minuta_fundamentada`, e `fluxo_rag.processar_solicitacao` com a auditoria do RF21. Experimento de chunking A contra B com as 5 perguntas respondíveis (RF18). Demonstração da troca para o perfil `alternativo` sem reindexar. Testes: T06, T07, T08, T09, T10, T12, T14.
+`ingestion.extrair_texto`, `dividir`, `incluir_documento` e `excluir_documento`, `embeddings.IndiceVetorial` (Chroma persistente, upsert sem duplicar, trechos antigos apagados quando o arquivo muda, exclusão em todas as coleções), `metrics.acerto_recuperacao`, `rag.responder` e `minuta_fundamentada`, e `fluxo_rag.processar_solicitacao` com a auditoria do RF21. Experimento de chunking A contra B com as 5 perguntas respondíveis (RF18). Demonstração da troca para o perfil `alternativo` sem reindexar. Testes: T06, T07, T08, T09, T10, T12, T14.
 
 Até os dados do Estudante 1 chegarem, dá para desenvolver com documentos de teste em `tmp_path`.
 
 ### Estudante 3 — guardrails, Streamlit, sentimentos e painel (RF16, RF20, RF22)
 
-`src/guardrails.py` (entrada, trechos e saída; `ControleRecursos` com teto de chamadas e tokens e no máximo uma repetição por falha transitória), `sentiment.classificar`, `metrics.agregar_sentimentos` com o gráfico do painel, `revisao.registrar_decisao_rag` (estados pendente, aprovada, rejeitada, revisar) e o acabamento de `src/app.py`. Testes: T04, T05, T11, T13.
+`src/guardrails.py` (entrada, arquivo, trechos e saída; `ControleRecursos` com `antes_da_chamada` e `registrar`, para o teto de chamadas e tokens; a repetição única já está no cliente), `sentiment.classificar`, `metrics.agregar_sentimentos` com o gráfico do painel, `revisao.registrar_decisao_rag` (estados pendente, aprovada, rejeitada, revisar) e o acabamento de `src/app.py`. Testes: T04, T05, T11, T13.
 
 ### Todos, no fim (RF23, RF24 e entrega)
 
@@ -63,5 +75,4 @@ Até os dados do Estudante 1 chegarem, dá para desenvolver com documentos de te
 
 ## Decisões em aberto do grupo
 
-- **Acervo:** os editais em `enunciado/desafio-2/arquivos/` são documentos públicos reais, e a seção 16 pede documentos criados para o exercício. Usá-los como acervo (com um segundo tema em TXT escrito pelo grupo) ou escrever um acervo fictício inspirado neles? Vale confirmar com o professor.
-- **Categorias:** o RF15 pede "outros" ou "revisão" entre as categorias; hoje `config.json` tem as cinco do Desafio 1, e a extração usa "não localizado" fora delas.
+Acervo (editais reais ou acervo fictício) e categorias "outros" ou "revisão": ver "Decisões em aberto" no `AGENTS.md`. Os editais são documentos públicos reais, e a seção 16 pede documentos criados para o exercício; vale confirmar com o professor. A decisão do acervo trava o primeiro passo do Estudante 1: até ela sair, os Estudantes 2 e 3 seguem com dados de teste.

@@ -7,12 +7,13 @@ reproduzir o texto bloqueado nem segredo.
 from __future__ import annotations
 
 from .config import Config
+from .llm_client import ErroLLM
 from .schemas import DecisaoGuardrail, RespostaRAG, TrechoRecuperado
 from .tipos import PendenteDeImplementacao
 
 
-class LimiteExecucao(Exception):
-    """Teto de chamadas ou de tokens da execução atingido (config["limites"])."""
+class LimiteExecucao(ErroLLM):
+    mensagem_padrao = "Limite de chamadas ou de tokens desta execução atingido (limites no config.json)."
 
 
 def verificar_entrada(texto: str, *, config: Config) -> DecisaoGuardrail:
@@ -20,6 +21,15 @@ def verificar_entrada(texto: str, *, config: Config) -> DecisaoGuardrail:
 
     Esperado: comprimento (limites.max_caracteres_solicitacao), escopo do atendimento e moderação por regras
     documentadas ou serviço; tentativa de obter segredo ou de mudar regras vira "bloquear" ou "revisar".
+    """
+    raise PendenteDeImplementacao("RF16", "guardrails")
+
+
+def verificar_arquivo(nome: str, tamanho_bytes: int, *, config: Config) -> DecisaoGuardrail:
+    """RF16 — parte: guardrails.
+
+    Esperado: extensão em acervo.extensoes e tamanho até acervo.tamanho_max_mb para documento incluído pela
+    interface; arquivo excessivo é "bloquear" (T05), com o motivo sem o conteúdo do arquivo.
     """
     raise PendenteDeImplementacao("RF16", "guardrails")
 
@@ -43,15 +53,19 @@ def verificar_saida(resposta: RespostaRAG, *, config: Config) -> DecisaoGuardrai
 
 
 class ControleRecursos:
-    """RF16 — parte: guardrails.
+    """RF16 — parte: guardrails. Uma instância por execução, passada a ClienteLLM(controle=...).
 
-    Esperado: conta chamadas e tokens de uma execução e levanta LimiteExecucao ao passar de
-    limites.max_chamadas_por_execucao ou limites.max_tokens_por_execucao; no máximo
-    limites.repeticoes_falha_transitoria nova tentativa para falha transitória (ServicoIndisponivel).
+    Esperado: antes_da_chamada levanta LimiteExecucao quando a próxima chamada passaria de
+    limites.max_chamadas_por_execucao ou quando os tokens já passaram de limites.max_tokens_por_execucao;
+    registrar soma os tokens (None quando o provedor não informa, como na voz). A repetição única em falha
+    transitória já está no ClienteLLM e conta como chamada.
     """
 
     def __init__(self, config: Config):
         self.config = config
+
+    def antes_da_chamada(self) -> None:
+        raise PendenteDeImplementacao("RF16", "guardrails")
 
     def registrar(self, tokens: int | None) -> None:
         raise PendenteDeImplementacao("RF16", "guardrails")

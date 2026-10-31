@@ -12,6 +12,7 @@ source .venv/bin/activate      # Python >= 3.11 (Pillow 13); o 3.9 do macOS não
 python -m pytest               # não chama a API
 python -m src.main verificar   # versões, chave e arquivos dos casos
 python -m src.main interface   # interface local em http://127.0.0.1:8000
+python -m src.main assistente  # assistente do Desafio 2 (Streamlit) em http://127.0.0.1:8501
 ```
 
 Não há lint nem typecheck configurados.
@@ -78,11 +79,15 @@ Desafio 2 em andamento: base, contratos e divisão por estudante em
   API (`client.responses.create`); texto, transcrição, voz e imagem têm cada
   um seu método em `ClienteLLM`.
 - Agente liga repetições do SDK → o cliente usa `max_retries=0` e prazo de
-  relógio: repetir um 429 de cota esgotada só atrasa a mesma recusa.
+  relógio: repetir um 429 de cota esgotada só atrasa a mesma recusa. A única
+  repetição (5xx e conexão, RF16) fica em `ClienteLLM._executar`.
 - RF07 depois de 06/01/2027 → todos os modelos da Speech API desligam nessa
   data; o substituto indicado só roda pela Realtime API. Trocar de modelo
   dentro da Speech API não resolve.
 
 ## Decisões em aberto
 
-Nenhuma pendente.
+- Desafio 2, acervo: usar os editais reais de `enunciado/desafio-2/arquivos/` ou
+  escrever um acervo fictício. Bloqueia os dados do Estudante 1.
+- Desafio 2, categorias: acrescentar "outros" ou "revisão" (RF15) às de
+  `config.json`; `nlp.validar_regras` bloqueia categoria fora da lista.

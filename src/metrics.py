@@ -1,4 +1,7 @@
-"""Métricas determinísticas (RF18, RF22, RF23): contagem por código, com numerador e denominador visíveis."""
+"""Métricas determinísticas (RF15, RF18, RF22, RF23): contagem por código, com numerador e denominador visíveis.
+
+Uma função por parte, já reservada aqui, para que cada estudante preencha a sua sem conflito de merge.
+"""
 
 from __future__ import annotations
 
@@ -15,6 +18,24 @@ def proporcao(numerador: int, denominador: int) -> dict:
         "denominador": denominador,
         "valor": round(numerador / denominador, 3) if denominador else None,
     }
+
+
+def acuracia_categorias(obtidas: dict[str, str | None], esperadas: dict[str, str]) -> dict:
+    """RF15/RF23 — parte: NLP.
+
+    Esperado: por id de solicitação, categoria obtida contra a do gabarito; proporção de acertos sobre as
+    solicitações com gabarito e a lista das divergências. Sem gabarito, a solicitação não entra no denominador.
+    """
+    raise PendenteDeImplementacao("RF15", "NLP")
+
+
+def acerto_recuperacao(recuperados: dict[str, list[str]], referencias: dict[str, list[str]]) -> dict:
+    """RF18/RF23 — parte: índice.
+
+    Esperado: pergunta conta como acerto se ao menos um id de trecho de referência está no top-k recuperado;
+    proporção sobre as perguntas respondíveis (cinco), com o resultado de cada pergunta.
+    """
+    raise PendenteDeImplementacao("RF18", "índice")
 
 
 def agregar_sentimentos(avaliacoes: list[AvaliacaoSentimento], *, polaridades: list[str] | None = None) -> dict:
