@@ -35,11 +35,11 @@ def test_tres_prompts_com_mesmo_modelo_parametros_sistema_e_entrada(config, audi
     pasta = config.caminho("experimentos") / metricas["id_execucao"]
     assert json.loads((pasta / "metricas.json").read_text(encoding="utf-8")) == metricas
     eventos = auditoria.eventos(caso_id="experimento-rf02")
-    assert [e["versao_prompt"] for e in eventos] == ["minuta_a_v1", "minuta_b_v1", "minuta_c_v2"]
+    assert [e["versao_prompt"] for e in eventos] == ["minuta_a_v1", "minuta_b_v1", "minuta_c_v3"]
 
 
 def test_prompt_c_vem_do_metaprompt_e_nao_sobrescreve(config, auditoria):
-    (config.caminho("prompts") / "minuta_c_v2.md").unlink(missing_ok=True)
+    (config.caminho("prompts") / "minuta_c_v3.md").unlink(missing_ok=True)
     sdk = SDKFalso(resposta("```markdown\n# PROMPT C\nRedija a minuta.\n```"))
     cliente = ClienteLLM(config, chave="c", sdk=sdk)
     destino = gerar_prompt_c(config=config, cliente=cliente, auditoria=auditoria)
