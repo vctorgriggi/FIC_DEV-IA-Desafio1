@@ -189,6 +189,7 @@ class ClienteLLM:
         conteudo = getattr(resposta, "content", None)
         if not conteudo:
             raise RespostaVazia("O provedor não retornou áudio.")
+        conteudo = _wav_com_tamanhos(conteudo)
         return RespostaLLM(
             texto="",
             modelo=modelo,
@@ -340,6 +341,37 @@ def _estrito(esquema: Any) -> Any:
     if ajustado.get("type") == "object":
         ajustado["additionalProperties"] = False
     return ajustado
+
+
+_TAMANHO_DESCONHECIDO = 0xFFFFFFFF
+
+
+def _wav_com_tamanhos(conteudo: bytes) -> bytes:
+    """Preenche os tamanhos de um WAV gerado em streaming; qualquer outro WAV volta intacto.
+
+    A Speech API devolve o RIFF e o bloco data com tamanho 0xFFFFFFFF, como em
+    streaming; sem o tamanho real, o arquivo não passa em audio.validar_wav.
+    """
+    if conteudo[:4] != b"RIFF" or conteudo[8:12] != b"WAVE" or int.from_bytes(conteudo[4:8], "little") != _TAMANHO_DESCONHECIDO:
+        return conteudo
+    posicao = 12
+    while posicao + 8 <= len(conteudo):
+        bloco, tamanho = conteudo[posicao:posicao + 4], int.from_bytes(conteudo[posicao + 4:posicao + 8], "little")
+        if bloco == b"data":
+            if tamanho != _TAMANHO_DESCONHECIDO:
+                return conteudo
+            dados = len(conteudo) - (posicao + 8)
+            return b"".join(
+                [
+                    b"RIFF",
+                    (len(conteudo) - 8).to_bytes(4, "little"),
+                    conteudo[8:posicao + 4],
+                    dados.to_bytes(4, "little"),
+                    conteudo[posicao + 8:],
+                ]
+            )
+        posicao += 8 + tamanho + tamanho % 2
+    return conteudo
 
 
 def _custo(partes: list[tuple[int | None, float | None]]) -> float | None:

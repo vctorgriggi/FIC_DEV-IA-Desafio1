@@ -248,3 +248,37 @@ def test_resposta_com_falha_do_provedor(config):
     falhou = resposta("", status="failed")
     with pytest.raises(ServicoIndisponivel):
         ClienteLLM(config, chave=CHAVE_FALSA, sdk=SDKFalso(falhou)).gerar(modelo="gpt-6.1-terra", entrada="oi")
+
+
+def _wav(frames=b"\x00\x01" * 2400):
+    import io
+    import wave
+
+    destino = io.BytesIO()
+    with wave.open(destino, "wb") as w:
+        w.setparams((1, 2, 24000, 0, "NONE", "not compressed"))
+        w.writeframes(frames)
+    return destino.getvalue()
+
+
+def test_wav_em_streaming_ganha_os_tamanhos_reais(config):
+    from src.audio import validar_wav
+
+    completo = _wav()
+    # Como a Speech API devolve: RIFF e data com tamanho 0xFFFFFFFF.
+    streaming = completo[:4] + b"\xff\xff\xff\xff" + completo[8:40] + b"\xff\xff\xff\xff" + completo[44:]
+    obtida = ClienteLLM(config, chave=CHAVE_FALSA, sdk=SDKFalso(audio(streaming))).sintetizar_voz(
+        modelo="gpt-4o-mini-tts", texto="oi", voz="marin", instrucoes="calmo"
+    )
+    assert obtida.conteudo == completo
+    assert validar_wav(obtida.conteudo)["duracao_audio_s"] == 0.1
+
+
+def test_wav_com_tamanhos_ou_quebrado_nao_e_alterado(config):
+    completo = _wav()
+    so_riff = completo[:4] + b"\xff\xff\xff\xff" + completo[8:]
+    for conteudo in (completo, so_riff, b"RIFF invalido"):
+        obtida = ClienteLLM(config, chave=CHAVE_FALSA, sdk=SDKFalso(audio(conteudo))).sintetizar_voz(
+            modelo="gpt-4o-mini-tts", texto="oi", voz="marin", instrucoes="calmo"
+        )
+        assert obtida.conteudo == conteudo
