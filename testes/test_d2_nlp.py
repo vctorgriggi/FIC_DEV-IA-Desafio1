@@ -154,3 +154,75 @@ def test_comparacao_json_invalido_e_esquema_invalido_sao_independentes(config):
 def test_conjunto_completo_dos_dados_validado():
     from scripts.validar_dados_d2 import validar
     assert validar()['ids_unicos']==35
+
+
+@pytest.mark.parametrize('id', [f'D2-S{i:02}' for i in range(1,7)])
+def test_t03_compreensao_dos_seis_casos_sem_reclassificar(config,id):
+    dados,texto=dados_caso(id)
+    s=SolicitacaoEstruturada.model_validate(dados)
+    # Passagens escritas antes da execução simulada, com pedido e contexto.
+    resumos={
+        'D2-S01':'Meu protocolo é 2026-000142, de 14 de outubro de 2026. … Meu nome é Marcos Vinícius de Almeida Santos … quero pedir a efetivação da minha matrícula no curso técnico em enfermagem do eixo tecnológico de saúde, com carga horária de 1.200 horas, no turno noturno. … Peço que informe quais os documentos ainda preciso apresentar.',
+        'D2-S02':'Lia Exemplo … Solicito emissão de declaração de matrícula.',
+        'D2-S03':'Ivo Exemplo … Solicito cancelamento da matrícula.',
+        'D2-S04':'Bia Exemplo … Reclamo da demora no atendimento e peço registro da reclamação.',
+        'D2-S05':'FICHA DE MATRÍCULA … CÓDIGO: 202[ilegível]-000142 … NOME: MARCOS VINICIUS DE ALMEIDA SANTOS … TURNO: NOTURNO … DATA MATRÍCULA: 14/10/2026',
+        'D2-S06':'Rui Exemplo … Quero resolver minha matrícula; talvez cancelar, talvez apenas saber como continuar. Não decidi.',
+    }
+    ficha={'resumo':resumos[id],'inferencias':[]}
+    cliente,sdk=cliente_falso(config,[ficha])
+    resultado=nlp.compreender(texto,s,origem=id,cliente=cliente,config=config)
+    assert resultado.valor.model_dump()==ficha
+    assert len(resultado.valor.resumo.split())<=100
+    assert s.model_dump()==dados
+    assert resultado.prompt.identificador=='compreensao_d2_v1'
+    assert len(sdk.chamadas)==1
+
+
+def test_inferencias_separadas_justificadas_e_sem_preencher_fatos(config):
+    dados,texto=dados_caso()
+    ficha={'resumo':'Solicito emissão de declaração de matrícula.',
+           'inferencias':[{'campo':'encaminhamento_sugerido','valor':'consulta à secretaria',
+                           'justificativa':'Sugestão de revisão pelo tema do pedido; o texto não confirma encaminhamento.'}]}
+    cliente,_=cliente_falso(config,[ficha])
+    s=SolicitacaoEstruturada.model_validate(dados)
+    resultado=nlp.compreender(texto,s,origem='T03',cliente=cliente,config=config)
+    assert resultado.valor.inferencias[0].justificativa
+    assert s.solicitante=='Lia Exemplo'
+    assert 'consulta à secretaria' not in resultado.valor.resumo
+
+
+@pytest.mark.parametrize('alteracao', [
+    {'resumo':'palavra '*101},
+    {'resumo':''},
+    {'resumo':'A matrícula foi aprovada.'},
+    {'resumo':'Protocolo 2026-999999'},
+    {'categoria':'informacao'},
+    {'inferencias':[{'campo':'nome','valor':'X','justificativa':''}]},
+    {'inferencias':[{'campo':'solicitante','valor':'X','justificativa':'Suposição'}]},
+])
+def test_compreensao_recusa_fatos_inventados_resumo_longo_e_inferencias_invalidas(config,alteracao):
+    dados,texto=dados_caso()
+    ficha={**{'resumo':'Solicito emissão de declaração de matrícula.','inferencias':[]},**alteracao}
+    cliente,sdk=cliente_falso(config,[ficha])
+    with pytest.raises(RespostaMalformada):
+        nlp.compreender(texto,SolicitacaoEstruturada.model_validate(dados),origem='T03',cliente=cliente,config=config)
+    assert len(sdk.chamadas)==1
+
+
+def test_compreensao_bloqueia_antes_da_api_se_solicitacao_incoerente(config):
+    dados,texto=dados_caso()
+    dados['protocolo']='2026-999999'
+    cliente,sdk=cliente_falso(config,[])
+    with pytest.raises(RespostaMalformada):
+        nlp.compreender(texto,SolicitacaoEstruturada.model_validate(dados),origem='T03',cliente=cliente,config=config)
+    assert not sdk.chamadas
+
+
+def test_acuracia_com_numerador_denominador_percentual_e_divergencias():
+    obtido=metrics.acuracia_categorias({'A':'matricula','B':'informacao','sem_gabarito':'reclamacao'},
+                                       {'A':'matricula','B':'cancelamento','C':'reclamacao'})
+    assert obtido=={'numerador':1,'denominador':3,'valor':0.333,'percentual':33.33,
+                    'divergencias':[{'id':'B','esperada':'cancelamento','obtida':'informacao'},
+                                    {'id':'C','esperada':'reclamacao','obtida':None}]}
+    assert metrics.acuracia_categorias({}, {})=={'numerador':0,'denominador':0,'valor':None,'percentual':None,'divergencias':[]}

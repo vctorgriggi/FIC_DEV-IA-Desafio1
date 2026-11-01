@@ -192,6 +192,43 @@ def comparar_sintatico_e_esquema(texto: str, *, origem: str, cliente: ClienteLLM
 
 def compreender(texto: str, solicitacao: SolicitacaoEstruturada, *, origem: str,
                 cliente: ClienteLLM, config: Config, perfil: str | None = None) -> Resultado[FichaCompreensao]:
-    """RF15 — implementado na próxima entrega."""
-    from .tipos import PendenteDeImplementacao
-    raise PendenteDeImplementacao('RF15', 'NLP')
+    """Resumo extrativo com até 100 palavras; inferências separadas e justificadas.
+
+    Trechos sem suporte são recusados; revisão humana ainda verifica seleção,
+    negações e fatos essenciais. Categoria e entidades nunca são regeneradas.
+    """
+    problemas = validar_regras(solicitacao, _seguro(texto, config), config=config)
+    if problemas:
+        raise RespostaMalformada('RF15: solicitação incoerente; compreensão bloqueada.',
+                                 detalhe=json.dumps(problemas, ensure_ascii=False))
+    prompt = carregar_prompt(config, 'compreensao_d2', 1)
+    original = _seguro(texto, config)
+    entrada = (prompt.texto + '\n' + delimitar(original, origem) + '\n'
+               + delimitar(_seguro(solicitacao.model_dump_json(), config), 'solicitacao_estruturada'))
+    resposta = _chamar(cliente, config, perfil, entrada,
+                       formato_json(FichaCompreensao.model_json_schema(), 'compreensao'))
+    erros = []
+    try:
+        _json(resposta.texto)
+        ficha = FichaCompreensao.model_validate_json(resposta.texto)
+        normalizado = ' '.join(original.split())
+        partes = ficha.resumo.split(' … ')
+        if any(not parte.strip() or ' '.join(parte.split()) not in normalizado for parte in partes):
+            erros.append('resumo: passagem sem suporte literal no original.')
+        for inferencia in ficha.inferencias:
+            if not all(v.strip() for v in (inferencia.campo, inferencia.valor, inferencia.justificativa)):
+                erros.append('inferencias: campo, valor e justificativa precisam estar preenchidos.')
+            if inferencia.campo.lower() in {*CAMPOS, 'entidades'}:
+                erros.append('inferencias: não podem substituir campos da solicitação.')
+        if _seguro(resposta.texto, config) != resposta.texto:
+            erros.append('compreensao: dado pessoal ou segredo indevidamente reproduzido.')
+        if not erros:
+            return Resultado(ficha, [resposta], prompt)
+    except ValidationError as erro:
+        erros = _erros_esquema(erro)
+    except ValueError:
+        erros = ['JSON inválido.']
+    erro = RespostaMalformada('RF15: ficha inválida; requer revisão humana.',
+                             detalhe=json.dumps(erros, ensure_ascii=False))
+    erro.respostas, erro.prompt = [resposta], prompt
+    raise erro

@@ -26,7 +26,18 @@ def acuracia_categorias(obtidas: dict[str, str | None], esperadas: dict[str, str
     Esperado: por id de solicitação, categoria obtida contra a do gabarito; proporção de acertos sobre as
     solicitações com gabarito e a lista das divergências. Sem gabarito, a solicitação não entra no denominador.
     """
-    raise PendenteDeImplementacao("RF15", "NLP")
+    divergencias = [
+        {"id": identificador, "esperada": esperada, "obtida": obtidas.get(identificador)}
+        for identificador, esperada in sorted(esperadas.items())
+        if obtidas.get(identificador) != esperada
+    ]
+    denominador = len(esperadas)
+    numerador = denominador - len(divergencias)
+    return {
+        **proporcao(numerador, denominador),
+        "percentual": round(100 * numerador / denominador, 2) if denominador else None,
+        "divergencias": divergencias,
+    }
 
 
 def acerto_recuperacao(recuperados: dict[str, list[str]], referencias: dict[str, list[str]]) -> dict:
