@@ -1,0 +1,52 @@
+{
+  "caso_id": "D2-S03",
+  "arquivo": "dados/originais/desafio-2/D2-S03.txt",
+  "elaborado_por": "Integrante 1 com apoio de IA; revisão do grupo pendente",
+  "elaborado_em": "2026-10-31",
+  "tipo": "completa",
+  "solicitacao_esperada": {
+    "protocolo": "2026-000202",
+    "data": "15/10/2026",
+    "solicitante": "Ivo Exemplo",
+    "assunto": "cancelamento",
+    "pedido": "Solicito cancelamento da matrícula.",
+    "categoria": "cancelamento",
+    "campos_ausentes": [],
+    "necessita_revisao": false,
+    "motivo_revisao": ""
+  },
+  "entidades_esperadas": {
+    "pessoas": [
+      "Ivo Exemplo"
+    ],
+    "orgaos": [
+      "Escola Técnica Fictícia Horizonte"
+    ],
+    "locais": [
+      "Vila Exemplo"
+    ],
+    "datas": [
+      "15/10/2026"
+    ],
+    "protocolos": [
+      "2026-000202"
+    ]
+  },
+  "fatos_essenciais": [
+    "Ivo Exemplo",
+    "cancelamento"
+  ],
+  "fontes_esperadas": [],
+  "decisao_esperada": "aprovar",
+  "justificativa_rotulo": "Pedido explícito; categoria definida pela providência solicitada.",
+  "campos_presentes": [
+    "protocolo",
+    "data",
+    "solicitante",
+    "assunto",
+    "pedido",
+    "categoria"
+  ],
+  "resumo_esperado": "Ivo Exemplo solicita cancelamento da matrícula.",
+  "criterio_avaliacao": "Categoria exata, entidades literais, fatos essenciais preservados; paráfrases no resumo são aceitas; nenhuma ação concluída inventada."
+}

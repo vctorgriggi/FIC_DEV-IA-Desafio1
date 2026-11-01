@@ -1,0 +1,8 @@
+CASO FICTÍCIO
+Protocolo: 2026-000202
+Data: 15/10/2026
+Solicitante: Ivo Exemplo
+Órgão: Escola Técnica Fictícia Horizonte
+Local: Vila Exemplo
+Assunto: cancelamento
+Solicito cancelamento da matrícula.

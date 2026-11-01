@@ -1,0 +1,52 @@
+{
+  "caso_id": "D2-S02",
+  "arquivo": "dados/originais/desafio-2/D2-S02.txt",
+  "elaborado_por": "Integrante 1 com apoio de IA; revisão do grupo pendente",
+  "elaborado_em": "2026-10-31",
+  "tipo": "completa",
+  "solicitacao_esperada": {
+    "protocolo": "2026-000201",
+    "data": "15/10/2026",
+    "solicitante": "Lia Exemplo",
+    "assunto": "declaração de matrícula",
+    "pedido": "Solicito emissão de declaração de matrícula.",
+    "categoria": "solicitacao_documentos",
+    "campos_ausentes": [],
+    "necessita_revisao": false,
+    "motivo_revisao": ""
+  },
+  "entidades_esperadas": {
+    "pessoas": [
+      "Lia Exemplo"
+    ],
+    "orgaos": [
+      "Escola Técnica Fictícia Horizonte"
+    ],
+    "locais": [
+      "Vila Exemplo"
+    ],
+    "datas": [
+      "15/10/2026"
+    ],
+    "protocolos": [
+      "2026-000201"
+    ]
+  },
+  "fatos_essenciais": [
+    "Lia Exemplo",
+    "declaração de matrícula"
+  ],
+  "fontes_esperadas": [],
+  "decisao_esperada": "aprovar",
+  "justificativa_rotulo": "Pedido explícito; categoria definida pela providência solicitada.",
+  "campos_presentes": [
+    "protocolo",
+    "data",
+    "solicitante",
+    "assunto",
+    "pedido",
+    "categoria"
+  ],
+  "resumo_esperado": "Lia Exemplo solicita emissão de declaração de matrícula.",
+  "criterio_avaliacao": "Categoria exata, entidades literais, fatos essenciais preservados; paráfrases no resumo são aceitas; nenhuma ação concluída inventada."
+}

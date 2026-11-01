@@ -1,0 +1,18 @@
+{
+  "id": "D2-R03",
+  "pergunta": "Qual o prazo de emissão da declaração?",
+  "elaborado_por": "Integrante 1 com apoio de IA; revisão do grupo pendente",
+  "elaborado_em": "2026-10-31",
+  "tipo": "respondivel",
+  "status_esperado": "fundamentada",
+  "trechos_referencia": [
+    {
+      "documento_id": "DOC-03",
+      "versao": "1.0",
+      "trecho_literal": "O prazo de emissão da declaração é de cinco dias úteis após a conferência dos dados."
+    }
+  ],
+  "resposta_esperada": "Cinco dias úteis após conferência dos dados.",
+  "decisao_esperada": "aprovar",
+  "criterio_avaliacao": "Todas as afirmações institucionais sustentadas por trechos literais e fonte com versão; aprovar significa somente decisão esperada do operador."
+}

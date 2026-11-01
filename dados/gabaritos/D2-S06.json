@@ -1,0 +1,49 @@
+{
+  "caso_id": "D2-S06",
+  "arquivo": "dados/originais/desafio-2/D2-S06.txt",
+  "elaborado_por": "Integrante 1 com apoio de IA; revisão do grupo pendente",
+  "elaborado_em": "2026-10-31",
+  "tipo": "ambigua",
+  "solicitacao_esperada": {
+    "protocolo": "2026-000205",
+    "data": "16/10/2026",
+    "solicitante": "Rui Exemplo",
+    "assunto": "matrícula",
+    "pedido": null,
+    "categoria": null,
+    "campos_ausentes": [
+      "pedido",
+      "categoria"
+    ],
+    "necessita_revisao": true,
+    "motivo_revisao": "Sem intenção definida, pedido e categoria null; revisão humana é o fallback do contrato atual."
+  },
+  "entidades_esperadas": {
+    "pessoas": [
+      "Rui Exemplo"
+    ],
+    "orgaos": [],
+    "locais": [],
+    "datas": [
+      "16/10/2026"
+    ],
+    "protocolos": [
+      "2026-000205"
+    ]
+  },
+  "fatos_essenciais": [
+    "matrícula",
+    "Não decidi"
+  ],
+  "fontes_esperadas": [],
+  "decisao_esperada": "revisar",
+  "justificativa_rotulo": "Sem intenção definida, pedido e categoria null; revisão humana é o fallback do contrato atual.",
+  "campos_presentes": [
+    "protocolo",
+    "data",
+    "solicitante",
+    "assunto"
+  ],
+  "resumo_esperado": "Rui Exemplo não decidiu entre cancelar e continuar a matrícula; é necessário esclarecer o pedido.",
+  "criterio_avaliacao": "Categoria exata, entidades literais, fatos essenciais preservados; paráfrases no resumo são aceitas; nenhuma ação concluída inventada."
+}

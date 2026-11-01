@@ -1,0 +1,52 @@
+{
+  "caso_id": "D2-S04",
+  "arquivo": "dados/originais/desafio-2/D2-S04.txt",
+  "elaborado_por": "Integrante 1 com apoio de IA; revisão do grupo pendente",
+  "elaborado_em": "2026-10-31",
+  "tipo": "completa",
+  "solicitacao_esperada": {
+    "protocolo": "2026-000203",
+    "data": "15/10/2026",
+    "solicitante": "Bia Exemplo",
+    "assunto": "reclamação",
+    "pedido": "Reclamo da demora no atendimento e peço registro da reclamação.",
+    "categoria": "reclamacao",
+    "campos_ausentes": [],
+    "necessita_revisao": false,
+    "motivo_revisao": ""
+  },
+  "entidades_esperadas": {
+    "pessoas": [
+      "Bia Exemplo"
+    ],
+    "orgaos": [
+      "Escola Técnica Fictícia Horizonte"
+    ],
+    "locais": [
+      "Vila Exemplo"
+    ],
+    "datas": [
+      "15/10/2026"
+    ],
+    "protocolos": [
+      "2026-000203"
+    ]
+  },
+  "fatos_essenciais": [
+    "Bia Exemplo",
+    "reclamação"
+  ],
+  "fontes_esperadas": [],
+  "decisao_esperada": "aprovar",
+  "justificativa_rotulo": "Pedido explícito; categoria definida pela providência solicitada.",
+  "campos_presentes": [
+    "protocolo",
+    "data",
+    "solicitante",
+    "assunto",
+    "pedido",
+    "categoria"
+  ],
+  "resumo_esperado": "Bia Exemplo reclama da demora no atendimento e pede registro.",
+  "criterio_avaliacao": "Categoria exata, entidades literais, fatos essenciais preservados; paráfrases no resumo são aceitas; nenhuma ação concluída inventada."
+}

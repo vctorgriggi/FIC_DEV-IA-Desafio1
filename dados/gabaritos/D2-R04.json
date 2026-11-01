@@ -1,0 +1,18 @@
+{
+  "id": "D2-R04",
+  "pergunta": "Como solicitar cancelamento?",
+  "elaborado_por": "Integrante 1 com apoio de IA; revisão do grupo pendente",
+  "elaborado_em": "2026-10-31",
+  "tipo": "respondivel",
+  "status_esperado": "fundamentada",
+  "trechos_referencia": [
+    {
+      "documento_id": "DOC-04",
+      "versao": "1.0",
+      "trecho_literal": "O cancelamento deve ser solicitado por requerimento assinado no balcão acadêmico."
+    }
+  ],
+  "resposta_esperada": "Por requerimento assinado no balcão acadêmico; depende de análise humana.",
+  "decisao_esperada": "aprovar",
+  "criterio_avaliacao": "Todas as afirmações institucionais sustentadas por trechos literais e fonte com versão; aprovar significa somente decisão esperada do operador."
+}

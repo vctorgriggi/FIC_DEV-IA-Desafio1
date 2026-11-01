@@ -1,0 +1,18 @@
+{
+  "id": "D2-R05",
+  "pergunta": "Qual o horário do balcão acadêmico?",
+  "elaborado_por": "Integrante 1 com apoio de IA; revisão do grupo pendente",
+  "elaborado_em": "2026-10-31",
+  "tipo": "respondivel",
+  "status_esperado": "fundamentada",
+  "trechos_referencia": [
+    {
+      "documento_id": "DOC-05",
+      "versao": "1.0",
+      "trecho_literal": "O balcão acadêmico atende de segunda a sexta-feira, das 8h às 16h."
+    }
+  ],
+  "resposta_esperada": "Segunda a sexta-feira, das 8h às 16h.",
+  "decisao_esperada": "aprovar",
+  "criterio_avaliacao": "Todas as afirmações institucionais sustentadas por trechos literais e fonte com versão; aprovar significa somente decisão esperada do operador."
+}

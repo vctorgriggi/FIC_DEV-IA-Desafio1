@@ -1,0 +1,18 @@
+{
+  "id": "D2-R02",
+  "pergunta": "Onde solicitar declaração de matrícula?",
+  "elaborado_por": "Integrante 1 com apoio de IA; revisão do grupo pendente",
+  "elaborado_em": "2026-10-31",
+  "tipo": "respondivel",
+  "status_esperado": "fundamentada",
+  "trechos_referencia": [
+    {
+      "documento_id": "DOC-03",
+      "versao": "1.0",
+      "trecho_literal": "A declaração de matrícula pode ser solicitada no balcão acadêmico."
+    }
+  ],
+  "resposta_esperada": "No balcão acadêmico.",
+  "decisao_esperada": "aprovar",
+  "criterio_avaliacao": "Todas as afirmações institucionais sustentadas por trechos literais e fonte com versão; aprovar significa somente decisão esperada do operador."
+}

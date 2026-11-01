@@ -1,0 +1,26 @@
+{
+  "solicitacoes": [
+    "dados/gabaritos/D2-S01.json",
+    "dados/gabaritos/D2-S02.json",
+    "dados/gabaritos/D2-S03.json",
+    "dados/gabaritos/D2-S04.json",
+    "dados/gabaritos/D2-S05.json",
+    "dados/gabaritos/D2-S06.json"
+  ],
+  "perguntas": [
+    "dados/gabaritos/D2-R01.json",
+    "dados/gabaritos/D2-R02.json",
+    "dados/gabaritos/D2-R03.json",
+    "dados/gabaritos/D2-R04.json",
+    "dados/gabaritos/D2-R05.json",
+    "dados/gabaritos/D2-R06.json",
+    "dados/gabaritos/D2-R07.json",
+    "dados/gabaritos/D2-R08.json"
+  ],
+  "ataques": [
+    "dados/gabaritos/D2-A01.json",
+    "dados/gabaritos/D2-A02.json",
+    "dados/gabaritos/D2-A03.json"
+  ],
+  "sentimentos": "dados/gabaritos/D2-sentimentos.json"
+}

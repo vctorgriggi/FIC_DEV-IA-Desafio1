@@ -1,0 +1,56 @@
+{
+  "caso_id": "D2-S01",
+  "arquivo": "dados/originais/desafio-2/D2-S01.txt",
+  "elaborado_por": "Integrante 1 com apoio de IA; revisão do grupo pendente",
+  "elaborado_em": "2026-10-31",
+  "tipo": "completa",
+  "solicitacao_esperada": {
+    "protocolo": "2026-000142",
+    "data": "14 de outubro de 2026",
+    "solicitante": "Marcos Vinícius de Almeida Santos",
+    "assunto": "matrícula",
+    "pedido": "Peço que informe quais os documentos ainda preciso apresentar.",
+    "categoria": "matricula",
+    "campos_ausentes": [],
+    "necessita_revisao": false,
+    "motivo_revisao": ""
+  },
+  "entidades_esperadas": {
+    "pessoas": [
+      "Marcos Vinícius de Almeida Santos",
+      "Lúcia Helena de Almeida Santos"
+    ],
+    "orgaos": [],
+    "locais": [
+      "Cuiabá"
+    ],
+    "datas": [
+      "14 de outubro de 2026",
+      "12 de agosto de 2008"
+    ],
+    "protocolos": [
+      "2026-000142"
+    ]
+  },
+  "fatos_essenciais": [
+    "2026-000142",
+    "matrícula",
+    "noturno",
+    "documentos"
+  ],
+  "fontes_esperadas": [],
+  "decisao_esperada": "aprovar",
+  "justificativa_rotulo": "Pedido explícito de efetivação; prevalece matrícula sobre informação acessória.",
+  "campos_presentes": [
+    "protocolo",
+    "data",
+    "solicitante",
+    "assunto",
+    "pedido",
+    "categoria"
+  ],
+  "resumo_esperado": "Marcos Vinícius de Almeida Santos pede efetivação da matrícula em enfermagem, turno noturno, e informação sobre documentos pendentes, no protocolo 2026-000142.",
+  "criterio_avaliacao": "Categoria exata, entidades literais, fatos essenciais preservados; paráfrases no resumo são aceitas; nenhuma ação concluída inventada.",
+  "reaproveitado_de": "dados/processados/audio-01/638263b33c98/texto_revisado.txt",
+  "hash_origem": "f231913dbd70d831ebc77d97a70bdd4c20a8eb5c08cba14d35f700badf15da5e"
+}

@@ -1,0 +1,58 @@
+{
+  "caso_id": "D2-S05",
+  "arquivo": "dados/originais/desafio-2/D2-S05.txt",
+  "elaborado_por": "Integrante 1 com apoio de IA; revisão do grupo pendente",
+  "elaborado_em": "2026-10-31",
+  "tipo": "incompleta",
+  "solicitacao_esperada": {
+    "protocolo": null,
+    "data": "14/10/2026",
+    "solicitante": "MARCOS VINICIUS DE ALMEIDA SANTOS",
+    "assunto": "FICHA DE MATRÍCULA",
+    "pedido": null,
+    "categoria": "matricula",
+    "campos_ausentes": [
+      "protocolo",
+      "pedido"
+    ],
+    "necessita_revisao": true,
+    "motivo_revisao": "OCR tem protocolo parcialmente ilegível e não traz pedido; não completar usando outra modalidade."
+  },
+  "entidades_esperadas": {
+    "pessoas": [
+      "MARCOS VINICIUS DE ALMEIDA SANTOS",
+      "LÚCIA HELENA DE ALMEIDA SANTOS"
+    ],
+    "orgaos": [
+      "SECRETARIA DE ESTADO DE CIÊNCIA, TECNOLOGIA E INOVAÇÃO - SECITECI/MT",
+      "ESCOLA TÉCNICA ESTADUAL DE CUIABÁ"
+    ],
+    "locais": [
+      "CUIABÁ"
+    ],
+    "datas": [
+      "12/08/2008",
+      "01/02/2027",
+      "14/10/2026"
+    ],
+    "protocolos": []
+  },
+  "fatos_essenciais": [
+    "FICHA DE MATRÍCULA",
+    "NOTURNO",
+    "14/10/2026"
+  ],
+  "fontes_esperadas": [],
+  "decisao_esperada": "revisar",
+  "justificativa_rotulo": "OCR tem protocolo parcialmente ilegível e não traz pedido; não completar usando outra modalidade.",
+  "campos_presentes": [
+    "data",
+    "solicitante",
+    "assunto",
+    "categoria"
+  ],
+  "resumo_esperado": "Ficha de matrícula em enfermagem, turno noturno, com data de matrícula de 14/10/2026. O protocolo está ilegível e não há pedido explícito.",
+  "criterio_avaliacao": "Categoria exata, entidades literais, fatos essenciais preservados; paráfrases no resumo são aceitas; nenhuma ação concluída inventada.",
+  "reaproveitado_de": "dados/processados/imagem-01/0b8591d5a30b/texto_revisado.txt",
+  "hash_origem": "d2d2c21b88c75bfbd29f8732f3e386a1f263e0cc97f6937e25f6715085031f7c"
+}

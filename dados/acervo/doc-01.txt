@@ -1,0 +1,12 @@
+DOC-01 | Guia de matrícula fictício | versão 1.0
+DOCUMENTO FICTÍCIO - SOMENTE EXERCÍCIO; NÃO É REGRA OFICIAL.
+Publicado em 2026-09-01.
+1. Escopo e documentos
+A Escola Técnica Fictícia Horizonte atende exclusivamente os cenários deste exercício.
+Para matrícula, apresente documento de identificação e histórico escolar.
+O atendimento confere os documentos e registra pendências; o recebimento não confirma deferimento.
+2. Prazo histórico
+O prazo de matrícula termina em 20/10/2026.
+Esta versão vale de 01/09/2026 até 09/10/2026; DOC-02 a substitui integralmente em 10/10/2026.
+3. Procedimento
+A solicitação deve informar nome, curso e protocolo, quando existente. Pendências exigem conferência humana. Não há matrícula automática.

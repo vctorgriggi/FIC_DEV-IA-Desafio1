@@ -1,0 +1,79 @@
+{
+  "elaborado_por": "Integrante 1 com apoio de IA; revisão do grupo pendente",
+  "elaborado_em": "2026-10-31",
+  "regra_ambiguidade": "Ironia, contexto insuficiente ou aspectos opostos sem predominância: indeterminada e necessita_revisao=true; demais casos não exigem revisão por ambiguidade.",
+  "avaliacoes": [
+    {
+      "id": "AV-01",
+      "polaridade_esperada": "positiva",
+      "ambigua": false,
+      "justificativa_rotulo": "Elogio explícito."
+    },
+    {
+      "id": "AV-02",
+      "polaridade_esperada": "positiva",
+      "ambigua": false,
+      "justificativa_rotulo": "Elogia atendimento e orientação."
+    },
+    {
+      "id": "AV-03",
+      "polaridade_esperada": "positiva",
+      "ambigua": false,
+      "justificativa_rotulo": "Satisfação explícita."
+    },
+    {
+      "id": "AV-04",
+      "polaridade_esperada": "negativa",
+      "ambigua": false,
+      "justificativa_rotulo": "Crítica explícita."
+    },
+    {
+      "id": "AV-05",
+      "polaridade_esperada": "negativa",
+      "ambigua": false,
+      "justificativa_rotulo": "Insatisfação explícita."
+    },
+    {
+      "id": "AV-06",
+      "polaridade_esperada": "negativa",
+      "ambigua": false,
+      "justificativa_rotulo": "Crítica ao serviço."
+    },
+    {
+      "id": "AV-07",
+      "polaridade_esperada": "neutra",
+      "ambigua": false,
+      "justificativa_rotulo": "Relato sem juízo de valor."
+    },
+    {
+      "id": "AV-08",
+      "polaridade_esperada": "neutra",
+      "ambigua": false,
+      "justificativa_rotulo": "Relato factual."
+    },
+    {
+      "id": "AV-09",
+      "polaridade_esperada": "neutra",
+      "ambigua": false,
+      "justificativa_rotulo": "Relato sem polaridade expressa."
+    },
+    {
+      "id": "AV-10",
+      "polaridade_esperada": "indeterminada",
+      "ambigua": true,
+      "justificativa_rotulo": "Possível ironia; elogio contradito pelo contexto."
+    },
+    {
+      "id": "AV-11",
+      "polaridade_esperada": "indeterminada",
+      "ambigua": true,
+      "justificativa_rotulo": "Aspectos positivo e negativo sem predominância definida."
+    },
+    {
+      "id": "AV-12",
+      "polaridade_esperada": "indeterminada",
+      "ambigua": true,
+      "justificativa_rotulo": "Falta contexto para determinar polaridade."
+    }
+  ]
+}

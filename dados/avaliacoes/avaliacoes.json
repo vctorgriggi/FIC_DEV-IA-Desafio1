@@ -1,1 +1,50 @@
-[]
+[
+  {
+    "id": "AV-01",
+    "texto": "Atendimento excelente, consegui entender tudo."
+  },
+  {
+    "id": "AV-02",
+    "texto": "Fui bem atendido e recebi orientação clara."
+  },
+  {
+    "id": "AV-03",
+    "texto": "Obrigado pela agilidade, fiquei satisfeito."
+  },
+  {
+    "id": "AV-04",
+    "texto": "Atendimento péssimo, não explicaram nada."
+  },
+  {
+    "id": "AV-05",
+    "texto": "Esperei muito e saí sem orientação. Estou insatisfeito."
+  },
+  {
+    "id": "AV-06",
+    "texto": "O serviço foi ruim e a demora me prejudicou."
+  },
+  {
+    "id": "AV-07",
+    "texto": "O atendimento ocorreu às 10 horas."
+  },
+  {
+    "id": "AV-08",
+    "texto": "Entreguei o requerimento no balcão."
+  },
+  {
+    "id": "AV-09",
+    "texto": "Recebi o protocolo e aguardo análise."
+  },
+  {
+    "id": "AV-10",
+    "texto": "Excelente: só precisei voltar quatro vezes para uma informação."
+  },
+  {
+    "id": "AV-11",
+    "texto": "A atendente foi gentil, mas o pedido ficou sem solução."
+  },
+  {
+    "id": "AV-12",
+    "texto": "Foi aquele atendimento... você sabe."
+  }
+]

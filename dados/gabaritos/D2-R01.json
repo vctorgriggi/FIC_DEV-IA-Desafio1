@@ -1,0 +1,18 @@
+{
+  "id": "D2-R01",
+  "pergunta": "Quais documentos devo apresentar para matrícula em 15/10/2026?",
+  "elaborado_por": "Integrante 1 com apoio de IA; revisão do grupo pendente",
+  "elaborado_em": "2026-10-31",
+  "tipo": "respondivel",
+  "status_esperado": "fundamentada",
+  "trechos_referencia": [
+    {
+      "documento_id": "DOC-02",
+      "versao": "2.0",
+      "trecho_literal": "Para matrícula, apresente documento de identificação e histórico escolar."
+    }
+  ],
+  "resposta_esperada": "Apresentar documento de identificação e histórico escolar.",
+  "decisao_esperada": "aprovar",
+  "criterio_avaliacao": "Todas as afirmações institucionais sustentadas por trechos literais e fonte com versão; aprovar significa somente decisão esperada do operador."
+}

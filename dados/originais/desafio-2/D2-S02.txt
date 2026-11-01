@@ -1,0 +1,8 @@
+CASO FICTÍCIO
+Protocolo: 2026-000201
+Data: 15/10/2026
+Solicitante: Lia Exemplo
+Órgão: Escola Técnica Fictícia Horizonte
+Local: Vila Exemplo
+Assunto: declaração de matrícula
+Solicito emissão de declaração de matrícula.

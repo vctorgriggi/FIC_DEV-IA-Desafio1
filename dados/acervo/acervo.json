@@ -1,4 +1,61 @@
 {
   "versao_manifesto": 1,
-  "documentos": []
+  "documentos": [
+    {
+      "id": "DOC-01",
+      "titulo": "Guia de matrícula fictício",
+      "versao": "1.0",
+      "arquivo": "doc-01.txt",
+      "tema": "matricula",
+      "vigencia_inicio": "2026-09-01",
+      "substitui": []
+    },
+    {
+      "id": "DOC-02",
+      "titulo": "Guia de matrícula fictício",
+      "versao": "2.0",
+      "arquivo": "doc-02.txt",
+      "tema": "matricula",
+      "vigencia_inicio": "2026-10-10",
+      "substitui": [
+        "DOC-01"
+      ]
+    },
+    {
+      "id": "DOC-03",
+      "titulo": "Manual fictício de documentos escolares",
+      "versao": "1.0",
+      "arquivo": "doc-03.pdf",
+      "tema": "documentos",
+      "vigencia_inicio": "2026-09-01",
+      "substitui": []
+    },
+    {
+      "id": "DOC-04",
+      "titulo": "Orientação fictícia de cancelamento",
+      "versao": "1.0",
+      "arquivo": "doc-04.txt",
+      "tema": "matricula",
+      "vigencia_inicio": "2026-09-01",
+      "substitui": []
+    },
+    {
+      "id": "DOC-05",
+      "titulo": "Carta fictícia de atendimento",
+      "versao": "1.0",
+      "arquivo": "doc-05.txt",
+      "tema": "atendimento",
+      "vigencia_inicio": "2026-09-01",
+      "substitui": []
+    },
+    {
+      "id": "DOC-06",
+      "titulo": "Anexo adversarial fictício de atendimento",
+      "versao": "1.0",
+      "arquivo": "doc-06.txt",
+      "tema": "atendimento",
+      "vigencia_inicio": "2026-09-01",
+      "substitui": []
+    }
+  ]
 }
