@@ -1,0 +1,1620 @@
+{
+  "modo": "real",
+  "casos": {
+    "D2-S01": {
+      "extracoes": [
+        {
+          "inicio": "2026-11-01T01:11:22.563444+00:00",
+          "status": "valido",
+          "solicitacao": {
+            "protocolo": "2026-000142",
+            "data": "14 de outubro de 2026",
+            "solicitante": "Marcos Vinícius de Almeida Santos",
+            "assunto": "matrícula no curso técnico em enfermagem",
+            "pedido": "quero pedir a efetivação da minha matrícula no curso técnico em enfermagem do eixo tecnológico de saúde, com carga horária de 1.200 horas, no turno noturno",
+            "categoria": "matricula",
+            "entidades": {
+              "pessoas": [
+                "Marcos Vinícius de Almeida Santos",
+                "Lúcia Helena de Almeida Santos"
+              ],
+              "orgaos": [],
+              "locais": [
+                "Cuiabá"
+              ],
+              "datas": [
+                "14 de outubro de 2026",
+                "12 de agosto de 2008"
+              ],
+              "protocolos": [
+                "2026-000142"
+              ]
+            },
+            "campos_ausentes": [],
+            "necessita_revisao": false,
+            "motivo_revisao": ""
+          },
+          "regras": [],
+          "divergencias_gabarito": {
+            "assunto": {
+              "esperado": "matrícula",
+              "obtido": "matrícula no curso técnico em enfermagem"
+            },
+            "pedido": {
+              "esperado": "Peço que informe quais os documentos ainda preciso apresentar.",
+              "obtido": "quero pedir a efetivação da minha matrícula no curso técnico em enfermagem do eixo tecnológico de saúde, com carga horária de 1.200 horas, no turno noturno"
+            }
+          },
+          "entidades": {
+            "pessoas": {
+              "corretas": [
+                "Lúcia Helena de Almeida Santos",
+                "Marcos Vinícius de Almeida Santos"
+              ],
+              "omitidas": [],
+              "adicionais_ao_gabarito": []
+            },
+            "orgaos": {
+              "corretas": [],
+              "omitidas": [],
+              "adicionais_ao_gabarito": []
+            },
+            "locais": {
+              "corretas": [
+                "Cuiabá"
+              ],
+              "omitidas": [],
+              "adicionais_ao_gabarito": []
+            },
+            "datas": {
+              "corretas": [
+                "12 de agosto de 2008",
+                "14 de outubro de 2026"
+              ],
+              "omitidas": [],
+              "adicionais_ao_gabarito": []
+            },
+            "protocolos": {
+              "corretas": [
+                "2026-000142"
+              ],
+              "omitidas": [],
+              "adicionais_ao_gabarito": []
+            }
+          },
+          "reparos": 0,
+          "respostas": [
+            {
+              "saida": "{\"protocolo\":\"2026-000142\",\"data\":\"14 de outubro de 2026\",\"solicitante\":\"Marcos Vinícius de Almeida Santos\",\"assunto\":\"matrícula no curso técnico em enfermagem\",\"pedido\":\"quero pedir a efetivação da minha matrícula no curso técnico em enfermagem do eixo tecnológico de saúde, com carga horária de 1.200 horas, no turno noturno\",\"categoria\":\"matricula\",\"entidades\":{\"pessoas\":[\"Marcos Vinícius de Almeida Santos\",\"Lúcia Helena de Almeida Santos\"],\"orgaos\":[],\"locais\":[\"Cuiabá\"],\"datas\":[\"14 de outubro de 2026\",\"12 de agosto de 2008\"],\"protocolos\":[\"2026-000142\"]},\"campos_ausentes\":[],\"necessita_revisao\":false,\"motivo_revisao\":\"\"}",
+              "modelo": "gpt-6.1-terra",
+              "tokens_entrada": 1312,
+              "tokens_saida": 264,
+              "custo_estimado_usd": 0.002632,
+              "duracao_s": 5.846,
+              "parametros": {
+                "store": false,
+                "max_output_tokens": 4096,
+                "reasoning": {
+                  "effort": "low"
+                },
+                "formato_resposta": "solicitacao"
+              }
+            }
+          ],
+          "prompt": "solicitacao_d2_v2",
+          "reavaliacao_pelas_regras_finais": []
+        },
+        {
+          "inicio": "2026-11-01T01:13:42.669368+00:00",
+          "status": "valido",
+          "solicitacao": {
+            "protocolo": "2026-000142",
+            "data": "14 de outubro de 2026",
+            "solicitante": "Marcos Vinícius de Almeida Santos",
+            "assunto": null,
+            "pedido": "quero pedir a efetivação da minha matrícula no curso técnico em enfermagem do eixo tecnológico de saúde, com carga horária de 1.200 horas, no turno noturno … Peço que informe quais os documentos ainda preciso apresentar",
+            "categoria": "matricula",
+            "entidades": {
+              "pessoas": [
+                "Marcos Vinícius de Almeida Santos",
+                "Lúcia Helena de Almeida Santos"
+              ],
+              "orgaos": [],
+              "locais": [
+                "Cuiabá"
+              ],
+              "datas": [
+                "14 de outubro de 2026",
+                "12 de agosto de 2008"
+              ],
+              "protocolos": [
+                "2026-000142"
+              ]
+            },
+            "campos_ausentes": [
+              "assunto"
+            ],
+            "necessita_revisao": true,
+            "motivo_revisao": "Assunto não informado explicitamente."
+          },
+          "regras": [],
+          "divergencias_gabarito": {
+            "assunto": {
+              "esperado": "matrícula",
+              "obtido": null
+            },
+            "pedido": {
+              "esperado": "Peço que informe quais os documentos ainda preciso apresentar.",
+              "obtido": "quero pedir a efetivação da minha matrícula no curso técnico em enfermagem do eixo tecnológico de saúde, com carga horária de 1.200 horas, no turno noturno … Peço que informe quais os documentos ainda preciso apresentar"
+            },
+            "campos_ausentes": {
+              "esperado": [],
+              "obtido": [
+                "assunto"
+              ]
+            },
+            "necessita_revisao": {
+              "esperado": false,
+              "obtido": true
+            },
+            "motivo_revisao": {
+              "esperado": "",
+              "obtido": "Assunto não informado explicitamente."
+            }
+          },
+          "entidades": {
+            "pessoas": {
+              "corretas": [
+                "Lúcia Helena de Almeida Santos",
+                "Marcos Vinícius de Almeida Santos"
+              ],
+              "omitidas": [],
+              "adicionais_ao_gabarito": []
+            },
+            "orgaos": {
+              "corretas": [],
+              "omitidas": [],
+              "adicionais_ao_gabarito": []
+            },
+            "locais": {
+              "corretas": [
+                "Cuiabá"
+              ],
+              "omitidas": [],
+              "adicionais_ao_gabarito": []
+            },
+            "datas": {
+              "corretas": [
+                "12 de agosto de 2008",
+                "14 de outubro de 2026"
+              ],
+              "omitidas": [],
+              "adicionais_ao_gabarito": []
+            },
+            "protocolos": {
+              "corretas": [
+                "2026-000142"
+              ],
+              "omitidas": [],
+              "adicionais_ao_gabarito": []
+            }
+          },
+          "reparos": 0,
+          "respostas": [
+            {
+              "saida": "{\"protocolo\":\"2026-000142\",\"data\":\"14 de outubro de 2026\",\"solicitante\":\"Marcos Vinícius de Almeida Santos\",\"assunto\":null,\"pedido\":\"quero pedir a efetivação da minha matrícula no curso técnico em enfermagem do eixo tecnológico de saúde, com carga horária de 1.200 horas, no turno noturno … Peço que informe quais os documentos ainda preciso apresentar\",\"categoria\":\"matricula\",\"entidades\":{\"pessoas\":[\"Marcos Vinícius de Almeida Santos\",\"Lúcia Helena de Almeida Santos\"],\"orgaos\":[],\"locais\":[\"Cuiabá\"],\"datas\":[\"14 de outubro de 2026\",\"12 de agosto de 2008\"],\"protocolos\":[\"2026-000142\"]},\"campos_ausentes\":[\"assunto\"],\"necessita_revisao\":true,\"motivo_revisao\":\"Assunto não informado explicitamente.\"}",
+              "modelo": "gpt-6.1-terra",
+              "tokens_entrada": 1572,
+              "tokens_saida": 202,
+              "custo_estimado_usd": 0.002582,
+              "duracao_s": 4.105,
+              "parametros": {
+                "store": false,
+                "max_output_tokens": 4096,
+                "reasoning": {
+                  "effort": "low"
+                },
+                "formato_resposta": "solicitacao"
+              }
+            }
+          ],
+          "prompt": "solicitacao_d2_v3",
+          "reavaliacao_pelas_regras_finais": []
+        },
+        {
+          "inicio": "2026-11-01T01:15:18.323645+00:00",
+          "status": "valido",
+          "solicitacao": {
+            "protocolo": "2026-000142",
+            "data": "14 de outubro de 2026",
+            "solicitante": "Marcos Vinícius de Almeida Santos",
+            "assunto": "matrícula no curso técnico em enfermagem",
+            "pedido": "quero pedir a efetivação da minha matrícula no curso técnico em enfermagem do eixo tecnológico de saúde, com carga horária de 1.200 horas, no turno noturno … Peço que informe quais os documentos ainda preciso apresentar",
+            "categoria": "matricula",
+            "entidades": {
+              "pessoas": [
+                "Marcos Vinícius de Almeida Santos",
+                "Lúcia Helena de Almeida Santos"
+              ],
+              "orgaos": [],
+              "locais": [
+                "Cuiabá"
+              ],
+              "datas": [
+                "14 de outubro de 2026",
+                "12 de agosto de 2008"
+              ],
+              "protocolos": [
+                "2026-000142"
+              ]
+            },
+            "campos_ausentes": [],
+            "necessita_revisao": false,
+            "motivo_revisao": ""
+          },
+          "regras": [],
+          "divergencias_gabarito": {
+            "assunto": {
+              "esperado": "matrícula",
+              "obtido": "matrícula no curso técnico em enfermagem"
+            },
+            "pedido": {
+              "esperado": "Peço que informe quais os documentos ainda preciso apresentar.",
+              "obtido": "quero pedir a efetivação da minha matrícula no curso técnico em enfermagem do eixo tecnológico de saúde, com carga horária de 1.200 horas, no turno noturno … Peço que informe quais os documentos ainda preciso apresentar"
+            }
+          },
+          "entidades": {
+            "pessoas": {
+              "corretas": [
+                "Lúcia Helena de Almeida Santos",
+                "Marcos Vinícius de Almeida Santos"
+              ],
+              "omitidas": [],
+              "adicionais_ao_gabarito": []
+            },
+            "orgaos": {
+              "corretas": [],
+              "omitidas": [],
+              "adicionais_ao_gabarito": []
+            },
+            "locais": {
+              "corretas": [
+                "Cuiabá"
+              ],
+              "omitidas": [],
+              "adicionais_ao_gabarito": []
+            },
+            "datas": {
+              "corretas": [
+                "12 de agosto de 2008",
+                "14 de outubro de 2026"
+              ],
+              "omitidas": [],
+              "adicionais_ao_gabarito": []
+            },
+            "protocolos": {
+              "corretas": [
+                "2026-000142"
+              ],
+              "omitidas": [],
+              "adicionais_ao_gabarito": []
+            }
+          },
+          "reparos": 0,
+          "respostas": [
+            {
+              "saida": "{\"protocolo\":\"2026-000142\",\"data\":\"14 de outubro de 2026\",\"solicitante\":\"Marcos Vinícius de Almeida Santos\",\"assunto\":\"matrícula no curso técnico em enfermagem\",\"pedido\":\"quero pedir a efetivação da minha matrícula no curso técnico em enfermagem do eixo tecnológico de saúde, com carga horária de 1.200 horas, no turno noturno … Peço que informe quais os documentos ainda preciso apresentar\",\"categoria\":\"matricula\",\"entidades\":{\"pessoas\":[\"Marcos Vinícius de Almeida Santos\",\"Lúcia Helena de Almeida Santos\"],\"orgaos\":[],\"locais\":[\"Cuiabá\"],\"datas\":[\"14 de outubro de 2026\",\"12 de agosto de 2008\"],\"protocolos\":[\"2026-000142\"]},\"campos_ausentes\":[],\"necessita_revisao\":false,\"motivo_revisao\":\"\"}",
+              "modelo": "gpt-6.1-terra",
+              "tokens_entrada": 1651,
+              "tokens_saida": 201,
+              "custo_estimado_usd": 0.002656,
+              "duracao_s": 4.092,
+              "parametros": {
+                "store": false,
+                "max_output_tokens": 4096,
+                "reasoning": {
+                  "effort": "low"
+                },
+                "formato_resposta": "solicitacao"
+              }
+            }
+          ],
+          "prompt": "solicitacao_d2_v4",
+          "reavaliacao_pelas_regras_finais": []
+        }
+      ],
+      "fichas": [
+        {
+          "inicio": "2026-11-01T01:11:28.422945+00:00",
+          "status": "valido",
+          "ficha": {
+            "resumo": "Marcos Vinícius de Almeida Santos, protocolo 2026-000142, de 14 de outubro de 2026, solicita a efetivação de sua matrícula no curso técnico em enfermagem, eixo tecnológico de saúde, com 1.200 horas, no turno noturno. Pede informação sobre os documentos que ainda precisa apresentar. Declara estar ciente do cancelamento automático da matrícula em caso de faltas sem justificativa comprovada: nos dois primeiros dias consecutivos de aula ou em três dias, consecutivos ou não, nos dez primeiros dias de aula.",
+            "inferencias": []
+          },
+          "palavras": 78,
+          "fatos_nao_localizados_literalmente": [],
+          "respostas": [
+            {
+              "saida": "{\"resumo\":\"Marcos Vinícius de Almeida Santos, protocolo 2026-000142, de 14 de outubro de 2026, solicita a efetivação de sua matrícula no curso técnico em enfermagem, eixo tecnológico de saúde, com 1.200 horas, no turno noturno. Pede informação sobre os documentos que ainda precisa apresentar. Declara estar ciente do cancelamento automático da matrícula em caso de faltas sem justificativa comprovada: nos dois primeiros dias consecutivos de aula ou em três dias, consecutivos ou não, nos dez primeiros dias de aula.\",\"inferencias\":[]}",
+              "modelo": "gpt-6.1-terra",
+              "tokens_entrada": 1102,
+              "tokens_saida": 135,
+              "custo_estimado_usd": 0.001777,
+              "duracao_s": 2.982,
+              "parametros": {
+                "store": false,
+                "max_output_tokens": 4096,
+                "reasoning": {
+                  "effort": "low"
+                },
+                "formato_resposta": "compreensao"
+              }
+            },
+            {
+              "saida": "{\"fiel\":true,\"evidencias\":[\"Meu protocolo é 2026-000142, de 14 de outubro de 2026.\",\"Meu nome é Marcos Vinícius de Almeida Santos, nasci em 12 de agosto de 2008, em Cuiabá, e quero pedir a efetivação da minha matrícula no curso técnico em enfermagem do eixo tecnológico de saúde, com carga horária de 1.200 horas, no turno noturno.\",\"Declaro estar ciente de que a matrícula será cancelada automaticamente se eu faltar, sem justificativa comprovada, nos dois primeiros dias de aula consecutivos ou em três dias de aula consecutivos ou não, nos dez primeiros dias de aula.\",\"Peço que informe quais os documentos ainda preciso apresentar.\"],\"fatos_sem_suporte\":[],\"justificativa\":\"Todas as afirmações do resumo são sustentadas pelo original. O pedido de matrícula e a condição de cancelamento foram apresentados sem indicar deferimento ou cancelamento realizado.\"}",
+              "modelo": "gpt-6.1-terra",
+              "tokens_entrada": 1108,
+              "tokens_saida": 213,
+              "custo_estimado_usd": 0.002173,
+              "duracao_s": 3.887,
+              "parametros": {
+                "store": false,
+                "max_output_tokens": 4096,
+                "reasoning": {
+                  "effort": "low"
+                },
+                "formato_resposta": "verificacao_resumo",
+                "prompt_id": "verificar_resumo_d2_v1",
+                "prompt_hash": "61eb720728a9"
+              }
+            }
+          ],
+          "prompt": "compreensao_d2_v2"
+        },
+        {
+          "inicio": "2026-11-01T01:13:46.812906+00:00",
+          "status": "valido",
+          "ficha": {
+            "resumo": "Marcos Vinícius de Almeida Santos, protocolo 2026-000142, de 14 de outubro de 2026, solicita a efetivação de sua matrícula no curso técnico em enfermagem, do eixo tecnológico de saúde, com 1.200 horas, no turno noturno. Pede esclarecimento sobre quais documentos ainda precisa apresentar. Declara estar ciente do cancelamento automático da matrícula em caso de faltas sem justificativa comprovada nos dois primeiros dias consecutivos de aula ou em três dias, consecutivos ou não, nos dez primeiros dias de aula.",
+            "inferencias": []
+          },
+          "palavras": 78,
+          "fatos_nao_localizados_literalmente": [],
+          "respostas": [
+            {
+              "saida": "{\"resumo\":\"Marcos Vinícius de Almeida Santos, protocolo 2026-000142, de 14 de outubro de 2026, solicita a efetivação de sua matrícula no curso técnico em enfermagem, do eixo tecnológico de saúde, com 1.200 horas, no turno noturno. Pede esclarecimento sobre quais documentos ainda precisa apresentar. Declara estar ciente do cancelamento automático da matrícula em caso de faltas sem justificativa comprovada nos dois primeiros dias consecutivos de aula ou em três dias, consecutivos ou não, nos dez primeiros dias de aula.\",\"inferencias\":[]}",
+              "modelo": "gpt-6.1-terra",
+              "tokens_entrada": 1231,
+              "tokens_saida": 135,
+              "custo_estimado_usd": 0.001906,
+              "duracao_s": 2.526,
+              "parametros": {
+                "store": false,
+                "max_output_tokens": 4096,
+                "reasoning": {
+                  "effort": "low"
+                },
+                "formato_resposta": "compreensao"
+              }
+            },
+            {
+              "saida": "{\"fiel\":true,\"evidencias\":[\"Meu protocolo é 2026-000142, de 14 de outubro de 2026. Meu nome é Marcos Vinícius de Almeida Santos\",\"quero pedir a efetivação da minha matrícula no curso técnico em enfermagem do eixo tecnológico de saúde, com carga horária de 1.200 horas, no turno noturno.\",\"Peço que informe quais os documentos ainda preciso apresentar.\",\"Declaro estar ciente de que a matrícula será cancelada automaticamente se eu faltar, sem justificativa comprovada, nos dois primeiros dias de aula consecutivos ou em três dias de aula consecutivos ou não, nos dez primeiros dias de aula.\"],\"fatos_sem_suporte\":[],\"justificativa\":\"As afirmações do resumo são sustentadas pelo original. O pedido de matrícula e a condição de cancelamento foram apresentados como tais, sem afirmar deferimento ou cancelamento realizado.\"}",
+              "modelo": "gpt-6.1-terra",
+              "tokens_entrada": 1163,
+              "tokens_saida": 198,
+              "custo_estimado_usd": 0.002153,
+              "duracao_s": 3.889,
+              "parametros": {
+                "store": false,
+                "max_output_tokens": 4096,
+                "reasoning": {
+                  "effort": "low"
+                },
+                "formato_resposta": "verificacao_resumo",
+                "prompt_id": "verificar_resumo_d2_v1",
+                "prompt_hash": "61eb720728a9"
+              }
+            }
+          ],
+          "prompt": "compreensao_d2_v3"
+        }
+      ],
+      "hash_gabarito": "3447805717e5cfcb08cdaed4487bc1b12e65b93aa8bf982f8c1b0111989e5ff6"
+    },
+    "D2-S02": {
+      "extracoes": [
+        {
+          "inicio": "2026-11-01T01:11:35.307474+00:00",
+          "status": "valido",
+          "solicitacao": {
+            "protocolo": "2026-000201",
+            "data": "15/10/2026",
+            "solicitante": "Lia Exemplo",
+            "assunto": "declaração de matrícula",
+            "pedido": "Solicito emissão de declaração de matrícula.",
+            "categoria": "solicitacao_documentos",
+            "entidades": {
+              "pessoas": [
+                "Lia Exemplo"
+              ],
+              "orgaos": [
+                "Escola Técnica Fictícia Horizonte"
+              ],
+              "locais": [
+                "Vila Exemplo"
+              ],
+              "datas": [
+                "15/10/2026"
+              ],
+              "protocolos": [
+                "2026-000201"
+              ]
+            },
+            "campos_ausentes": [],
+            "necessita_revisao": false,
+            "motivo_revisao": ""
+          },
+          "regras": [],
+          "divergencias_gabarito": {},
+          "entidades": {
+            "pessoas": {
+              "corretas": [
+                "Lia Exemplo"
+              ],
+              "omitidas": [],
+              "adicionais_ao_gabarito": []
+            },
+            "orgaos": {
+              "corretas": [
+                "Escola Técnica Fictícia Horizonte"
+              ],
+              "omitidas": [],
+              "adicionais_ao_gabarito": []
+            },
+            "locais": {
+              "corretas": [
+                "Vila Exemplo"
+              ],
+              "omitidas": [],
+              "adicionais_ao_gabarito": []
+            },
+            "datas": {
+              "corretas": [
+                "15/10/2026"
+              ],
+              "omitidas": [],
+              "adicionais_ao_gabarito": []
+            },
+            "protocolos": {
+              "corretas": [
+                "2026-000201"
+              ],
+              "omitidas": [],
+              "adicionais_ao_gabarito": []
+            }
+          },
+          "reparos": 0,
+          "respostas": [
+            {
+              "saida": "{\"protocolo\":\"2026-000201\",\"data\":\"15/10/2026\",\"solicitante\":\"Lia Exemplo\",\"assunto\":\"declaração de matrícula\",\"pedido\":\"Solicito emissão de declaração de matrícula.\",\"categoria\":\"solicitacao_documentos\",\"entidades\":{\"pessoas\":[\"Lia Exemplo\"],\"orgaos\":[\"Escola Técnica Fictícia Horizonte\"],\"locais\":[\"Vila Exemplo\"],\"datas\":[\"15/10/2026\"],\"protocolos\":[\"2026-000201\"]},\"campos_ausentes\":[],\"necessita_revisao\":false,\"motivo_revisao\":\"\"}",
+              "modelo": "gpt-6.1-terra",
+              "tokens_entrada": 1188,
+              "tokens_saida": 141,
+              "custo_estimado_usd": 0.001893,
+              "duracao_s": 2.835,
+              "parametros": {
+                "store": false,
+                "max_output_tokens": 4096,
+                "reasoning": {
+                  "effort": "low"
+                },
+                "formato_resposta": "solicitacao"
+              }
+            }
+          ],
+          "prompt": "solicitacao_d2_v2",
+          "reavaliacao_pelas_regras_finais": []
+        }
+      ],
+      "fichas": [
+        {
+          "inicio": "2026-11-01T01:11:38.154403+00:00",
+          "status": "valido",
+          "ficha": {
+            "resumo": "Lia Exemplo solicita a emissão de declaração de matrícula à Escola Técnica Fictícia Horizonte, em Vila Exemplo. Protocolo: 2026-000201, de 15/10/2026.",
+            "inferencias": []
+          },
+          "palavras": 21,
+          "fatos_nao_localizados_literalmente": [],
+          "respostas": [
+            {
+              "saida": "{\"resumo\":\"Lia Exemplo solicita a emissão de declaração de matrícula à Escola Técnica Fictícia Horizonte, em Vila Exemplo. Protocolo: 2026-000201, de 15/10/2026.\",\"inferencias\":[]}",
+              "modelo": "gpt-6.1-terra",
+              "tokens_entrada": 929,
+              "tokens_saida": 62,
+              "custo_estimado_usd": 0.001239,
+              "duracao_s": 2.059,
+              "parametros": {
+                "store": false,
+                "max_output_tokens": 4096,
+                "reasoning": {
+                  "effort": "low"
+                },
+                "formato_resposta": "compreensao"
+              }
+            },
+            {
+              "saida": "{\"fiel\":true,\"evidencias\":[\"Protocolo: 2026-000201\",\"Data: 15/10/2026\",\"Solicitante: Lia Exemplo\",\"Órgão: Escola Técnica Fictícia Horizonte\",\"Local: Vila Exemplo\",\"Solicito emissão de declaração de matrícula.\"],\"fatos_sem_suporte\":[],\"justificativa\":\"O resumo reproduz o pedido e os dados de identificação, órgão, local, protocolo e data presentes no original.\"}",
+              "modelo": "gpt-6.1-terra",
+              "tokens_entrada": 862,
+              "tokens_saida": 111,
+              "custo_estimado_usd": 0.001417,
+              "duracao_s": 2.402,
+              "parametros": {
+                "store": false,
+                "max_output_tokens": 4096,
+                "reasoning": {
+                  "effort": "low"
+                },
+                "formato_resposta": "verificacao_resumo",
+                "prompt_id": "verificar_resumo_d2_v1",
+                "prompt_hash": "61eb720728a9"
+              }
+            }
+          ],
+          "prompt": "compreensao_d2_v2"
+        }
+      ],
+      "hash_gabarito": "d76b7f9bb63efd8258dc7a617be8c45bcef009ca6ce7624a801a93f9d542ab45"
+    },
+    "D2-S03": {
+      "extracoes": [
+        {
+          "inicio": "2026-11-01T01:11:42.629343+00:00",
+          "status": "valido",
+          "solicitacao": {
+            "protocolo": "2026-000202",
+            "data": "15/10/2026",
+            "solicitante": "Ivo Exemplo",
+            "assunto": "cancelamento",
+            "pedido": "Solicito cancelamento da matrícula.",
+            "categoria": "cancelamento",
+            "entidades": {
+              "pessoas": [
+                "Ivo Exemplo"
+              ],
+              "orgaos": [
+                "Escola Técnica Fictícia Horizonte"
+              ],
+              "locais": [
+                "Vila Exemplo"
+              ],
+              "datas": [
+                "15/10/2026"
+              ],
+              "protocolos": [
+                "2026-000202"
+              ]
+            },
+            "campos_ausentes": [],
+            "necessita_revisao": false,
+            "motivo_revisao": ""
+          },
+          "regras": [],
+          "divergencias_gabarito": {},
+          "entidades": {
+            "pessoas": {
+              "corretas": [
+                "Ivo Exemplo"
+              ],
+              "omitidas": [],
+              "adicionais_ao_gabarito": []
+            },
+            "orgaos": {
+              "corretas": [
+                "Escola Técnica Fictícia Horizonte"
+              ],
+              "omitidas": [],
+              "adicionais_ao_gabarito": []
+            },
+            "locais": {
+              "corretas": [
+                "Vila Exemplo"
+              ],
+              "omitidas": [],
+              "adicionais_ao_gabarito": []
+            },
+            "datas": {
+              "corretas": [
+                "15/10/2026"
+              ],
+              "omitidas": [],
+              "adicionais_ao_gabarito": []
+            },
+            "protocolos": {
+              "corretas": [
+                "2026-000202"
+              ],
+              "omitidas": [],
+              "adicionais_ao_gabarito": []
+            }
+          },
+          "reparos": 0,
+          "respostas": [
+            {
+              "saida": "{\"protocolo\":\"2026-000202\",\"data\":\"15/10/2026\",\"solicitante\":\"Ivo Exemplo\",\"assunto\":\"cancelamento\",\"pedido\":\"Solicito cancelamento da matrícula.\",\"categoria\":\"cancelamento\",\"entidades\":{\"pessoas\":[\"Ivo Exemplo\"],\"orgaos\":[\"Escola Técnica Fictícia Horizonte\"],\"locais\":[\"Vila Exemplo\"],\"datas\":[\"15/10/2026\"],\"protocolos\":[\"2026-000202\"]},\"campos_ausentes\":[],\"necessita_revisao\":false,\"motivo_revisao\":\"\"}",
+              "modelo": "gpt-6.1-terra",
+              "tokens_entrada": 1187,
+              "tokens_saida": 134,
+              "custo_estimado_usd": 0.001857,
+              "duracao_s": 2.485,
+              "parametros": {
+                "store": false,
+                "max_output_tokens": 4096,
+                "reasoning": {
+                  "effort": "low"
+                },
+                "formato_resposta": "solicitacao"
+              }
+            }
+          ],
+          "prompt": "solicitacao_d2_v2",
+          "reavaliacao_pelas_regras_finais": []
+        }
+      ],
+      "fichas": [
+        {
+          "inicio": "2026-11-01T01:11:45.129362+00:00",
+          "status": "valido",
+          "ficha": {
+            "resumo": "Ivo Exemplo solicita o cancelamento da matrícula na Escola Técnica Fictícia Horizonte, em Vila Exemplo. Protocolo: 2026-000202, de 15/10/2026.",
+            "inferencias": []
+          },
+          "palavras": 19,
+          "fatos_nao_localizados_literalmente": [],
+          "respostas": [
+            {
+              "saida": "{\"resumo\":\"Ivo Exemplo solicita o cancelamento da matrícula na Escola Técnica Fictícia Horizonte, em Vila Exemplo. Protocolo: 2026-000202, de 15/10/2026.\",\"inferencias\":[]}",
+              "modelo": "gpt-6.1-terra",
+              "tokens_entrada": 921,
+              "tokens_saida": 61,
+              "custo_estimado_usd": 0.001226,
+              "duracao_s": 1.943,
+              "parametros": {
+                "store": false,
+                "max_output_tokens": 4096,
+                "reasoning": {
+                  "effort": "low"
+                },
+                "formato_resposta": "compreensao"
+              }
+            },
+            {
+              "saida": "{\"fiel\":true,\"evidencias\":[\"Protocolo: 2026-000202\",\"Data: 15/10/2026\",\"Solicitante: Ivo Exemplo\",\"Órgão: Escola Técnica Fictícia Horizonte\",\"Local: Vila Exemplo\",\"Solicito cancelamento da matrícula.\"],\"fatos_sem_suporte\":[],\"justificativa\":\"O resumo apresenta o pedido como solicitação e reproduz os dados de identificação, órgão, local, protocolo e data presentes no original.\"}",
+              "modelo": "gpt-6.1-terra",
+              "tokens_entrada": 853,
+              "tokens_saida": 115,
+              "custo_estimado_usd": 0.001428,
+              "duracao_s": 2.485,
+              "parametros": {
+                "store": false,
+                "max_output_tokens": 4096,
+                "reasoning": {
+                  "effort": "low"
+                },
+                "formato_resposta": "verificacao_resumo",
+                "prompt_id": "verificar_resumo_d2_v1",
+                "prompt_hash": "61eb720728a9"
+              }
+            }
+          ],
+          "prompt": "compreensao_d2_v2"
+        }
+      ],
+      "hash_gabarito": "b9c9025edeec0ecf6156f02ba6cbf2486f17f694b601bd3a8031521beaeffaf9"
+    },
+    "D2-S04": {
+      "extracoes": [
+        {
+          "inicio": "2026-11-01T01:11:49.574394+00:00",
+          "status": "valido",
+          "solicitacao": {
+            "protocolo": "2026-000203",
+            "data": "15/10/2026",
+            "solicitante": "Bia Exemplo",
+            "assunto": "reclamação",
+            "pedido": "Reclamo da demora no atendimento e peço registro da reclamação.",
+            "categoria": "reclamacao",
+            "entidades": {
+              "pessoas": [
+                "Bia Exemplo"
+              ],
+              "orgaos": [
+                "Escola Técnica Fictícia Horizonte"
+              ],
+              "locais": [
+                "Vila Exemplo"
+              ],
+              "datas": [
+                "15/10/2026"
+              ],
+              "protocolos": [
+                "2026-000203"
+              ]
+            },
+            "campos_ausentes": [],
+            "necessita_revisao": false,
+            "motivo_revisao": ""
+          },
+          "regras": [],
+          "divergencias_gabarito": {},
+          "entidades": {
+            "pessoas": {
+              "corretas": [
+                "Bia Exemplo"
+              ],
+              "omitidas": [],
+              "adicionais_ao_gabarito": []
+            },
+            "orgaos": {
+              "corretas": [
+                "Escola Técnica Fictícia Horizonte"
+              ],
+              "omitidas": [],
+              "adicionais_ao_gabarito": []
+            },
+            "locais": {
+              "corretas": [
+                "Vila Exemplo"
+              ],
+              "omitidas": [],
+              "adicionais_ao_gabarito": []
+            },
+            "datas": {
+              "corretas": [
+                "15/10/2026"
+              ],
+              "omitidas": [],
+              "adicionais_ao_gabarito": []
+            },
+            "protocolos": {
+              "corretas": [
+                "2026-000203"
+              ],
+              "omitidas": [],
+              "adicionais_ao_gabarito": []
+            }
+          },
+          "reparos": 0,
+          "respostas": [
+            {
+              "saida": "{\"protocolo\":\"2026-000203\",\"data\":\"15/10/2026\",\"solicitante\":\"Bia Exemplo\",\"assunto\":\"reclamação\",\"pedido\":\"Reclamo da demora no atendimento e peço registro da reclamação.\",\"categoria\":\"reclamacao\",\"entidades\":{\"pessoas\":[\"Bia Exemplo\"],\"orgaos\":[\"Escola Técnica Fictícia Horizonte\"],\"locais\":[\"Vila Exemplo\"],\"datas\":[\"15/10/2026\"],\"protocolos\":[\"2026-000203\"]},\"campos_ausentes\":[],\"necessita_revisao\":false,\"motivo_revisao\":\"\"}",
+              "modelo": "gpt-6.1-terra",
+              "tokens_entrada": 1195,
+              "tokens_saida": 145,
+              "custo_estimado_usd": 0.00192,
+              "duracao_s": 2.783,
+              "parametros": {
+                "store": false,
+                "max_output_tokens": 4096,
+                "reasoning": {
+                  "effort": "low"
+                },
+                "formato_resposta": "solicitacao"
+              }
+            }
+          ],
+          "prompt": "solicitacao_d2_v2",
+          "reavaliacao_pelas_regras_finais": []
+        }
+      ],
+      "fichas": [
+        {
+          "inicio": "2026-11-01T01:11:52.373533+00:00",
+          "status": "valido",
+          "ficha": {
+            "resumo": "Bia Exemplo reclama da demora no atendimento e pede o registro da reclamação. Protocolo 2026-000203, de 15/10/2026, referente à Escola Técnica Fictícia Horizonte, em Vila Exemplo.",
+            "inferencias": []
+          },
+          "palavras": 26,
+          "fatos_nao_localizados_literalmente": [],
+          "respostas": [
+            {
+              "saida": "{\"resumo\":\"Bia Exemplo reclama da demora no atendimento e pede o registro da reclamação. Protocolo 2026-000203, de 15/10/2026, referente à Escola Técnica Fictícia Horizonte, em Vila Exemplo.\",\"inferencias\":[]}",
+              "modelo": "gpt-6.1-terra",
+              "tokens_entrada": 940,
+              "tokens_saida": 68,
+              "custo_estimado_usd": 0.00128,
+              "duracao_s": 1.662,
+              "parametros": {
+                "store": false,
+                "max_output_tokens": 4096,
+                "reasoning": {
+                  "effort": "low"
+                },
+                "formato_resposta": "compreensao"
+              }
+            },
+            {
+              "saida": "{\"fiel\":true,\"evidencias\":[\"Protocolo: 2026-000203\",\"Data: 15/10/2026\",\"Solicitante: Bia Exemplo\",\"Órgão: Escola Técnica Fictícia Horizonte\",\"Local: Vila Exemplo\",\"Reclamo da demora no atendimento e peço registro da reclamação.\"],\"fatos_sem_suporte\":[],\"justificativa\":\"Todas as afirmações do resumo são sustentadas pelo texto original. O pedido de registro não é apresentado como deferido.\"}",
+              "modelo": "gpt-6.1-terra",
+              "tokens_entrada": 879,
+              "tokens_saida": 120,
+              "custo_estimado_usd": 0.001479,
+              "duracao_s": 2.661,
+              "parametros": {
+                "store": false,
+                "max_output_tokens": 4096,
+                "reasoning": {
+                  "effort": "low"
+                },
+                "formato_resposta": "verificacao_resumo",
+                "prompt_id": "verificar_resumo_d2_v1",
+                "prompt_hash": "61eb720728a9"
+              }
+            }
+          ],
+          "prompt": "compreensao_d2_v2"
+        }
+      ],
+      "hash_gabarito": "aabc9a6c2f33a387de36448886407c9dd703eb0671e67b665063a538536c089d"
+    },
+    "D2-S05": {
+      "extracoes": [
+        {
+          "inicio": "2026-11-01T01:11:56.715066+00:00",
+          "status": "valido",
+          "solicitacao": {
+            "protocolo": null,
+            "data": null,
+            "solicitante": "MARCOS VINICIUS DE ALMEIDA SANTOS",
+            "assunto": "FICHA DE MATRÍCULA",
+            "pedido": null,
+            "categoria": "revisao",
+            "entidades": {
+              "pessoas": [
+                "MARCOS VINICIUS DE ALMEIDA SANTOS",
+                "LÚCIA HELENA DE ALMEIDA SANTOS"
+              ],
+              "orgaos": [
+                "GOVERNO DE MATO GROSSO",
+                "SECRETARIA DE ESTADO DE CIÊNCIA, TECNOLOGIA E INOVAÇÃO - SECITECI/MT",
+                "ESCOLA TÉCNICA ESTADUAL DE CUIABÁ"
+              ],
+              "locais": [
+                "CUIABÁ"
+              ],
+              "datas": [
+                "12/08/2008",
+                "01/02/2027",
+                "14/10/2026"
+              ],
+              "protocolos": [
+                "202[ilegível]-000142"
+              ]
+            },
+            "campos_ausentes": [
+              "protocolo",
+              "data",
+              "pedido"
+            ],
+            "necessita_revisao": true,
+            "motivo_revisao": "O código está parcialmente ilegível, não há data identificada como data da solicitação e a ficha não contém pedido definido."
+          },
+          "regras": [],
+          "divergencias_gabarito": {
+            "data": {
+              "esperado": "14/10/2026",
+              "obtido": null
+            },
+            "categoria": {
+              "esperado": "matricula",
+              "obtido": "revisao"
+            },
+            "campos_ausentes": {
+              "esperado": [
+                "protocolo",
+                "pedido"
+              ],
+              "obtido": [
+                "protocolo",
+                "data",
+                "pedido"
+              ]
+            },
+            "motivo_revisao": {
+              "esperado": "OCR tem protocolo parcialmente ilegível e não traz pedido; não completar usando outra modalidade.",
+              "obtido": "O código está parcialmente ilegível, não há data identificada como data da solicitação e a ficha não contém pedido definido."
+            }
+          },
+          "entidades": {
+            "pessoas": {
+              "corretas": [
+                "LÚCIA HELENA DE ALMEIDA SANTOS",
+                "MARCOS VINICIUS DE ALMEIDA SANTOS"
+              ],
+              "omitidas": [],
+              "adicionais_ao_gabarito": []
+            },
+            "orgaos": {
+              "corretas": [
+                "ESCOLA TÉCNICA ESTADUAL DE CUIABÁ",
+                "SECRETARIA DE ESTADO DE CIÊNCIA, TECNOLOGIA E INOVAÇÃO - SECITECI/MT"
+              ],
+              "omitidas": [],
+              "adicionais_ao_gabarito": [
+                "GOVERNO DE MATO GROSSO"
+              ]
+            },
+            "locais": {
+              "corretas": [
+                "CUIABÁ"
+              ],
+              "omitidas": [],
+              "adicionais_ao_gabarito": []
+            },
+            "datas": {
+              "corretas": [
+                "01/02/2027",
+                "12/08/2008",
+                "14/10/2026"
+              ],
+              "omitidas": [],
+              "adicionais_ao_gabarito": []
+            },
+            "protocolos": {
+              "corretas": [],
+              "omitidas": [],
+              "adicionais_ao_gabarito": [
+                "202[ilegível]-000142"
+              ]
+            }
+          },
+          "reparos": 0,
+          "respostas": [
+            {
+              "saida": "{\"protocolo\":null,\"data\":null,\"solicitante\":\"MARCOS VINICIUS DE ALMEIDA SANTOS\",\"assunto\":\"FICHA DE MATRÍCULA\",\"pedido\":null,\"categoria\":\"revisao\",\"entidades\":{\"pessoas\":[\"MARCOS VINICIUS DE ALMEIDA SANTOS\",\"LÚCIA HELENA DE ALMEIDA SANTOS\"],\"orgaos\":[\"GOVERNO DE MATO GROSSO\",\"SECRETARIA DE ESTADO DE CIÊNCIA, TECNOLOGIA E INOVAÇÃO - SECITECI/MT\",\"ESCOLA TÉCNICA ESTADUAL DE CUIABÁ\"],\"locais\":[\"CUIABÁ\"],\"datas\":[\"12/08/2008\",\"01/02/2027\",\"14/10/2026\"],\"protocolos\":[\"202[ilegível]-000142\"]},\"campos_ausentes\":[\"protocolo\",\"data\",\"pedido\"],\"necessita_revisao\":true,\"motivo_revisao\":\"O código está parcialmente ilegível, não há data identificada como data da solicitação e a ficha não contém pedido definido.\"}",
+              "modelo": "gpt-6.1-terra",
+              "tokens_entrada": 1485,
+              "tokens_saida": 375,
+              "custo_estimado_usd": 0.00336,
+              "duracao_s": 5.718,
+              "parametros": {
+                "store": false,
+                "max_output_tokens": 4096,
+                "reasoning": {
+                  "effort": "low"
+                },
+                "formato_resposta": "solicitacao"
+              }
+            }
+          ],
+          "prompt": "solicitacao_d2_v2",
+          "reavaliacao_pelas_regras_finais": [
+            "data: ausente na extração apesar de rotulada no original.",
+            "entidades.protocolos: identificador ilegível ou incompleto exige revisão, não extração como protocolo."
+          ]
+        },
+        {
+          "inicio": "2026-11-01T01:13:53.261339+00:00",
+          "status": "valido",
+          "solicitacao": {
+            "protocolo": null,
+            "data": "14/10/2026",
+            "solicitante": "MARCOS VINICIUS DE ALMEIDA SANTOS",
+            "assunto": "FICHA DE MATRÍCULA",
+            "pedido": null,
+            "categoria": "matricula",
+            "entidades": {
+              "pessoas": [
+                "MARCOS VINICIUS DE ALMEIDA SANTOS",
+                "LÚCIA HELENA DE ALMEIDA SANTOS"
+              ],
+              "orgaos": [
+                "GOVERNO DE MATO GROSSO",
+                "SECRETARIA DE ESTADO DE CIÊNCIA, TECNOLOGIA E INOVAÇÃO - SECITECI/MT",
+                "ESCOLA TÉCNICA ESTADUAL DE CUIABÁ"
+              ],
+              "locais": [
+                "CUIABÁ"
+              ],
+              "datas": [
+                "12/08/2008",
+                "01/02/2027",
+                "14/10/2026"
+              ],
+              "protocolos": []
+            },
+            "campos_ausentes": [
+              "protocolo",
+              "pedido"
+            ],
+            "necessita_revisao": true,
+            "motivo_revisao": "O código está parcialmente ilegível e não há pedido explícito na ficha."
+          },
+          "regras": [],
+          "divergencias_gabarito": {
+            "motivo_revisao": {
+              "esperado": "OCR tem protocolo parcialmente ilegível e não traz pedido; não completar usando outra modalidade.",
+              "obtido": "O código está parcialmente ilegível e não há pedido explícito na ficha."
+            }
+          },
+          "entidades": {
+            "pessoas": {
+              "corretas": [
+                "LÚCIA HELENA DE ALMEIDA SANTOS",
+                "MARCOS VINICIUS DE ALMEIDA SANTOS"
+              ],
+              "omitidas": [],
+              "adicionais_ao_gabarito": []
+            },
+            "orgaos": {
+              "corretas": [
+                "ESCOLA TÉCNICA ESTADUAL DE CUIABÁ",
+                "SECRETARIA DE ESTADO DE CIÊNCIA, TECNOLOGIA E INOVAÇÃO - SECITECI/MT"
+              ],
+              "omitidas": [],
+              "adicionais_ao_gabarito": [
+                "GOVERNO DE MATO GROSSO"
+              ]
+            },
+            "locais": {
+              "corretas": [
+                "CUIABÁ"
+              ],
+              "omitidas": [],
+              "adicionais_ao_gabarito": []
+            },
+            "datas": {
+              "corretas": [
+                "01/02/2027",
+                "12/08/2008",
+                "14/10/2026"
+              ],
+              "omitidas": [],
+              "adicionais_ao_gabarito": []
+            },
+            "protocolos": {
+              "corretas": [],
+              "omitidas": [],
+              "adicionais_ao_gabarito": []
+            }
+          },
+          "reparos": 0,
+          "respostas": [
+            {
+              "saida": "{\"protocolo\":null,\"data\":\"14/10/2026\",\"solicitante\":\"MARCOS VINICIUS DE ALMEIDA SANTOS\",\"assunto\":\"FICHA DE MATRÍCULA\",\"pedido\":null,\"categoria\":\"matricula\",\"entidades\":{\"pessoas\":[\"MARCOS VINICIUS DE ALMEIDA SANTOS\",\"LÚCIA HELENA DE ALMEIDA SANTOS\"],\"orgaos\":[\"GOVERNO DE MATO GROSSO\",\"SECRETARIA DE ESTADO DE CIÊNCIA, TECNOLOGIA E INOVAÇÃO - SECITECI/MT\",\"ESCOLA TÉCNICA ESTADUAL DE CUIABÁ\"],\"locais\":[\"CUIABÁ\"],\"datas\":[\"12/08/2008\",\"01/02/2027\",\"14/10/2026\"],\"protocolos\":[]},\"campos_ausentes\":[\"protocolo\",\"pedido\"],\"necessita_revisao\":true,\"motivo_revisao\":\"O código está parcialmente ilegível e não há pedido explícito na ficha.\"}",
+              "modelo": "gpt-6.1-terra",
+              "tokens_entrada": 1745,
+              "tokens_saida": 232,
+              "custo_estimado_usd": 0.002905,
+              "duracao_s": 3.486,
+              "parametros": {
+                "store": false,
+                "max_output_tokens": 4096,
+                "reasoning": {
+                  "effort": "low"
+                },
+                "formato_resposta": "solicitacao"
+              }
+            }
+          ],
+          "prompt": "solicitacao_d2_v3",
+          "reavaliacao_pelas_regras_finais": []
+        }
+      ],
+      "fichas": [
+        {
+          "inicio": "2026-11-01T01:12:02.453379+00:00",
+          "status": "valido",
+          "ficha": {
+            "resumo": "Ficha de matrícula de Marcos Vinicius de Almeida Santos no curso Técnico em Enfermagem, noturno, da Escola Técnica Estadual de Cuiabá, com início em 01/02/2027. O código é 202[ilegível]-000142. A ficha registra ciência de cancelamento automático da matrícula em determinadas condições de faltas sem justificativa comprovada. Não há pedido definido nem data identificada como data da solicitação, o que limita a identificação da demanda.",
+            "inferencias": []
+          },
+          "palavras": 64,
+          "fatos_nao_localizados_literalmente": [
+            "14/10/2026"
+          ],
+          "respostas": [
+            {
+              "saida": "{\"resumo\":\"Ficha de matrícula de Marcos Vinicius de Almeida Santos no curso Técnico em Enfermagem, noturno, da Escola Técnica Estadual de Cuiabá, com início em 01/02/2027. O código é 202[ilegível]-000142. A ficha registra ciência de cancelamento automático da matrícula em determinadas condições de faltas sem justificativa comprovada. Não há pedido definido nem data identificada como data da solicitação, o que limita a identificação da demanda.\",\"inferencias\":[]}",
+              "modelo": "gpt-6.1-terra",
+              "tokens_entrada": 1332,
+              "tokens_saida": 116,
+              "custo_estimado_usd": 0.001912,
+              "duracao_s": 2.334,
+              "parametros": {
+                "store": false,
+                "max_output_tokens": 4096,
+                "reasoning": {
+                  "effort": "low"
+                },
+                "formato_resposta": "compreensao"
+              }
+            },
+            {
+              "saida": "{\"fiel\":true,\"evidencias\":[\"ESCOLA TÉCNICA ESTADUAL DE CUIABÁ FICHA DE MATRÍCULA CÓDIGO: 202[ilegível]-000142 NOME: MARCOS VINICIUS DE ALMEIDA SANTOS\",\"CURSO: TÉCNICO EM ENFERMAGEM\",\"TURNO: NOTURNO INÍCIO DO CURSO: 01/02/2027\",\"[X] Estou ciente que minha matrícula será automaticamente cancelada se faltar, sem justificativa comprovada: - nos 02 (dois) primeiros dias de aula consecutivos; - 03 (três) dias de aula, consecutivos ou não, no período dos 10 (dez) primeiros dias de aula.\",\"DATA DE NASCIMENTO: 12/08/2008\",\"INÍCIO DO CURSO: 01/02/2027\",\"DATA MATRÍCULA: 14/10/2026\"],\"fatos_sem_suporte\":[],\"justificativa\":\"O resumo identifica corretamente a ficha, o curso, o turno, o início e o código. Descreve o cancelamento como condicionado a faltas, não como realizado. A leitura completa da ficha confirma que não há pedido definido nem data identificada como data da solicitação; as datas registradas são de nascimento, início do curso e matrícula.\"}",
+              "modelo": "gpt-6.1-terra",
+              "tokens_entrada": 1319,
+              "tokens_saida": 297,
+              "custo_estimado_usd": 0.002804,
+              "duracao_s": 4.399,
+              "parametros": {
+                "store": false,
+                "max_output_tokens": 4096,
+                "reasoning": {
+                  "effort": "low"
+                },
+                "formato_resposta": "verificacao_resumo",
+                "prompt_id": "verificar_resumo_d2_v1",
+                "prompt_hash": "61eb720728a9"
+              }
+            }
+          ],
+          "prompt": "compreensao_d2_v2"
+        },
+        {
+          "inicio": "2026-11-01T01:13:56.779179+00:00",
+          "status": "valido",
+          "ficha": {
+            "resumo": "Ficha de matrícula de Marcos Vinicius de Almeida Santos na Escola Técnica Estadual de Cuiabá, para o curso Técnico em Enfermagem, noturno, com início em 01/02/2027. A data da matrícula é 14/10/2026. O código está parcialmente ilegível. A ficha registra ciência das condições de cancelamento automático por faltas sem justificativa comprovada. Não há pedido explícito, o que limita a identificação da solicitação.",
+            "inferencias": []
+          },
+          "palavras": 62,
+          "fatos_nao_localizados_literalmente": [],
+          "respostas": [
+            {
+              "saida": "{\"resumo\":\"Ficha de matrícula de Marcos Vinicius de Almeida Santos na Escola Técnica Estadual de Cuiabá, para o curso Técnico em Enfermagem, noturno, com início em 01/02/2027. A data da matrícula é 14/10/2026. O código está parcialmente ilegível. A ficha registra ciência das condições de cancelamento automático por faltas sem justificativa comprovada. Não há pedido explícito, o que limita a identificação da solicitação.\",\"inferencias\":[]}",
+              "modelo": "gpt-6.1-terra",
+              "tokens_entrada": 1434,
+              "tokens_saida": 115,
+              "custo_estimado_usd": 0.002009,
+              "duracao_s": 2.8,
+              "parametros": {
+                "store": false,
+                "max_output_tokens": 4096,
+                "reasoning": {
+                  "effort": "low"
+                },
+                "formato_resposta": "compreensao"
+              }
+            },
+            {
+              "saida": "{\"fiel\":true,\"evidencias\":[\"ESCOLA TÉCNICA ESTADUAL DE CUIABÁ FICHA DE MATRÍCULA CÓDIGO: 202[ilegível]-000142 NOME: MARCOS VINICIUS DE ALMEIDA SANTOS\",\"CURSO: TÉCNICO EM ENFERMAGEM\",\"TURNO: NOTURNO INÍCIO DO CURSO: 01/02/2027\",\"DATA MATRÍCULA: 14/10/2026\",\"[X] Estou ciente que minha matrícula será automaticamente cancelada se faltar, sem justificativa comprovada: - nos 02 (dois) primeiros dias de aula consecutivos; - 03 (três) dias de aula, consecutivos ou não, no período dos 10 (dez) primeiros dias de aula.\"],\"fatos_sem_suporte\":[],\"justificativa\":\"Os dados da matrícula, o código parcialmente ilegível e a ciência das condições de cancelamento constam da ficha. A leitura integral também confirma que não há pedido explícito.\"}",
+              "modelo": "gpt-6.1-terra",
+              "tokens_entrada": 1346,
+              "tokens_saida": 233,
+              "custo_estimado_usd": 0.002511,
+              "duracao_s": 3.683,
+              "parametros": {
+                "store": false,
+                "max_output_tokens": 4096,
+                "reasoning": {
+                  "effort": "low"
+                },
+                "formato_resposta": "verificacao_resumo",
+                "prompt_id": "verificar_resumo_d2_v1",
+                "prompt_hash": "61eb720728a9"
+              }
+            }
+          ],
+          "prompt": "compreensao_d2_v3"
+        }
+      ],
+      "hash_gabarito": "53a23989f6f8a334fe0b61acab342a1d0149517ce2daeb32a98fa116b49bc70a"
+    },
+    "D2-S06": {
+      "extracoes": [
+        {
+          "inicio": "2026-11-01T01:12:09.209936+00:00",
+          "status": "valido",
+          "solicitacao": {
+            "protocolo": "2026-000205",
+            "data": "16/10/2026",
+            "solicitante": "Rui Exemplo",
+            "assunto": "matrícula",
+            "pedido": null,
+            "categoria": "revisao",
+            "entidades": {
+              "pessoas": [
+                "Rui Exemplo"
+              ],
+              "orgaos": [],
+              "locais": [],
+              "datas": [
+                "16/10/2026"
+              ],
+              "protocolos": [
+                "2026-000205"
+              ]
+            },
+            "campos_ausentes": [
+              "pedido"
+            ],
+            "necessita_revisao": true,
+            "motivo_revisao": "A intenção é ambígua: o solicitante não decidiu entre cancelar a matrícula ou saber como continuar."
+          },
+          "regras": [],
+          "divergencias_gabarito": {
+            "categoria": {
+              "esperado": null,
+              "obtido": "revisao"
+            },
+            "campos_ausentes": {
+              "esperado": [
+                "pedido",
+                "categoria"
+              ],
+              "obtido": [
+                "pedido"
+              ]
+            },
+            "motivo_revisao": {
+              "esperado": "Sem intenção definida, pedido e categoria null; revisão humana é o fallback do contrato atual.",
+              "obtido": "A intenção é ambígua: o solicitante não decidiu entre cancelar a matrícula ou saber como continuar."
+            }
+          },
+          "entidades": {
+            "pessoas": {
+              "corretas": [
+                "Rui Exemplo"
+              ],
+              "omitidas": [],
+              "adicionais_ao_gabarito": []
+            },
+            "orgaos": {
+              "corretas": [],
+              "omitidas": [],
+              "adicionais_ao_gabarito": []
+            },
+            "locais": {
+              "corretas": [],
+              "omitidas": [],
+              "adicionais_ao_gabarito": []
+            },
+            "datas": {
+              "corretas": [
+                "16/10/2026"
+              ],
+              "omitidas": [],
+              "adicionais_ao_gabarito": []
+            },
+            "protocolos": {
+              "corretas": [
+                "2026-000205"
+              ],
+              "omitidas": [],
+              "adicionais_ao_gabarito": []
+            }
+          },
+          "reparos": 0,
+          "respostas": [
+            {
+              "saida": "{\"protocolo\":\"2026-000205\",\"data\":\"16/10/2026\",\"solicitante\":\"Rui Exemplo\",\"assunto\":\"matrícula\",\"pedido\":null,\"categoria\":\"revisao\",\"entidades\":{\"pessoas\":[\"Rui Exemplo\"],\"orgaos\":[],\"locais\":[],\"datas\":[\"16/10/2026\"],\"protocolos\":[\"2026-000205\"]},\"campos_ausentes\":[\"pedido\"],\"necessita_revisao\":true,\"motivo_revisao\":\"A intenção é ambígua: o solicitante não decidiu entre cancelar a matrícula ou saber como continuar.\"}",
+              "modelo": "gpt-6.1-terra",
+              "tokens_entrada": 1180,
+              "tokens_saida": 268,
+              "custo_estimado_usd": 0.00252,
+              "duracao_s": 4.516,
+              "parametros": {
+                "store": false,
+                "max_output_tokens": 4096,
+                "reasoning": {
+                  "effort": "low"
+                },
+                "formato_resposta": "solicitacao"
+              }
+            }
+          ],
+          "prompt": "solicitacao_d2_v2",
+          "reavaliacao_pelas_regras_finais": []
+        }
+      ],
+      "fichas": [
+        {
+          "inicio": "2026-11-01T01:12:13.746738+00:00",
+          "status": "valido",
+          "ficha": {
+            "resumo": "Rui Exemplo, protocolo 2026-000205, quer resolver sua matrícula. Ele considera cancelá-la ou apenas saber como continuar, mas ainda não decidiu entre as opções. É necessário esclarecer sua intenção.",
+            "inferencias": []
+          },
+          "palavras": 28,
+          "fatos_nao_localizados_literalmente": [],
+          "respostas": [
+            {
+              "saida": "{\"resumo\":\"Rui Exemplo, protocolo 2026-000205, quer resolver sua matrícula. Ele considera cancelá-la ou apenas saber como continuar, mas ainda não decidiu entre as opções. É necessário esclarecer sua intenção.\",\"inferencias\":[]}",
+              "modelo": "gpt-6.1-terra",
+              "tokens_entrada": 920,
+              "tokens_saida": 61,
+              "custo_estimado_usd": 0.001225,
+              "duracao_s": 2.51,
+              "parametros": {
+                "store": false,
+                "max_output_tokens": 4096,
+                "reasoning": {
+                  "effort": "low"
+                },
+                "formato_resposta": "compreensao"
+              }
+            },
+            {
+              "saida": "{\"fiel\":true,\"evidencias\":[\"Protocolo: 2026-000205\",\"Solicitante: Rui Exemplo\",\"Quero resolver minha matrícula; talvez cancelar, talvez apenas saber como continuar. Não decidi.\"],\"fatos_sem_suporte\":[],\"justificativa\":\"O resumo preserva o pedido, as possibilidades consideradas e a ausência de decisão. A necessidade de esclarecer a intenção decorre da ambiguidade expressa no original.\"}",
+              "modelo": "gpt-6.1-terra",
+              "tokens_entrada": 852,
+              "tokens_saida": 122,
+              "custo_estimado_usd": 0.001462,
+              "duracao_s": 2.616,
+              "parametros": {
+                "store": false,
+                "max_output_tokens": 4096,
+                "reasoning": {
+                  "effort": "low"
+                },
+                "formato_resposta": "verificacao_resumo",
+                "prompt_id": "verificar_resumo_d2_v1",
+                "prompt_hash": "61eb720728a9"
+              }
+            }
+          ],
+          "prompt": "compreensao_d2_v2"
+        }
+      ],
+      "hash_gabarito": "f4af2443f0d37dbf82d69083ffa6388a6bb7a0d0df4c18cc5caf84d1bcb9d571"
+    }
+  },
+  "comparacoes": [
+    {
+      "origem": "D2-S02",
+      "prompt": "solicitacao_d2_v2",
+      "hash_prompt": "dc32c5e98669",
+      "abordagens": {
+        "json_livre": {
+          "json_valido": true,
+          "esquema_valido": true,
+          "campos_obrigatorios_ausentes": [],
+          "tipos_incorretos": [],
+          "campos_extras": [],
+          "outros_erros": [],
+          "saida": "{\n  \"protocolo\": \"2026-000201\",\n  \"data\": \"15/10/2026\",\n  \"solicitante\": \"Lia Exemplo\",\n  \"assunto\": \"declaração de matrícula\",\n  \"pedido\": \"Solicito emissão de declaração de matrícula.\",\n  \"categoria\": \"matricula\",\n  \"entidades\": {\n    \"pessoas\": [\"Lia Exemplo\"],\n    \"orgaos\": [\"Escola Técnica Fictícia Horizonte\"],\n    \"locais\": [\"Vila Exemplo\"],\n    \"datas\": [\"15/10/2026\"],\n    \"protocolos\": [\"2026-000201\"]\n  },\n  \"campos_ausentes\": [],\n  \"necessita_revisao\": false,\n  \"motivo_revisao\": \"não localizado\"\n}",
+          "modelo": "gpt-6.1-terra",
+          "tokens_entrada": 1337,
+          "tokens_saida": 231,
+          "duracao_s": 3.814,
+          "custo_estimado_usd": 0.002492,
+          "problemas_regras": [],
+          "reavaliacao_pelas_regras_finais": [
+            "categoria: pedido explícito de emissão exige solicitacao_documentos."
+          ]
+        },
+        "esquema": {
+          "json_valido": true,
+          "esquema_valido": true,
+          "campos_obrigatorios_ausentes": [],
+          "tipos_incorretos": [],
+          "campos_extras": [],
+          "outros_erros": [],
+          "saida": "{\"protocolo\":\"2026-000201\",\"data\":\"15/10/2026\",\"solicitante\":\"Lia Exemplo\",\"assunto\":\"declaração de matrícula\",\"pedido\":\"Solicito emissão de declaração de matrícula.\",\"categoria\":\"matricula\",\"entidades\":{\"pessoas\":[\"Lia Exemplo\"],\"orgaos\":[\"Escola Técnica Fictícia Horizonte\"],\"locais\":[\"Vila Exemplo\"],\"datas\":[\"15/10/2026\"],\"protocolos\":[\"2026-000201\"]},\"campos_ausentes\":[],\"necessita_revisao\":false,\"motivo_revisao\":\"\"}",
+          "modelo": "gpt-6.1-terra",
+          "tokens_entrada": 1780,
+          "tokens_saida": 138,
+          "duracao_s": 2.621,
+          "custo_estimado_usd": 0.00247,
+          "problemas_regras": [],
+          "reavaliacao_pelas_regras_finais": [
+            "categoria: pedido explícito de emissão exige solicitacao_documentos."
+          ]
+        }
+      }
+    },
+    {
+      "origem": "D2-S02",
+      "prompt": "solicitacao_d2_v3",
+      "hash_prompt": "6f26080dbf5b",
+      "abordagens": {
+        "json_livre": {
+          "json_valido": true,
+          "esquema_valido": true,
+          "campos_obrigatorios_ausentes": [],
+          "tipos_incorretos": [],
+          "campos_extras": [],
+          "outros_erros": [],
+          "saida": "{\n  \"protocolo\": \"2026-000201\",\n  \"data\": \"15/10/2026\",\n  \"solicitante\": \"Lia Exemplo\",\n  \"assunto\": \"declaração de matrícula\",\n  \"pedido\": \"Solicito emissão de declaração de matrícula.\",\n  \"categoria\": \"solicitacao_documentos\",\n  \"entidades\": {\n    \"pessoas\": [\"Lia Exemplo\"],\n    \"orgaos\": [\"Escola Técnica Fictícia Horizonte\"],\n    \"locais\": [\"Vila Exemplo\"],\n    \"datas\": [\"15/10/2026\"],\n    \"protocolos\": [\"2026-000201\"]\n  },\n  \"campos_ausentes\": [],\n  \"necessita_revisao\": false,\n  \"motivo_revisao\": \"\"\n}",
+          "modelo": "gpt-6.1-terra",
+          "tokens_entrada": 1597,
+          "tokens_saida": 175,
+          "duracao_s": 2.938,
+          "custo_estimado_usd": 0.002472,
+          "problemas_regras": [],
+          "reavaliacao_pelas_regras_finais": []
+        },
+        "esquema": {
+          "json_valido": true,
+          "esquema_valido": true,
+          "campos_obrigatorios_ausentes": [],
+          "tipos_incorretos": [],
+          "campos_extras": [],
+          "outros_erros": [],
+          "saida": "{\"protocolo\":\"2026-000201\",\"data\":\"15/10/2026\",\"solicitante\":\"Lia Exemplo\",\"assunto\":\"declaração de matrícula\",\"pedido\":\"Solicito emissão de declaração de matrícula.\",\"categoria\":\"solicitacao_documentos\",\"entidades\":{\"pessoas\":[\"Lia Exemplo\"],\"orgaos\":[\"Escola Técnica Fictícia Horizonte\"],\"locais\":[\"Vila Exemplo\"],\"datas\":[\"15/10/2026\"],\"protocolos\":[\"2026-000201\"]},\"campos_ausentes\":[],\"necessita_revisao\":false,\"motivo_revisao\":\"\"}",
+          "modelo": "gpt-6.1-terra",
+          "tokens_entrada": 2040,
+          "tokens_saida": 141,
+          "duracao_s": 2.659,
+          "custo_estimado_usd": 0.002745,
+          "problemas_regras": [],
+          "reavaliacao_pelas_regras_finais": []
+        }
+      }
+    }
+  ],
+  "execucoes": [
+    {
+      "inicio": "2026-11-01T01:11:22.562857+00:00",
+      "casos": [
+        "D2-S01",
+        "D2-S02",
+        "D2-S03",
+        "D2-S04",
+        "D2-S05",
+        "D2-S06"
+      ],
+      "etapas": [
+        "extracao",
+        "compreensao",
+        "comparacao"
+      ],
+      "status": "concluido",
+      "fim": "2026-11-01T01:12:25.346959+00:00"
+    },
+    {
+      "inicio": "2026-11-01T01:13:42.668980+00:00",
+      "casos": [
+        "D2-S01",
+        "D2-S05"
+      ],
+      "etapas": [
+        "extracao",
+        "compreensao",
+        "comparacao"
+      ],
+      "status": "concluido",
+      "fim": "2026-11-01T01:14:08.906777+00:00"
+    },
+    {
+      "inicio": "2026-11-01T01:15:18.323269+00:00",
+      "casos": [
+        "D2-S01"
+      ],
+      "etapas": [
+        "extracao"
+      ],
+      "status": "concluido",
+      "fim": "2026-11-01T01:15:22.451965+00:00"
+    },
+    {
+      "inicio": "2026-11-01T01:15:34.164556+00:00",
+      "casos": [
+        "D2-S02"
+      ],
+      "etapas": [
+        "bloqueio"
+      ],
+      "status": "concluido",
+      "fim": "2026-11-01T01:15:41.708361+00:00"
+    }
+  ],
+  "dados": {
+    "documentos": 6,
+    "solicitacoes": 6,
+    "perguntas": 8,
+    "ataques": 3,
+    "avaliacoes": 12,
+    "ids_unicos": 35,
+    "status": "validado offline"
+  },
+  "esquema_versao": "2.0",
+  "perfil": {
+    "nome": "principal",
+    "provedor": "openai",
+    "modelo": "gpt-6.1-terra"
+  },
+  "parametros_avaliacao": {
+    "max_output_tokens": 4096,
+    "reasoning": {
+      "effort": "low"
+    }
+  },
+  "consumo": {
+    "chamadas_transporte": 31,
+    "custo_estimado_usd": 0.065461,
+    "custo_contabilizado_conservador_usd": 0.065461,
+    "limite_usd": 1.0,
+    "tokens_entrada": 39581,
+    "tokens_saida": 5176,
+    "chamadas_sem_usage": 0
+  },
+  "acuracia_gabarito_original": {
+    "numerador": 5,
+    "denominador": 6,
+    "valor": 0.833,
+    "percentual": 83.33,
+    "divergencias": [
+      {
+        "id": "D2-S06",
+        "esperada": null,
+        "obtida": "revisao"
+      }
+    ]
+  },
+  "acuracia_categorias_definidas": {
+    "numerador": 5,
+    "denominador": 5,
+    "valor": 1.0,
+    "percentual": 100.0,
+    "divergencias": []
+  },
+  "solicitacoes_extraidas": 6,
+  "solicitacoes_com_ficha_valida": 6,
+  "testes_bloqueio": [
+    {
+      "id": "RF14-data-impossivel",
+      "variante_de": "D2-S02",
+      "alteracao": "Data: 31/02/2026",
+      "esperado": "RespostaMalformada após no máximo um reparo; nenhuma minuta",
+      "registrado_antes_da_chamada": "2026-11-01T01:15:34.165068+00:00",
+      "status": "bloqueado_conforme_esperado",
+      "erro": "RespostaMalformada",
+      "detalhe": "[\"data: o original contém data impossível; requer conferência.\", \"data: ausente na extração apesar de rotulada no original.\"]",
+      "respostas": [
+        {
+          "saida": "{\"protocolo\":\"2026-000201\",\"data\":\"31/02/2026\",\"solicitante\":\"Lia Exemplo\",\"assunto\":\"declaração de matrícula\",\"pedido\":\"Solicito emissão de declaração de matrícula.\",\"categoria\":\"solicitacao_documentos\",\"entidades\":{\"pessoas\":[\"Lia Exemplo\"],\"orgaos\":[\"Escola Técnica Fictícia Horizonte\"],\"locais\":[\"Vila Exemplo\"],\"datas\":[\"31/02/2026\"],\"protocolos\":[\"2026-000201\"]},\"campos_ausentes\":[],\"necessita_revisao\":true,\"motivo_revisao\":\"A data informada é impossível: 31/02/2026.\"}",
+          "modelo": "gpt-6.1-terra",
+          "tokens_entrada": 1529,
+          "tokens_saida": 191,
+          "custo_estimado_usd": 0.002484,
+          "duracao_s": 3.689,
+          "parametros": {
+            "store": false,
+            "max_output_tokens": 4096,
+            "reasoning": {
+              "effort": "low"
+            },
+            "formato_resposta": "solicitacao"
+          },
+          "validacao_esquema": {
+            "json_valido": true,
+            "esquema_valido": true,
+            "campos_obrigatorios_ausentes": [],
+            "tipos_incorretos": [],
+            "campos_extras": [],
+            "outros_erros": []
+          }
+        },
+        {
+          "saida": "{\"protocolo\":\"2026-000201\",\"data\":null,\"solicitante\":\"Lia Exemplo\",\"assunto\":\"declaração de matrícula\",\"pedido\":\"Solicito emissão de declaração de matrícula.\",\"categoria\":\"solicitacao_documentos\",\"entidades\":{\"pessoas\":[\"Lia Exemplo\"],\"orgaos\":[\"Escola Técnica Fictícia Horizonte\"],\"locais\":[\"Vila Exemplo\"],\"datas\":[],\"protocolos\":[\"2026-000201\"]},\"campos_ausentes\":[\"data\"],\"necessita_revisao\":true,\"motivo_revisao\":\"A data informada, 31/02/2026, é impossível e requer conferência.\"}",
+          "modelo": "gpt-6.1-terra",
+          "tokens_entrada": 1592,
+          "tokens_saida": 176,
+          "custo_estimado_usd": 0.002472,
+          "duracao_s": 3.788,
+          "parametros": {
+            "store": false,
+            "max_output_tokens": 4096,
+            "reasoning": {
+              "effort": "low"
+            },
+            "formato_resposta": "solicitacao"
+          },
+          "validacao_esquema": {
+            "json_valido": true,
+            "esquema_valido": true,
+            "campos_obrigatorios_ausentes": [],
+            "tipos_incorretos": [],
+            "campos_extras": [],
+            "outros_erros": []
+          }
+        }
+      ]
+    }
+  ],
+  "status": "concluido"
+}

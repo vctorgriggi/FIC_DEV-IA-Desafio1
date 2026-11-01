@@ -29,7 +29,7 @@ def acuracia_categorias(obtidas: dict[str, str | None], esperadas: dict[str, str
     divergencias = [
         {"id": identificador, "esperada": esperada, "obtida": obtidas.get(identificador)}
         for identificador, esperada in sorted(esperadas.items())
-        if obtidas.get(identificador) != esperada
+        if identificador not in obtidas or obtidas.get(identificador) != esperada
     ]
     denominador = len(esperadas)
     numerador = denominador - len(divergencias)

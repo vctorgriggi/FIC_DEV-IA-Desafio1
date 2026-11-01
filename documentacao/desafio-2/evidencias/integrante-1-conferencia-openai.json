@@ -1,0 +1,114 @@
+{
+  "tipo": "conferência técnica por IA, não é aprovação humana",
+  "gabaritos_alterados": false,
+  "casos": {
+    "D2-S01": {
+      "fatos_essenciais_conferidos": [
+        "2026-000142",
+        "matrícula",
+        "noturno",
+        "documentos"
+      ],
+      "omissoes_semanticas_identificadas": [],
+      "afirmacoes_factuais_sem_suporte_identificadas": [],
+      "palavras": 78,
+      "inferencia_operacional": null
+    },
+    "D2-S02": {
+      "fatos_essenciais_conferidos": [
+        "Lia Exemplo",
+        "declaração de matrícula"
+      ],
+      "omissoes_semanticas_identificadas": [],
+      "afirmacoes_factuais_sem_suporte_identificadas": [],
+      "palavras": 21,
+      "inferencia_operacional": null
+    },
+    "D2-S03": {
+      "fatos_essenciais_conferidos": [
+        "Ivo Exemplo",
+        "cancelamento"
+      ],
+      "omissoes_semanticas_identificadas": [],
+      "afirmacoes_factuais_sem_suporte_identificadas": [],
+      "palavras": 19,
+      "inferencia_operacional": null
+    },
+    "D2-S04": {
+      "fatos_essenciais_conferidos": [
+        "Bia Exemplo",
+        "reclamação"
+      ],
+      "omissoes_semanticas_identificadas": [],
+      "afirmacoes_factuais_sem_suporte_identificadas": [],
+      "palavras": 26,
+      "inferencia_operacional": null
+    },
+    "D2-S05": {
+      "fatos_essenciais_conferidos": [
+        "FICHA DE MATRÍCULA",
+        "NOTURNO",
+        "14/10/2026"
+      ],
+      "omissoes_semanticas_identificadas": [],
+      "afirmacoes_factuais_sem_suporte_identificadas": [],
+      "palavras": 62,
+      "inferencia_operacional": null
+    },
+    "D2-S06": {
+      "fatos_essenciais_conferidos": [
+        "matrícula",
+        "Não decidi"
+      ],
+      "omissoes_semanticas_identificadas": [],
+      "afirmacoes_factuais_sem_suporte_identificadas": [],
+      "palavras": 28,
+      "inferencia_operacional": "Necessidade de esclarecer decorre de necessita_revisao; não é fato novo sobre o cidadão."
+    }
+  },
+  "entidades": {
+    "esperadas_corretas": 32,
+    "omitidas": 0,
+    "adicionais_sustentadas": 1,
+    "adicionais_sem_suporte": 0
+  },
+  "acuracia_original": {
+    "numerador": 5,
+    "denominador": 6,
+    "valor": 0.833,
+    "percentual": 83.33,
+    "divergencias": [
+      {
+        "id": "D2-S06",
+        "esperada": null,
+        "obtida": "revisao"
+      }
+    ]
+  },
+  "acuracia_tematicas": {
+    "numerador": 5,
+    "denominador": 5,
+    "valor": 1.0,
+    "percentual": 100.0,
+    "divergencias": []
+  },
+  "consumo": {
+    "chamadas_transporte": 31,
+    "custo_estimado_usd": 0.065461,
+    "custo_contabilizado_conservador_usd": 0.065461,
+    "limite_usd": 1.0,
+    "tokens_entrada": 39581,
+    "tokens_saida": 5176,
+    "chamadas_sem_usage": 0
+  },
+  "fatos_essenciais_total": 15,
+  "observacoes": [
+    "Gabaritos originais preservados integralmente. D2-S06 retorna revisao no lugar do null histórico, como solicitado nesta missão; isso continua uma divergência exata 5/6.",
+    "D2-S01 tem assunto mais específico e preserva dois pedidos explícitos; a diferença de texto é registrada, sem mudar o gabarito.",
+    "D2-S05 tem órgão adicional GOVERNO DE MATO GROSSO, presente literalmente no original; não é alucinação.",
+    "A primeira saída do OCR omitiu a data e o primeiro resumo não preservou esse fato; corrigidos na repetição específica.",
+    "Ambas as saídas da primeira comparação eram válidas em sintaxe/esquema, mas erravam a categoria. A nova regra bloqueia essas saídas; a repetição específica corrigiu ambas.",
+    "Nenhum dos seis casos finais exigiu reparo automático. A variante controlada com data impossível fez duas gerações, incluindo um único reparo, e foi bloqueada.",
+    "A classificação, os resumos e as entidades continuam sujeitos a decisão humana; a checagem semântica por modelo não é garantia de verdade."
+  ]
+}

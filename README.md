@@ -115,6 +115,7 @@ A extração classifica cada solicitação em uma destas categorias (`categorias
 | `solicitacao_documentos` | Pedido de emissão de documento, como declaração, histórico ou certificado. |
 | `reclamacao` | Manifestação de insatisfação com um serviço ou atendimento. |
 | `cancelamento` | Pedido de cancelamento ou trancamento, ou informação sobre como fazer isso. |
+| `revisao` | Desafio 2: intenção ambígua entre ações ou tema fora das categorias; exige revisão e motivo, sem completar dados ausentes. |
 
 ## Gabaritos
 

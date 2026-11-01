@@ -1,0 +1,26 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.1.1, pluggy-1.7.0
+rootdir: /home/andre/estudos/FIC_DEV-IA-Desafio1
+configfile: pytest.ini
+testpaths: testes
+plugins: anyio-4.15.1
+collected 284 items
+
+testes/test_audio.py .................................                   [ 11%]
+testes/test_audit_e_main.py ...........                                  [ 15%]
+testes/test_avaliacao.py .....                                           [ 17%]
+testes/test_base_desafio2.py .......................................     [ 30%]
+testes/test_d2_guardrails_sentimentos.py .                               [ 31%]
+testes/test_d2_indice_rag.py .                                           [ 31%]
+testes/test_d2_nlp.py .................................................. [ 49%]
+.....................................                                    [ 62%]
+testes/test_d2_orcamento.py .....                                        [ 64%]
+testes/test_entradas_e_extracao.py ................                      [ 69%]
+testes/test_experimento.py ..                                            [ 70%]
+testes/test_fluxo_e_revisao.py ..............                            [ 75%]
+testes/test_imagem.py .......................                            [ 83%]
+testes/test_llm_client.py ...............................                [ 94%]
+testes/test_privacidade_e_prompts.py .......                             [ 96%]
+testes/test_web.py .........                                             [100%]
+
+============================= 284 passed in 12.55s =============================

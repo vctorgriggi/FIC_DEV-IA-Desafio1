@@ -45,7 +45,8 @@
     "informacao",
     "solicitacao_documentos",
     "reclamacao",
-    "cancelamento"
+    "cancelamento",
+    "revisao"
   ],
   "privacidade": {
     "mascarar_antes_de_enviar": ["cpf", "rg", "email", "telefone"]

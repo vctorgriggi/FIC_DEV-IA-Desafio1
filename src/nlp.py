@@ -9,7 +9,7 @@ import json
 import re
 from datetime import date
 
-from pydantic import ValidationError
+from pydantic import BaseModel, ConfigDict, ValidationError
 
 from .config import Config
 from .llm_client import ClienteLLM, ErroLLM, RespostaMalformada, formato_json
@@ -63,6 +63,13 @@ def _literal(valor, texto):
     return bool(re.search(r'(?<!\w)' + re.escape(valor) + r'(?!\w)', texto))
 
 
+def _data_rotulada(texto):
+    rotulada = re.search(r'(?im)(?:^|\n|\\n)\s*Data(?: da solicitação| de matrícula| matrícula)?\s*:\s*(' + PADRAO_DATA.pattern + ')', texto)
+    if rotulada is None:
+        rotulada = re.search(r'protocolo\s+(?:é\s+)?\d{4}-\d{6},?\s+de\s+(' + PADRAO_DATA.pattern + ')', texto, re.I)
+    return rotulada
+
+
 def validar_regras(solicitacao: SolicitacaoEstruturada, texto_original: str, *, config: Config) -> list[str]:
     """Problemas bloqueiam a minuta; não corrige fatos nem preenche ausências."""
     problemas = []
@@ -75,13 +82,17 @@ def validar_regras(solicitacao: SolicitacaoEstruturada, texto_original: str, *, 
         problemas.append('motivo_revisao: obrigatório quando há revisão.')
     if solicitacao.categoria is not None and solicitacao.categoria not in config.dados['categorias']:
         problemas.append('categoria: fora da lista configurada.')
+    if solicitacao.categoria == 'revisao' and not solicitacao.necessita_revisao:
+        problemas.append('categoria: revisao exige necessita_revisao=true.')
+    if re.match(r'^solicito (?:a )?emissão de (?:uma? )?(?:declaração|histórico|certificado|documento)\b', (solicitacao.pedido or '').casefold()) and solicitacao.categoria != 'solicitacao_documentos':
+        problemas.append('categoria: pedido explícito de emissão exige solicitacao_documentos.')
     for campo in CAMPOS:
         valor = getattr(solicitacao, campo)
         if valor is None:
             continue
         if not valor.strip() or valor.strip().lower() in {'não localizado', 'null'}:
             problemas.append(f'{campo}: ausência deve ser null.')
-        elif campo not in {'categoria', 'data'} and not _literal(valor, texto_original):
+        elif campo not in {'categoria', 'data'} and not all(parte.strip() and _literal(parte, texto_original) for parte in (valor.split(' … ') if campo == 'pedido' else [valor])):
             problemas.append(f'{campo}: valor sem suporte literal no original.')
     if solicitacao.protocolo is not None:
         if not re.fullmatch(r'\d{4}-\d{6}', solicitacao.protocolo):
@@ -95,15 +106,15 @@ def validar_regras(solicitacao: SolicitacaoEstruturada, texto_original: str, *, 
             datas_originais.add(_data(valor))
         except ValueError:
             problemas.append('data: o original contém data impossível; requer conferência.')
+    rotulada = _data_rotulada(texto_original)
+    if rotulada and solicitacao.data is None:
+        problemas.append('data: ausente na extração apesar de rotulada no original.')
     if solicitacao.data is not None:
         try:
             extraida = _data(solicitacao.data)
             if extraida not in datas_originais:
                 problemas.append('data: valor sem suporte no original.')
             # Uma data de nascimento literal não deve substituir a data do requerimento.
-            rotulada = re.search(r'(?im)(?:^|\n|\\n)\s*Data(?: da solicitação| de matrícula| matrícula)?\s*:\s*(' + PADRAO_DATA.pattern + ')', texto_original)
-            if rotulada is None:
-                rotulada = re.search(r'protocolo\s+(?:é\s+)?\d{4}-\d{6},?\s+de\s+(' + PADRAO_DATA.pattern + ')', texto_original, re.I)
             if rotulada and extraida != _data(rotulada[1]):
                 problemas.append('data: não corresponde à data identificada da solicitação.')
         except ValueError:
@@ -112,6 +123,8 @@ def validar_regras(solicitacao: SolicitacaoEstruturada, texto_original: str, *, 
         for valor in valores:
             if not valor.strip() or not _literal(valor, texto_original):
                 problemas.append(f'entidades.{tipo}: entidade sem suporte literal no original.')
+            if tipo == 'protocolos' and not re.fullmatch(r'\d{4}-\d{6}', valor):
+                problemas.append('entidades.protocolos: identificador ilegível ou incompleto exige revisão, não extração como protocolo.')
             if tipo == 'datas':
                 try:
                     _data(valor)
@@ -129,14 +142,14 @@ def _chamar(cliente, config, perfil, entrada, formato):
     geracao = config.perfil_geracao(perfil)
     return cliente.gerar(modelo=geracao['modelo'], entrada=entrada,
                          parametros=geracao.get('parametros', {}),
-                         instrucao_sistema=carregar_prompt(config, 'sistema_seguro', 1).texto,
+                         instrucao_sistema=carregar_prompt(config, 'sistema_seguro_d2', 1).texto,
                          formato_resposta=formato)
 
 
 def extrair_solicitacao(texto: str, *, origem: str, cliente: ClienteLLM, config: Config,
                         perfil: str | None = None) -> Resultado[SolicitacaoEstruturada]:
     """Saída estrita e no máximo um reparo; incoerência persistente é erro controlado."""
-    prompt = carregar_prompt(config, 'solicitacao_d2', 1)
+    prompt = carregar_prompt(config, 'solicitacao_d2', 4)
     entrada = _entrada_extracao(texto, origem, config, prompt)
     formato = formato_json(SolicitacaoEstruturada.model_json_schema(), 'solicitacao')
     respostas = []
@@ -191,7 +204,7 @@ def _diagnosticar(texto):
 def comparar_sintatico_e_esquema(texto: str, *, origem: str, cliente: ClienteLLM,
                                  config: Config, perfil: str | None = None) -> dict:
     """Duas chamadas independentes, sem reparo, para comparar as saídas iniciais."""
-    prompt = carregar_prompt(config, 'solicitacao_d2', 1)
+    prompt = carregar_prompt(config, 'solicitacao_d2', 4)
     entrada = _entrada_extracao(texto, origem, config, prompt)
     resultado = {'origem':origem, 'prompt':prompt.identificador, 'hash_prompt':prompt.hash, 'abordagens':{}}
     for nome, formato in [('json_livre', None), ('esquema', formato_json(SolicitacaoEstruturada.model_json_schema(), 'solicitacao'))]:
@@ -205,9 +218,47 @@ def comparar_sintatico_e_esquema(texto: str, *, origem: str, cliente: ClienteLLM
     return resultado
 
 
+class _ChecagemResumo(BaseModel):
+    """Contrato interno do verificador; não modifica a ficha compartilhada."""
+    model_config = ConfigDict(extra='forbid', strict=True)
+    fiel: bool
+    evidencias: list[str]
+    fatos_sem_suporte: list[str]
+    justificativa: str
+
+
+def _conferir_resumo(ficha, original, solicitacao, *, cliente, config, perfil, respostas):
+    normalizado = ' '.join(original.split())
+    # Passagens literais mantêm o caminho local. Paráfrases seguem para verificação semântica.
+    partes = ficha.resumo.split(' … ')
+    if all(parte.strip() and ' '.join(parte.split()) in normalizado for parte in partes):
+        return []
+    # Protocolos inexistentes também são bloqueados por código, antes da checagem semântica.
+    for protocolo in re.findall(r'\b\d{4}-\d{6}\b', ficha.resumo):
+        if protocolo not in original:
+            return ['resumo: protocolo sem suporte no original.']
+    prompt = carregar_prompt(config, 'verificar_resumo_d2', 1)
+    entrada = (prompt.texto + '\n' + delimitar(original, 'original') + '\n'
+               + delimitar(_seguro(solicitacao.model_dump_json(), config), 'solicitacao') + '\n'
+               + delimitar(ficha.resumo, 'resumo'))
+    resposta = _chamar(cliente, config, perfil, entrada,
+                       formato_json(_ChecagemResumo.model_json_schema(), 'verificacao_resumo'))
+    respostas.append(resposta)
+    resposta.parametros.update(prompt_id=prompt.identificador, prompt_hash=prompt.hash)
+    _json(resposta.texto)
+    checagem = _ChecagemResumo.model_validate_json(resposta.texto)
+    if not checagem.fiel or checagem.fatos_sem_suporte:
+        return ['resumo: verificação semântica identificou afirmação sem suporte.']
+    if not checagem.justificativa.strip() or not checagem.evidencias:
+        return ['resumo: verificação sem evidências suficientes.']
+    if any(not trecho.strip() or ' '.join(trecho.split()) not in normalizado for trecho in checagem.evidencias):
+        return ['resumo: evidência do verificador ausente no original.']
+    return []
+
+
 def compreender(texto: str, solicitacao: SolicitacaoEstruturada, *, origem: str,
                 cliente: ClienteLLM, config: Config, perfil: str | None = None) -> Resultado[FichaCompreensao]:
-    """Resumo extrativo com até 100 palavras; inferências separadas e justificadas.
+    """Resumo de até 100 palavras; paráfrases verificadas e inferências separadas.
 
     Trechos sem suporte são recusados; revisão humana ainda verifica seleção,
     negações e fatos essenciais. Categoria e entidades nunca são regeneradas.
@@ -216,20 +267,19 @@ def compreender(texto: str, solicitacao: SolicitacaoEstruturada, *, origem: str,
     if problemas:
         raise RespostaMalformada('RF15: solicitação incoerente; compreensão bloqueada.',
                                  detalhe=json.dumps(problemas, ensure_ascii=False))
-    prompt = carregar_prompt(config, 'compreensao_d2', 1)
+    prompt = carregar_prompt(config, 'compreensao_d2', 3)
     original = _seguro(texto, config)
     entrada = (prompt.texto + '\n' + delimitar(original, origem) + '\n'
                + delimitar(_seguro(solicitacao.model_dump_json(), config), 'solicitacao_estruturada'))
     resposta = _chamar(cliente, config, perfil, entrada,
                        formato_json(FichaCompreensao.model_json_schema(), 'compreensao'))
     erros = []
+    respostas = [resposta]
     try:
         _json(resposta.texto)
         ficha = FichaCompreensao.model_validate_json(resposta.texto)
-        normalizado = ' '.join(original.split())
-        partes = ficha.resumo.split(' … ')
-        if any(not parte.strip() or ' '.join(parte.split()) not in normalizado for parte in partes):
-            erros.append('resumo: passagem sem suporte literal no original.')
+        if not ficha.resumo.strip():
+            erros.append('resumo: não pode ser vazio.')
         for inferencia in ficha.inferencias:
             if not all(v.strip() for v in (inferencia.campo, inferencia.valor, inferencia.justificativa)):
                 erros.append('inferencias: campo, valor e justificativa precisam estar preenchidos.')
@@ -238,12 +288,17 @@ def compreender(texto: str, solicitacao: SolicitacaoEstruturada, *, origem: str,
         if _seguro(resposta.texto, config) != resposta.texto:
             erros.append('compreensao: dado pessoal ou segredo indevidamente reproduzido.')
         if not erros:
-            return Resultado(ficha, [resposta], prompt)
+            erros.extend(_conferir_resumo(ficha, original, solicitacao, cliente=cliente, config=config, perfil=perfil, respostas=respostas))
+        if not erros:
+            return Resultado(ficha, respostas, prompt)
     except ValidationError as erro:
         erros = _erros_esquema(erro)
     except ValueError:
         erros = ['JSON inválido.']
+    except ErroLLM as erro:
+        erro.respostas, erro.prompt = respostas, prompt
+        raise
     erro = RespostaMalformada('RF15: ficha inválida; requer revisão humana.',
                              detalhe=_seguro(json.dumps(erros, ensure_ascii=False), config))
-    erro.respostas, erro.prompt = [resposta], prompt
+    erro.respostas, erro.prompt = respostas, prompt
     raise erro

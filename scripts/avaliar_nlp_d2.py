@@ -1,4 +1,4 @@
-"""Evidências de RF14/RF15: offline por padrão; --real requer chave e usa só S01/S02.
+"""Evidências de RF14/RF15: offline por padrão; --real delega à avaliação de seis casos com orçamento.
 
 python -m scripts.avaliar_nlp_d2 [--real] [--saida caminho.json]
 Nenhum gabarito é alterado. Respostas simuladas não medem qualidade de modelo.
@@ -17,6 +17,9 @@ from scripts.validar_dados_d2 import validar
 
 
 def avaliar(*, real=False):
+    if real:
+        from scripts.validar_nlp_real import executar
+        return executar()
     config=carregar_config()
     chave=carregar_chave() if real else None
     relatorio={'modo':'real' if real else 'simulado', 'executado_em':datetime.now(timezone.utc).isoformat(),
@@ -94,8 +97,12 @@ def main():
     parser.add_argument('--real',action='store_true')
     parser.add_argument('--saida',type=Path)
     args=parser.parse_args()
+    if args.real:
+        from scripts.validar_nlp_real import executar
+        executar(saida=args.saida)
+        return
     config=carregar_config()
-    resultado=avaliar(real=args.real)
+    resultado=avaliar(real=False)
     caminho=args.saida or config.caminho('metricas')/('integrante-1-real.json' if args.real else 'integrante-1-simulado.json')
     caminho.parent.mkdir(parents=True,exist_ok=True)
     seguro=ocultar_segredos(mascarar(json.dumps(resultado,ensure_ascii=False,indent=2),config.dados['privacidade']['mascarar_antes_de_enviar'])[0],[])

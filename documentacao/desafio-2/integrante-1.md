@@ -1,6 +1,7 @@
 # Integrante 1 — Dados, RF14 e RF15
 
-Implementado em 31/10/2026 na branch `feat/desafio2-integrante1-dados-nlp`.
+Implementado em 31/10/2026, validado com a API real em 01/11/2026 UTC
+(31/10 à noite em Cuiabá), na branch `feat/desafio2-integrante1-dados-nlp`.
 O acervo é inteiramente fictício, inspirado apenas nos temas de matrícula e
 retificações dos editais fornecidos. Suas regras não são oficiais. Os originais
 do Desafio 1 e os contratos compartilhados foram preservados.
@@ -12,7 +13,8 @@ do Desafio 1 e os contratos compartilhados foram preservados.
 Nenhuma destas funções gera ou envia uma minuta.
 
 Todas as chamadas usam `ClienteLLM.gerar`, o perfil de `Config.perfil_geracao`,
-`formato_json` e o prompt de sistema seguro existente. Assim permanecem no
+`formato_json` e o novo sistema seguro do Desafio 2. O sistema do Desafio 1
+permanece intacto: sua regra de ausência como string era incompatível com null. Assim permanecem no
 adaptador único `store=False`, timeout, repetição transitória, contabilização de
 tokens, custo e latência. Mascaramento e ocultação de formatos de chave são
 aplicados antes do envio, inclusive à solicitação estruturada da compreensão.
@@ -24,8 +26,11 @@ Na falha definitiva de validação, `RespostaMalformada` também disponibiliza
 de erros e mensagens de regras, sem reproduzir valores inválidos. Falhas do
 provedor continuam como subclasses de `ErroLLM`, sem disparar reparo de JSON.
 
-Prompts novos: `solicitacao_d2_v1.md` e `compreensao_d2_v1.md`. Nenhum prompt
-anterior foi editado. Perfil alternativo não altera dados nem índice.
+Prompts ativos: `solicitacao_d2_v4.md`, `compreensao_d2_v3.md`,
+`verificar_resumo_d2_v1.md` e `sistema_seguro_d2_v1.md`. Versões anteriores
+foram preservadas, inclusive as utilizadas nas primeiras chamadas reais.
+Perfil alternativo não altera dados nem índice. O schema compartilhado 2.0
+e todas as assinaturas continuam compatíveis; o verificador usa um tipo interno.
 
 ## Base e gabaritos prévios
 
@@ -56,7 +61,7 @@ quebras de linha inseridas pelo extrator, sem alterar palavras ou pontuação.
 | D2-S03 | completa | cancelamento |
 | D2-S04 | completa | reclamacao |
 | D2-S05 | incompleta | matricula; OCR copiado, protocolo ilegível e pedido ausente |
-| D2-S06 | ambígua | null; intenção entre continuar e cancelar não definida |
+| D2-S06 | ambígua | revisao na execução atual; null no gabarito histórico preservado |
 
 Entradas estão em `dados/originais/desafio-2/D2-S*.txt`; gabaritos em
 `dados/gabaritos/D2-S*.json`. Cada gabarito tem campos presentes/ausentes,
@@ -112,12 +117,18 @@ mascarada, nunca a saída inválida como instrução. Falha persistente gera
 Regras locais bloqueiam categoria fora da configuração; strings vazias ou
 sentinelas em lugar de null; lista de ausências diferente dos campos null,
 duplicada ou com nomes estranhos; ausência sem revisão; revisão sem motivo;
-protocolo fora de `aaaa-nnnnnn`, abreviado ou ausente do original; nome,
+protocolo fora de `aaaa-nnnnnn`, abreviado ou ausente do original; protocolo
+ilegível em entidades; data null apesar de estar rotulada no original; nome,
 assunto, pedido e entidades sem suporte literal; datas inexistentes, inválidas
 ou não sustentadas. Datas aceitam `dd/mm/aaaa`, ISO e mês por extenso em
-português. A data rotulada da solicitação ou ligada ao protocolo prevalece
+português. Em formulário, DATA MATRÍCULA identifica a data do documento. A data
+rotulada da solicitação ou ligada ao protocolo prevalece
 sobre nascimento e datas do curso. Não há validação por relógio: datas futuras
-em documentos não são automaticamente erros.
+em documentos não são automaticamente erros. A regra de categoria de emissão
+explícita de declaração/histórico/certificado/documento bloqueia confusão com
+efetivação de matrícula. A categoria revisao exige necessita_revisao=true.
+Pedidos múltiplos podem reunir passagens literais com ` … `, cada uma validada
+contra o original; não se descarta o pedido adicional de esclarecimento.
 
 Exemplo de D2-S02: protocolo `2026-000201`, data `15/10/2026`, solicitante
 `Lia Exemplo`, pedido `Solicito emissão de declaração de matrícula.`, categoria
@@ -137,60 +148,145 @@ de uma abordagem. Esquema válido não comprova verdade: regras são outra etapa
 ## RF15 — resumo, classificação e entidades
 
 Categoria e entidades pertencem exclusivamente à `SolicitacaoEstruturada`.
-A ficha só admite resumo e inferências. O resumo é extrativo: passagens
-literais do texto mascarado, unidas por ` … `, no máximo 100 palavras.
-O código verifica cada passagem e rejeita texto sem apoio. Isso reduz
-invenções, mas seleção enganosa, perda de negação/contexto e omissão de fatos
-ainda exigem conferência humana. Inferências têm campo, valor e justificativa
-não vazios; não podem substituir campos da solicitação. Não há reparo adicional
-na ficha: erro de compreensão bloqueia e pede revisão.
+A ficha só admite resumo e inferências. O resumo pode parafrasear o original,
+com no máximo 100 palavras. Texto vazio, esquema inválido, reprodução de dados
+pessoais, protocolos sem suporte e inferências sem justificativa são recusados.
+Passagens literais podem ser conferidas localmente. Para paráfrases há uma
+segunda chamada, delimitada e com esquema estrito, que confere cada afirmação,
+negação, relação e modalidade contra o original e a solicitação. Seu veredito
+precisa ser favorável, sem fatos sem suporte, com justificativa e evidências
+literais existentes no original. Evidência inexistente ou verificador inválido
+bloqueia a ficha. Ambas as respostas entram em Resultado e no consumo.
 
-As cinco categorias existentes continuam: matrícula, informação, emissão de
-documentos, reclamação e cancelamento (códigos em `config.json`). Limitação
-formal: RF15 pede categoria “outros” ou “revisão”, mas o contrato configurado
-não as inclui. Sem alterar contrato compartilhado, a alternativa implementada
-é categoria null + ausência + revisão com motivo. A inclusão de um novo rótulo
-continua sendo decisão do grupo. O caso ambíguo verifica esse fallback.
+O verificador é outro uso do mesmo modelo, sujeito a erros e vieses correlacionados;
+não substitui revisão humana. A seleção de trechos literais também pode perder
+contexto, portanto não é garantia de fidelidade semântica. As inferências ficam
+separadas e justificadas, sem substituir campos estruturados. A necessidade de
+esclarecimento de uma intenção ambígua é consequência operacional da revisão,
+não uma nova ação institucional ou fato sobre o cidadão.
 
-`metrics.acuracia_categorias` usa `proporcao`: numerador, denominador, valor,
-percentual e divergências por ID. Todos os IDs com gabarito de categoria entram
-no denominador; saída faltante ou null contra rótulo definido é erro. IDs sem
-gabarito são excluídos. Denominador zero produz valor/percentual null.
-A avaliação do conjunto separa o caso cujo rótulo esperado é null: cinco
-categorias definidas e uma abstenção esperada, sem transformar revisão em
-categoria inventada.
+A lista configurada agora contém **revisao**, de forma aditiva às cinco categorias
+anteriores. Não houve alteração em schemas.py ou no formato das mensagens
+compartilhadas. Dados legados com categoria null continuam válidos. revisao é
+usada para intenção ambígua ou tema fora das categorias, sempre com revisão e
+motivo. Uma ficha de matrícula sem pedido explícito permanece matricula: ausência
+de pedido não torna o tema ambíguo. Emissão de declaração é solicitacao_documentos.
 
-## Evidências e reprodução
+`metrics.acuracia_categorias` mantém numerador, denominador, valor, percentual e
+divergências por ID. Todos os IDs esperados entram no denominador; ID sem saída
+não conta como acerto, inclusive quando o gabarito histórico contém null.
+Denominador zero retorna valor/percentual null. Os gabaritos não foram alterados
+para adaptar as métricas à categoria nova.
+
+## Evidências reais e correções
+
+Modelo utilizado: gpt-6.1-terra, perfil principal, Responses API, store=False,
+max_output_tokens=4096 e reasoning.effort=low **somente na configuração em memória
+da avaliação**. O perfil compartilhado permanece com seus parâmetros originais.
+A compatibilidade e os preços foram conferidos na documentação oficial:
+[GPT-6.1 Terra](https://developers.openai.com/api/docs/models/gpt-6.1-terra),
+[Structured Outputs](https://developers.openai.com/api/docs/guides/structured-outputs)
+e [perfil alternativo GPT-6 Luna](https://developers.openai.com/api/docs/models/gpt-6-luna).
+O alternativo não foi chamado nesta rodada; acesso real foi demonstrado somente
+para o principal. Preços padrão configurados: US$ 1/M entrada e US$ 5/M saída;
+a estimativa não aplica desconto de cache nem substitui o faturamento do provedor.
+
+O .env foi carregado sem exibir seu conteúdo, continua ignorado e não versionado,
+com permissão 0600. Nenhuma chave foi registrada nos artefatos. As gerações ficam
+em artefato de experimento explicitamente solicitado, separado do log de auditoria.
+
+| Medida final | Resultado real |
+|---|---|
+| Solicitações com extração e ficha avaliadas | 6/6 |
+| Acurácia exata contra os seis gabaritos originais | 5/6, 83,33% |
+| Categorias temáticas com rótulo definido no gabarito | 5/5, 100% |
+| Caso ambíguo | revisao, pedido null e necessita_revisao=true |
+| Palavras dos resumos S01 a S06 | 78, 21, 19, 26, 62, 28 |
+| Fatos essenciais conferidos nos resumos finais | 15; nenhuma omissão semântica identificada |
+| Entidades esperadas corretas / omitidas | 32 / 0 |
+| Entidades adicionais sem suporte identificadas | 0 |
+| Entidade adicional sustentada | GOVERNO DE MATO GROSSO no OCR |
+| Chamadas de transporte totais, incluindo correções | 31 |
+| Tokens entrada / saída | 39.581 / 5.176 |
+| Custo estimado total | US$ 0,065461 |
+| Chamadas sem usage | 0 |
+
+A diferença exata de categoria é D2-S06: o gabarito anterior previa null e agora
+o requisito exige a categoria revisao. Essa diferença **continua contada como
+divergência**, em vez de reescrever o esperado e alegar 100% nos seis casos.
+Também estão registradas diferenças de texto do assunto/pedido em S01: o assunto
+é mais específico, e pedido preserva tanto efetivação quanto esclarecimento,
+ambos expressos no áudio. O motivo de revisão em S05 é uma paráfrase do gabarito.
+
+O histórico completo foi preservado:
+
+1. Primeira rodada: seis extrações, seis resumos com verificação semântica e uma
+   comparação das duas abordagens. O OCR omitiu data, incluiu protocolo ilegível
+   na lista de entidades e confundiu ausência de pedido com tema ambíguo.
+2. Correção de regras e prompts; somente S01/S05 e a comparação S02 foram
+   repetidos. O OCR passou a preservar a data e a categoria, sem completar o
+   protocolo. Surgiu uma ausência indevida de assunto em S01, corrigida por
+   orientação de que o assunto pode vir do texto corrido, sem cabeçalho.
+3. Somente a extração S01 foi repetida; o resumo já válido foi reutilizado.
+   A última extração tem assunto preenchido, sem ausências e sem revisão indevida.
+4. Variante controlada de S02 com data 31/02/2026: a expectativa foi persistida
+   antes da chamada. Houve duas gerações, incluindo exatamente um reparo, e
+   RespostaMalformada bloqueou o resultado. Nenhuma minuta foi criada.
+
+Na primeira comparação JSON livre × esquema, **ambas** as respostas eram válidas
+sintaticamente e no esquema, mas classificavam emissão como matricula. Essa é
+uma evidência real de que schema não garante correção de negócio. A regra nova
+rejeita as duas respostas anteriores; a repetição específica retornou
+solicitacao_documentos em ambas, sem problemas de regras. Não se fabricou uma
+falha sintática para atribuir superioridade à abordagem restrita.
+
+Os seis casos finais não exigiram reparo automático. O reparo real e a recusa
+foram demonstrados pela variante de data impossível. Testes offline cobrem,
+adicionalmente, JSON inválido, coerções, campos omitidos/extras, reparo único,
+falha persistente, paráfrases válidas/contraditórias, falha do verificador,
+compatibilidade com null legado e limites de consumo. Regressão final:
+**284 testes aprovados, zero falhas**, incluindo 87 de NLP/dados e 5 de orçamento.
+A validação da base confirmou novamente as quantidades exatas e 35 IDs únicos.
+
+Artefatos em `documentacao/desafio-2/evidencias/`:
+
+- integrante-1-openai.json: saídas, tentativas, divergências e revalidação das
+  respostas antigas pelas regras finais, sem apagar os resultados iniciais.
+- integrante-1-conferencia-openai.json: conferência técnica dos fatos e entidades.
+  É avaliação por IA, **não aprovação humana**.
+- integrante-1-orcamento.json: metadados de cada chamada e consumo acumulado.
+- testes-openai.txt e dados-validados-openai.json: regressão e validação da base.
+- Os arquivos anteriores de simulação e bloqueio por falta de chave foram
+  preservados como evidência histórica da primeira entrega.
+
+## Reprodução e orçamento
 
 ```bash
 source .venv/bin/activate
 python -m scripts.validar_dados_d2
-python -m pytest testes/test_d2_nlp.py -q
-python -m scripts.avaliar_nlp_d2
-python -m scripts.avaliar_nlp_d2 --real  # opcional; S01/S02 e comparação, para na primeira falha
 python -m pytest
+python -m scripts.validar_nlp_real
+# Só a etapa afetada, reutilizando extração/ficha já registrada:
+python -m scripts.validar_nlp_real --casos D2-S05 --etapas extracao compreensao
+python -m scripts.validar_nlp_real --casos D2-S02 --etapas comparacao
+python -m scripts.validar_nlp_real --casos D2-S02 --etapas bloqueio
 ```
 
-Os scripts não editam os gabaritos. Avaliação padrão usa SDK falso e grava
-`resultados/metricas/integrante-1-simulado.json` (fora do git). Para escolher
-outro caminho, use `--saida`. As evidências desta entrega foram gravadas em
-`documentacao/desafio-2/evidencias/` para permanecerem versionadas.
+O comando antigo `scripts.avaliar_nlp_d2 --real` agora delega ao avaliador com
+orçamento. A opção sem --real permanece offline. O avaliador novo usa, por
+padrão, resultados/metricas/integrante-1-openai.json e um ledger persistente em
+resultados/metricas/integrante-1-orcamento.json. `--saida` escolhe o relatório;
+`--ledger` escolhe o ledger. Para continuar esta mesma missão, use o ledger
+original, sem apagá-lo ou reiniciá-lo. Em outra cópia do repositório, restaure
+a cópia versionada do ledger no caminho de trabalho antes de continuar esta
+mesma missão; não reinicie o saldo. Não rode avaliações concorrentes.
 
-- Base validada: seis documentos, seis solicitações, oito perguntas, doze
-  avaliações, três ataques e 35 IDs únicos; citações e referências conferidas.
-- Situação inicial: 193 testes aprovados, 21 subtestes aprovados, sem falhas.
-- T01: schema rejeita tipos, ausências e extras; JSON inválido e reparo único
-  também testados.
-- T02: datas impossíveis, data de nascimento indevida, nome/entidade sem
-  suporte, protocolo inconsistente e listas de ausência bloqueados.
-- T03: seis extrações/fichas simuladas; resumos de 56, 9, 7, 13, 20 e 16 palavras;
-  zero omissões dos fatos essenciais e zero entidades incorretas/omitidas nos
-  cenários simulados. Acurácia simulada 5/5 = 100%, uma abstenção correta
-  avaliada separadamente. Não são métricas de qualidade de um modelo real.
-- API real: bloqueada por ausência de `OPENAI_API_KEY`; zero chamadas reais.
-  O arquivo `integrante-1-real.json` registra exatamente esse bloqueio.
-- A suíte completa inclui regressão dos fluxos anteriores com SDK falso.
-  Total final: 261 testes aprovados, zero falhas; 69 testes específicos de NLP/dados. A saída do pytest está em `evidencias/testes.txt`.
+Antes de cada transporte, inclusive repetição transitória, reserva um limite
+superior com bytes UTF-8 de entrada, margem para o protocolo e saída máxima.
+Usage disponível substitui a reserva pelo custo medido; falha sem usage conserva
+a reserva, em vez de assumir custo zero. Sem preço ou saldo suficiente, nenhuma
+chamada é feita. Limites: US$ 1 acumulado e 40 transportes. A contabilização se
+aplica às gerações de extração, reparo, resumo, verificação e comparação.
 
 ## Integração e pendências externas
 
@@ -209,6 +305,7 @@ reclassificar. Registrar decisão humana; nenhuma função de envio foi criada.
 
 Permanecem para integração do grupo: índice/RAG, guardrails, sentimentos,
 interface, decisões humanas e testes T04–T15 em serviço real. Não foram
-implementadas funções reservadas aos demais integrantes. A falta de chave
-impede medir qualidade, tokens/custos reais ou demonstrar ponta a ponta real.
-A fidelidade semântica de resumo e justificativas inferidas exige revisão.
+implementadas funções reservadas aos demais integrantes. A validação real de RF14/RF15 foi concluída; a demonstração integrada de
+índice, minutas e decisões humanas permanece com o grupo. A fidelidade semântica
+e as justificativas inferidas ainda exigem revisão humana. Categoria revisao
+não é o status revisar do registro de minuta: preservar os dois contratos.

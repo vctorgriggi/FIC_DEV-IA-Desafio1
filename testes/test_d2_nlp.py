@@ -36,7 +36,7 @@ def test_t03_extracao_dos_seis_casos_preserva_null_entidades_e_categoria(config,
     assert resultado.valor.model_dump()==dados
     assert len(sdk.chamadas)==len(resultado.respostas)==1
     assert not nlp.validar_regras(resultado.valor,texto,config=config)
-    assert resultado.prompt.identificador=='solicitacao_d2_v1'
+    assert resultado.prompt.identificador=='solicitacao_d2_v4'
     assert resultado.respostas[0].tokens_entrada==10
 
 
@@ -67,7 +67,7 @@ def test_falha_apos_reparo_preserva_evidencia_sem_expor_saida(config,invalido):
     with pytest.raises(RespostaMalformada) as erro:
         extrair(config,cliente,texto)
     assert len(sdk.chamadas)==len(erro.value.respostas)==2
-    assert erro.value.prompt.identificador=='solicitacao_d2_v1'
+    assert erro.value.prompt.identificador=='solicitacao_d2_v4'
 
 
 def test_falha_provedor_nao_vira_reparo(config):
@@ -168,7 +168,7 @@ def test_t03_compreensao_dos_seis_casos_sem_reclassificar(config,id):
     assert resultado.valor.model_dump()==ficha
     assert len(resultado.valor.resumo.split())<=100
     assert s.model_dump()==dados
-    assert resultado.prompt.identificador=='compreensao_d2_v1'
+    assert resultado.prompt.identificador=='compreensao_d2_v3'
     assert len(sdk.chamadas)==1
 
 
@@ -200,7 +200,7 @@ def test_compreensao_recusa_fatos_inventados_resumo_longo_e_inferencias_invalida
     cliente,sdk=cliente_falso(config,[ficha])
     with pytest.raises(RespostaMalformada):
         nlp.compreender(texto,SolicitacaoEstruturada.model_validate(dados),origem='T03',cliente=cliente,config=config)
-    assert len(sdk.chamadas)==1
+    assert len(sdk.chamadas)==(2 if alteracao.get('resumo')=='A matrícula foi aprovada.' else 1)
 
 
 def test_compreensao_bloqueia_antes_da_api_se_solicitacao_incoerente(config):
@@ -295,5 +295,143 @@ def test_falha_provedor_durante_reparo_preserva_primeira_resposta(config):
     with pytest.raises(LimiteRequisicoes) as erro:
         extrair(config,cliente,'teste')
     assert erro.value.respostas==[primeira]
-    assert erro.value.prompt.identificador=='solicitacao_d2_v1'
+    assert erro.value.prompt.identificador=='solicitacao_d2_v4'
     assert cliente.gerar.call_count==2
+
+
+def test_categoria_revisao_e_aditiva_e_preserva_null_legado(config):
+    dados,texto=dados_caso('D2-S06')
+    assert 'revisao' in config.dados['categorias']
+    s=SolicitacaoEstruturada.model_validate(dados)
+    assert not nlp.validar_regras(s,texto,config=config)
+    novos={**dados,'categoria':'revisao','campos_ausentes':['pedido']}
+    s=SolicitacaoEstruturada.model_validate(novos)
+    assert not nlp.validar_regras(s,texto,config=config)
+    s.necessita_revisao=False
+    assert any('revisao exige' in p for p in nlp.validar_regras(s,texto,config=config))
+
+
+def veredito(**mudancas):
+    return {'fiel':True,'evidencias':['Solicito emissão de declaração de matrícula.'],
+            'fatos_sem_suporte':[],'justificativa':'A paráfrase preserva a emissão solicitada.',**mudancas}
+
+
+def test_parafrase_semanticamente_correta_nao_exige_copia_literal(config):
+    dados,texto=dados_caso()
+    ficha={'resumo':'Lia Exemplo pede uma declaração de matrícula.','inferencias':[]}
+    cliente,sdk=cliente_falso(config,[ficha,veredito()])
+    s=SolicitacaoEstruturada.model_validate(dados)
+    resultado=nlp.compreender(texto,s,origem='T03',cliente=cliente,config=config)
+    assert resultado.valor.resumo==ficha['resumo']
+    assert len(resultado.respostas)==len(sdk.chamadas)==2
+    assert resultado.respostas[-1].parametros['prompt_id']=='verificar_resumo_d2_v1'
+    assert s.model_dump()==dados
+
+
+@pytest.mark.parametrize('checagem',[
+    veredito(fiel=False,fatos_sem_suporte=['Atribui documento a outra pessoa.']),
+    veredito(evidencias=['Citação inexistente']),
+    veredito(evidencias=[]),
+    veredito(justificativa=''),
+    veredito(fatos_sem_suporte=['Uma inconsistência mesmo com fiel=true']),
+    '{',
+])
+def test_parafrase_sem_suporte_ou_verificacao_invalida_bloqueia(config,checagem):
+    dados,texto=dados_caso()
+    cliente,sdk=cliente_falso(config,[{'resumo':'Lia Exemplo pede uma declaração.','inferencias':[]},checagem])
+    with pytest.raises(RespostaMalformada) as erro:
+        nlp.compreender(texto,SolicitacaoEstruturada.model_validate(dados),origem='T03',cliente=cliente,config=config)
+    assert len(sdk.chamadas)==len(erro.value.respostas)==2
+
+
+def test_falha_na_verificacao_semantica_preserva_consumo(config):
+    from unittest.mock import Mock
+    from src.llm_client import RespostaLLM
+    dados,texto=dados_caso()
+    cliente=Mock()
+    primeira=RespostaLLM(texto=json.dumps({'resumo':'Lia Exemplo pede uma declaração.','inferencias':[]}),
+        modelo='simulado',duracao_s=0,tokens_entrada=10,tokens_saida=5,custo_estimado_usd=0)
+    cliente.gerar.side_effect=[primeira,LimiteRequisicoes()]
+    with pytest.raises(LimiteRequisicoes) as erro:
+        nlp.compreender(texto,SolicitacaoEstruturada.model_validate(dados),origem='T03',cliente=cliente,config=config)
+    assert erro.value.respostas==[primeira]
+
+
+def test_metrica_nao_conta_ausencia_de_saida_como_acerto_de_null():
+    assert metrics.acuracia_categorias({}, {'A':None})['numerador']==0
+    assert metrics.acuracia_categorias({'A':None}, {'A':None})['numerador']==1
+
+
+def test_regressao_ocr_real_data_rotulada_e_protocolo_ilegivel(config):
+    dados,texto=dados_caso('D2-S05')
+    falha={**dados,'data':None,'campos_ausentes':['protocolo','data','pedido'],
+           'entidades':{**dados['entidades'],'protocolos':['202[ilegível]-000142']}}
+    problemas=nlp.validar_regras(SolicitacaoEstruturada.model_validate(falha),texto,config=config)
+    assert any('apesar de rotulada' in p for p in problemas)
+    assert any('entidades.protocolos' in p for p in problemas)
+    cliente,sdk=cliente_falso(config,[falha,dados])
+    assert extrair(config,cliente,texto).valor.data=='14/10/2026'
+    assert len(sdk.chamadas)==2
+
+
+def test_emissao_de_declaracao_nao_vira_efetivacao_de_matricula(config):
+    dados,texto=dados_caso()
+    s=SolicitacaoEstruturada.model_validate({**dados,'categoria':'matricula'})
+    assert any('emissão exige solicitacao_documentos' in p for p in nlp.validar_regras(s,texto,config=config))
+
+
+def test_varios_pedidos_literais_podem_ser_preservados(config):
+    dados,texto=dados_caso('D2-S01')
+    dados['pedido']='quero pedir a efetivação da minha matrícula … Peço que informe quais os documentos ainda preciso apresentar.'
+    assert not nlp.validar_regras(SolicitacaoEstruturada.model_validate(dados),texto,config=config)
+    dados['pedido']+=' … Sua matrícula foi aprovada.'
+    assert any('pedido' in p for p in nlp.validar_regras(SolicitacaoEstruturada.model_validate(dados),texto,config=config))
+
+
+def test_parafrase_pode_descrever_documento_a_emitir_sem_afirmar_emissao(config):
+    dados,texto=dados_caso()
+    ficha={'resumo':'Lia Exemplo pede que seja emitida uma declaração de matrícula.','inferencias':[]}
+    cliente,sdk=cliente_falso(config,[ficha,veredito()])
+    assert nlp.compreender(texto,SolicitacaoEstruturada.model_validate(dados),origem='T03',cliente=cliente,config=config).valor.resumo==ficha['resumo']
+    assert len(sdk.chamadas)==2
+
+
+def test_verificador_bloqueia_pedido_transformado_em_acao_concluida(config):
+    dados,texto=dados_caso()
+    ficha={'resumo':'A declaração de Lia Exemplo foi emitida.','inferencias':[]}
+    cliente,sdk=cliente_falso(config,[ficha,veredito(fiel=False,fatos_sem_suporte=['Emissão não confirmada.'])])
+    with pytest.raises(RespostaMalformada):
+        nlp.compreender(texto,SolicitacaoEstruturada.model_validate(dados),origem='T03',cliente=cliente,config=config)
+    assert len(sdk.chamadas)==2
+
+
+def test_sistema_d2_nao_manda_usar_sentinela_do_desafio1(config):
+    dados,texto=dados_caso()
+    cliente,sdk=cliente_falso(config,[dados])
+    extrair(config,cliente,texto)
+    assert 'use null e registre o campo em campos_ausentes' in sdk.chamadas[0]['instructions']
+    assert 'escreva exatamente: não localizado' not in sdk.chamadas[0]['instructions']
+
+
+def test_saida_invalida_do_verificador_nao_vaza_para_diagnostico(config):
+    dados,texto=dados_caso()
+    cliente,_=cliente_falso(config,[{'resumo':'Lia Exemplo pede uma declaração.','inferencias':[]},
+                                  {'fiel':'true','evidencias':[],'fatos_sem_suporte':[],'justificativa':'qualquer'}])
+    with pytest.raises(RespostaMalformada) as erro:
+        nlp.compreender(texto,SolicitacaoEstruturada.model_validate(dados),origem='T03',cliente=cliente,config=config)
+    assert 'bool_type' in erro.value.detalhe
+    assert 'qualquer' not in erro.value.detalhe
+
+
+def test_artefatos_reais_finais_podem_ser_revalidados_sem_api():
+    from src.schemas import FichaCompreensao
+    caminho=RAIZ/'documentacao/desafio-2/evidencias/integrante-1-openai.json'
+    d=json.loads(caminho.read_text(encoding='utf-8'))
+    assert len(d['casos'])==6
+    for id,c in d['casos'].items():
+        _,texto=dados_caso(id)
+        assert c['extracoes'][-1]['status']=='valido'
+        s=SolicitacaoEstruturada.model_validate(c['extracoes'][-1]['solicitacao'])
+        assert not nlp.validar_regras(s,texto,config=carregar_config())
+        ficha=FichaCompreensao.model_validate(c['fichas'][-1]['ficha'])
+        assert len(ficha.resumo.split())<=100

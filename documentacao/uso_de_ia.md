@@ -56,3 +56,21 @@ Datas de nascimento confundidas com data da solicitação e prefixos de protocol
 receberam testes próprios. Evidências e limitações estão em
 `documentacao/desafio-2/integrante-1.md`. A revisão e responsabilidade final da
 equipe permanecem necessárias; o agente não registra aprovação humana.
+
+## Continuação do Integrante 1 — validação real (01/11/2026 UTC)
+
+Codex executou as seis solicitações com a OpenAI, corrigiu falhas observadas e
+registrou o histórico sem alterar os gabaritos. Solicitações relevantes:
+(1) validar RF14/RF15 com dados reais da API sob orçamento de US$ 1;
+(2) incluir revisao de modo compatível; (3) aceitar paráfrases sem aceitar
+fatos inventados. Aceitos: categoria aditiva e verificação semântica com fontes
+literais. Modificados: resumo estritamente extrativo e política que confundia
+ficha sem pedido com categoria ambígua. Rejeitada: reescrita do gabarito null
+para inflar a acurácia. Corrigidos: conflito de ausência entre sistemas D1/D2,
+data de matrícula omitida, protocolo parcial como entidade, classificação de
+emissão como matrícula e assunto omitido por ausência de cabeçalho.
+
+O agente realizou conferência técnica, sem registrar aprovação humana. Os
+resultados reais (31 chamadas; US$ 0,065461 estimados) e os testes offline estão
+identificados separadamente na documentação do Integrante 1. Todos os modelos
+continuam acessados via ClienteLLM; nenhuma chave integra as evidências.
