@@ -35,3 +35,24 @@ decisões são da equipe.
 
 A equipe revisou e entende todo o código, prompts e documentação, e assume
 responsabilidade integral pela solução entregue.
+
+## Desafio 2 — Integrante 1 (31/10/2026)
+
+Foi usado o agente Codex para implementar dados fictícios, RF14/RF15, testes e
+instruções de reprodução. O identificador exato do modelo do agente não foi
+exposto nesta sessão. Não houve chamadas reais da solução: a chave estava
+ausente; SDK falso e evidências reais estão identificados separadamente.
+
+Solicitações relevantes: (1) construir a base e gabaritos antes de chamar
+modelos; (2) implementar extração estrita com um único reparo e regras locais;
+(3) verificar resumo, entidades e classificação nos seis casos e calcular a
+métrica por código. Aceitos: Pydantic estrito e diagnóstico sem copiar valores
+inválidos. Modificado: resumo generativo passou a selecionar passagens literais
+para permitir conferir suporte por código. Não adotados: completar o protocolo
+ilegível do OCR com o áudio e acrescentar categoria ao contrato compartilhado
+sem acordo. Erros encontrados durante a implementação: sintaxe de decorador de
+teste e falso erro do provedor incompatível com o adaptador; ambos corrigidos.
+Datas de nascimento confundidas com data da solicitação e prefixos de protocolo
+receberam testes próprios. Evidências e limitações estão em
+`documentacao/desafio-2/integrante-1.md`. A revisão e responsabilidade final da
+equipe permanecem necessárias; o agente não registra aprovação humana.

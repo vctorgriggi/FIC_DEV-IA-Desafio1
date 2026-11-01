@@ -12,7 +12,7 @@ from datetime import date
 from pydantic import ValidationError
 
 from .config import Config
-from .llm_client import ClienteLLM, RespostaMalformada, formato_json
+from .llm_client import ClienteLLM, ErroLLM, RespostaMalformada, formato_json
 from .privacidade import mascarar, ocultar_segredos
 from .prompts import carregar_prompt, delimitar
 from .schemas import FichaCompreensao, SolicitacaoEstruturada
@@ -83,8 +83,11 @@ def validar_regras(solicitacao: SolicitacaoEstruturada, texto_original: str, *, 
             problemas.append(f'{campo}: ausência deve ser null.')
         elif campo not in {'categoria', 'data'} and not _literal(valor, texto_original):
             problemas.append(f'{campo}: valor sem suporte literal no original.')
-    if solicitacao.protocolo is not None and not re.fullmatch(r'\d{4}-\d{6}', solicitacao.protocolo):
-        problemas.append('protocolo: formato esperado aaaa-nnnnnn ou null se ilegível.')
+    if solicitacao.protocolo is not None:
+        if not re.fullmatch(r'\d{4}-\d{6}', solicitacao.protocolo):
+            problemas.append('protocolo: formato esperado aaaa-nnnnnn ou null se ilegível.')
+        elif not re.search(r'(?<![\w-])' + re.escape(solicitacao.protocolo) + r'(?![\w-])', texto_original):
+            problemas.append('protocolo: valor abreviado ou inconsistente no original.')
     # Cada data declarada no original é conferida, sem confundir datas de funções diferentes.
     datas_originais = set()
     for valor in PADRAO_DATA.findall(texto_original):
@@ -94,8 +97,15 @@ def validar_regras(solicitacao: SolicitacaoEstruturada, texto_original: str, *, 
             problemas.append('data: o original contém data impossível; requer conferência.')
     if solicitacao.data is not None:
         try:
-            if _data(solicitacao.data) not in datas_originais:
+            extraida = _data(solicitacao.data)
+            if extraida not in datas_originais:
                 problemas.append('data: valor sem suporte no original.')
+            # Uma data de nascimento literal não deve substituir a data do requerimento.
+            rotulada = re.search(r'(?im)(?:^|\n|\\n)\s*Data(?: da solicitação| de matrícula| matrícula)?\s*:\s*(' + PADRAO_DATA.pattern + ')', texto_original)
+            if rotulada is None:
+                rotulada = re.search(r'protocolo\s+(?:é\s+)?\d{4}-\d{6},?\s+de\s+(' + PADRAO_DATA.pattern + ')', texto_original, re.I)
+            if rotulada and extraida != _data(rotulada[1]):
+                problemas.append('data: não corresponde à data identificada da solicitação.')
         except ValueError:
             problemas.append('data: inexistente ou formato inválido.')
     for tipo, valores in solicitacao.entidades.model_dump().items():
@@ -132,8 +142,13 @@ def extrair_solicitacao(texto: str, *, origem: str, cliente: ClienteLLM, config:
     respostas = []
     erros = []
     for tentativa in range(2):
-        instrucao = '' if not tentativa else '\nCorrija uma única vez estes erros locais: ' + json.dumps(erros, ensure_ascii=False)
-        resposta = _chamar(cliente, config, perfil, entrada + instrucao, formato)
+        instrucao = '' if not tentativa else ('\nCorrija uma única vez estes erros locais:\n'
+            + delimitar(_seguro(json.dumps(erros, ensure_ascii=False), config), 'diagnostico_validacao'))
+        try:
+            resposta = _chamar(cliente, config, perfil, entrada + instrucao, formato)
+        except ErroLLM as erro:
+            erro.respostas, erro.prompt = respostas, prompt
+            raise
         respostas.append(resposta)
         try:
             _json(resposta.texto)
@@ -145,7 +160,7 @@ def extrair_solicitacao(texto: str, *, origem: str, cliente: ClienteLLM, config:
             erros = _erros_esquema(erro)
         except ValueError:
             erros = ['JSON sintaticamente inválido ou com chaves repetidas.']
-    erro = RespostaMalformada('RF14: extração inválida após uma tentativa de reparo.', detalhe=json.dumps(erros, ensure_ascii=False))
+    erro = RespostaMalformada('RF14: extração inválida após uma tentativa de reparo.', detalhe=_seguro(json.dumps(erros, ensure_ascii=False), config))
     # Permite ao fluxo auditar custo/latência também quando a validação bloqueia.
     erro.respostas, erro.prompt = respostas, prompt
     raise erro
@@ -229,6 +244,6 @@ def compreender(texto: str, solicitacao: SolicitacaoEstruturada, *, origem: str,
     except ValueError:
         erros = ['JSON inválido.']
     erro = RespostaMalformada('RF15: ficha inválida; requer revisão humana.',
-                             detalhe=json.dumps(erros, ensure_ascii=False))
+                             detalhe=_seguro(json.dumps(erros, ensure_ascii=False), config))
     erro.respostas, erro.prompt = [resposta], prompt
     raise erro

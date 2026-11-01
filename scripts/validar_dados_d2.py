@@ -30,7 +30,7 @@ def validar(config=None):
     versoes = {d.id: d.versao for d in docs}
     for d in docs:
         p = config.caminho('acervo') / d.arquivo
-        textos[d.id] = '\n'.join(pg.extract_text() or '' for pg in PdfReader(p).pages) if p.suffix == '.pdf' else p.read_text()
+        textos[d.id] = '\n'.join(pg.extract_text() or '' for pg in PdfReader(p).pages) if p.suffix == '.pdf' else p.read_text(encoding='utf-8')
         exigir('FICTÍCIO' in textos[d.id], 'Documento sem aviso de ficção.')
     exigir(any(d.substitui and d.vigencia_inicio for d in docs), 'Falta versionamento.')
     todos_textos = list(textos.values())
@@ -48,7 +48,7 @@ def validar(config=None):
             for i in itens:
                 s = SolicitacaoEstruturada.model_validate({**i['solicitacao_esperada'], 'entidades':i['entidades_esperadas']})
                 FichaCompreensao(resumo=i['resumo_esperado'], inferencias=[])
-                texto = (raiz / i['arquivo']).read_text()
+                texto = (raiz / i['arquivo']).read_text(encoding='utf-8')
                 todos_textos.append(texto)
                 nulos = {k for k in ('protocolo','data','solicitante','assunto','pedido','categoria') if getattr(s,k) is None}
                 exigir(set(s.campos_ausentes) == nulos, 'Ausências inconsistentes.')

@@ -1,0 +1,17 @@
+{
+  "modo": "real",
+  "executado_em": "2026-11-01T00:57:49.098805+00:00",
+  "dados": {
+    "documentos": 6,
+    "solicitacoes": 6,
+    "perguntas": 8,
+    "ataques": 3,
+    "avaliacoes": 12,
+    "ids_unicos": 35,
+    "status": "validado offline"
+  },
+  "casos": [],
+  "limitacoes": [],
+  "status": "bloqueado",
+  "motivo": "OPENAI_API_KEY indisponível; nenhuma chamada real realizada."
+}
