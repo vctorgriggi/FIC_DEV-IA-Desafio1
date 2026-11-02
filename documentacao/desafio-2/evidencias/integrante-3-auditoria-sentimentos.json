@@ -1,0 +1,389 @@
+{
+  "origem": "resultados/logs/execucoes.jsonl, eventos sentimento da rodada de integrante-3-sentimentos-openai.json",
+  "eventos": [
+    {
+      "id_evento": "c3fe0ee5ffc0",
+      "data_hora": "2026-11-01T23:12:01-04:00",
+      "id_execucao": "7860f5270173",
+      "caso_id": "AV-01",
+      "etapa": "sentimento",
+      "modalidade": null,
+      "arquivo_origem": null,
+      "provedor": "openai",
+      "modelo": "gpt-6.1-terra",
+      "parametros": {
+        "store": false,
+        "max_output_tokens": 25000,
+        "formato_resposta": "sentimento"
+      },
+      "versao_prompt": "sentimento_v1",
+      "hash_prompt": "9023a8b184a7",
+      "saida": null,
+      "duracao_s": 2.856,
+      "tokens_entrada": 403,
+      "tokens_saida": 77,
+      "custo_estimado_usd": 0.000788,
+      "erro": null,
+      "decisao_humana": null,
+      "justificativa": null,
+      "revisor": null,
+      "extra": {
+        "polaridade": "positiva",
+        "necessita_revisao": false,
+        "falha": false
+      }
+    },
+    {
+      "id_evento": "af4df4c1d770",
+      "data_hora": "2026-11-01T23:12:05-04:00",
+      "id_execucao": "d4f8ac595743",
+      "caso_id": "AV-02",
+      "etapa": "sentimento",
+      "modalidade": null,
+      "arquivo_origem": null,
+      "provedor": "openai",
+      "modelo": "gpt-6.1-terra",
+      "parametros": {
+        "store": false,
+        "max_output_tokens": 25000,
+        "formato_resposta": "sentimento"
+      },
+      "versao_prompt": "sentimento_v1",
+      "hash_prompt": "9023a8b184a7",
+      "saida": null,
+      "duracao_s": 3.996,
+      "tokens_entrada": 406,
+      "tokens_saida": 81,
+      "custo_estimado_usd": 0.000811,
+      "erro": null,
+      "decisao_humana": null,
+      "justificativa": null,
+      "revisor": null,
+      "extra": {
+        "polaridade": "positiva",
+        "necessita_revisao": false,
+        "falha": false
+      }
+    },
+    {
+      "id_evento": "d9f70d907f52",
+      "data_hora": "2026-11-01T23:12:07-04:00",
+      "id_execucao": "d46d41d02051",
+      "caso_id": "AV-03",
+      "etapa": "sentimento",
+      "modalidade": null,
+      "arquivo_origem": null,
+      "provedor": "openai",
+      "modelo": "gpt-6.1-terra",
+      "parametros": {
+        "store": false,
+        "max_output_tokens": 25000,
+        "formato_resposta": "sentimento"
+      },
+      "versao_prompt": "sentimento_v1",
+      "hash_prompt": "9023a8b184a7",
+      "saida": null,
+      "duracao_s": 2.439,
+      "tokens_entrada": 404,
+      "tokens_saida": 84,
+      "custo_estimado_usd": 0.000824,
+      "erro": null,
+      "decisao_humana": null,
+      "justificativa": null,
+      "revisor": null,
+      "extra": {
+        "polaridade": "positiva",
+        "necessita_revisao": false,
+        "falha": false
+      }
+    },
+    {
+      "id_evento": "cf1e2e36310a",
+      "data_hora": "2026-11-01T23:12:10-04:00",
+      "id_execucao": "4b4c2201f361",
+      "caso_id": "AV-04",
+      "etapa": "sentimento",
+      "modalidade": null,
+      "arquivo_origem": null,
+      "provedor": "openai",
+      "modelo": "gpt-6.1-terra",
+      "parametros": {
+        "store": false,
+        "max_output_tokens": 25000,
+        "formato_resposta": "sentimento"
+      },
+      "versao_prompt": "sentimento_v1",
+      "hash_prompt": "9023a8b184a7",
+      "saida": null,
+      "duracao_s": 2.788,
+      "tokens_entrada": 406,
+      "tokens_saida": 96,
+      "custo_estimado_usd": 0.000886,
+      "erro": null,
+      "decisao_humana": null,
+      "justificativa": null,
+      "revisor": null,
+      "extra": {
+        "polaridade": "negativa",
+        "necessita_revisao": false,
+        "falha": false
+      }
+    },
+    {
+      "id_evento": "3679c5d073df",
+      "data_hora": "2026-11-01T23:12:12-04:00",
+      "id_execucao": "cfe87895f4c0",
+      "caso_id": "AV-05",
+      "etapa": "sentimento",
+      "modalidade": null,
+      "arquivo_origem": null,
+      "provedor": "openai",
+      "modelo": "gpt-6.1-terra",
+      "parametros": {
+        "store": false,
+        "max_output_tokens": 25000,
+        "formato_resposta": "sentimento"
+      },
+      "versao_prompt": "sentimento_v1",
+      "hash_prompt": "9023a8b184a7",
+      "saida": null,
+      "duracao_s": 2.224,
+      "tokens_entrada": 409,
+      "tokens_saida": 92,
+      "custo_estimado_usd": 0.000869,
+      "erro": null,
+      "decisao_humana": null,
+      "justificativa": null,
+      "revisor": null,
+      "extra": {
+        "polaridade": "negativa",
+        "necessita_revisao": false,
+        "falha": false
+      }
+    },
+    {
+      "id_evento": "12c71626b05c",
+      "data_hora": "2026-11-01T23:12:14-04:00",
+      "id_execucao": "6752844c655b",
+      "caso_id": "AV-06",
+      "etapa": "sentimento",
+      "modalidade": null,
+      "arquivo_origem": null,
+      "provedor": "openai",
+      "modelo": "gpt-6.1-terra",
+      "parametros": {
+        "store": false,
+        "max_output_tokens": 25000,
+        "formato_resposta": "sentimento"
+      },
+      "versao_prompt": "sentimento_v1",
+      "hash_prompt": "9023a8b184a7",
+      "saida": null,
+      "duracao_s": 1.981,
+      "tokens_entrada": 407,
+      "tokens_saida": 82,
+      "custo_estimado_usd": 0.000817,
+      "erro": null,
+      "decisao_humana": null,
+      "justificativa": null,
+      "revisor": null,
+      "extra": {
+        "polaridade": "negativa",
+        "necessita_revisao": false,
+        "falha": false
+      }
+    },
+    {
+      "id_evento": "dbec1397f7be",
+      "data_hora": "2026-11-01T23:12:16-04:00",
+      "id_execucao": "1fd32b197402",
+      "caso_id": "AV-07",
+      "etapa": "sentimento",
+      "modalidade": null,
+      "arquivo_origem": null,
+      "provedor": "openai",
+      "modelo": "gpt-6.1-terra",
+      "parametros": {
+        "store": false,
+        "max_output_tokens": 25000,
+        "formato_resposta": "sentimento"
+      },
+      "versao_prompt": "sentimento_v1",
+      "hash_prompt": "9023a8b184a7",
+      "saida": null,
+      "duracao_s": 2.186,
+      "tokens_entrada": 403,
+      "tokens_saida": 97,
+      "custo_estimado_usd": 0.000888,
+      "erro": null,
+      "decisao_humana": null,
+      "justificativa": null,
+      "revisor": null,
+      "extra": {
+        "polaridade": "neutra",
+        "necessita_revisao": false,
+        "falha": false
+      }
+    },
+    {
+      "id_evento": "a71b3b392d4d",
+      "data_hora": "2026-11-01T23:12:19-04:00",
+      "id_execucao": "c6e2e9d0d388",
+      "caso_id": "AV-08",
+      "etapa": "sentimento",
+      "modalidade": null,
+      "arquivo_origem": null,
+      "provedor": "openai",
+      "modelo": "gpt-6.1-terra",
+      "parametros": {
+        "store": false,
+        "max_output_tokens": 25000,
+        "formato_resposta": "sentimento"
+      },
+      "versao_prompt": "sentimento_v1",
+      "hash_prompt": "9023a8b184a7",
+      "saida": null,
+      "duracao_s": 2.347,
+      "tokens_entrada": 405,
+      "tokens_saida": 81,
+      "custo_estimado_usd": 0.00081,
+      "erro": null,
+      "decisao_humana": null,
+      "justificativa": null,
+      "revisor": null,
+      "extra": {
+        "polaridade": "neutra",
+        "necessita_revisao": false,
+        "falha": false
+      }
+    },
+    {
+      "id_evento": "cce9cc99e109",
+      "data_hora": "2026-11-01T23:12:21-04:00",
+      "id_execucao": "33222a4a8be9",
+      "caso_id": "AV-09",
+      "etapa": "sentimento",
+      "modalidade": null,
+      "arquivo_origem": null,
+      "provedor": "openai",
+      "modelo": "gpt-6.1-terra",
+      "parametros": {
+        "store": false,
+        "max_output_tokens": 25000,
+        "formato_resposta": "sentimento"
+      },
+      "versao_prompt": "sentimento_v1",
+      "hash_prompt": "9023a8b184a7",
+      "saida": null,
+      "duracao_s": 1.98,
+      "tokens_entrada": 404,
+      "tokens_saida": 84,
+      "custo_estimado_usd": 0.000824,
+      "erro": null,
+      "decisao_humana": null,
+      "justificativa": null,
+      "revisor": null,
+      "extra": {
+        "polaridade": "neutra",
+        "necessita_revisao": false,
+        "falha": false
+      }
+    },
+    {
+      "id_evento": "ac8e2d227fa8",
+      "data_hora": "2026-11-01T23:12:23-04:00",
+      "id_execucao": "e4b86c6f23f4",
+      "caso_id": "AV-10",
+      "etapa": "sentimento",
+      "modalidade": null,
+      "arquivo_origem": null,
+      "provedor": "openai",
+      "modelo": "gpt-6.1-terra",
+      "parametros": {
+        "store": false,
+        "max_output_tokens": 25000,
+        "formato_resposta": "sentimento"
+      },
+      "versao_prompt": "sentimento_v1",
+      "hash_prompt": "9023a8b184a7",
+      "saida": null,
+      "duracao_s": 2.216,
+      "tokens_entrada": 407,
+      "tokens_saida": 111,
+      "custo_estimado_usd": 0.000962,
+      "erro": null,
+      "decisao_humana": null,
+      "justificativa": null,
+      "revisor": null,
+      "extra": {
+        "polaridade": "indeterminada",
+        "necessita_revisao": true,
+        "falha": false
+      }
+    },
+    {
+      "id_evento": "80abf2e8762f",
+      "data_hora": "2026-11-01T23:12:26-04:00",
+      "id_execucao": "31d727bc9e98",
+      "caso_id": "AV-11",
+      "etapa": "sentimento",
+      "modalidade": null,
+      "arquivo_origem": null,
+      "provedor": "openai",
+      "modelo": "gpt-6.1-terra",
+      "parametros": {
+        "store": false,
+        "max_output_tokens": 25000,
+        "formato_resposta": "sentimento"
+      },
+      "versao_prompt": "sentimento_v1",
+      "hash_prompt": "9023a8b184a7",
+      "saida": null,
+      "duracao_s": 3.405,
+      "tokens_entrada": 408,
+      "tokens_saida": 182,
+      "custo_estimado_usd": 0.001318,
+      "erro": null,
+      "decisao_humana": null,
+      "justificativa": null,
+      "revisor": null,
+      "extra": {
+        "polaridade": "negativa",
+        "necessita_revisao": false,
+        "falha": false
+      }
+    },
+    {
+      "id_evento": "708707f8bab9",
+      "data_hora": "2026-11-01T23:12:29-04:00",
+      "id_execucao": "26148f3d5cf7",
+      "caso_id": "AV-12",
+      "etapa": "sentimento",
+      "modalidade": null,
+      "arquivo_origem": null,
+      "provedor": "openai",
+      "modelo": "gpt-6.1-terra",
+      "parametros": {
+        "store": false,
+        "max_output_tokens": 25000,
+        "formato_resposta": "sentimento"
+      },
+      "versao_prompt": "sentimento_v1",
+      "hash_prompt": "9023a8b184a7",
+      "saida": null,
+      "duracao_s": 2.607,
+      "tokens_entrada": 402,
+      "tokens_saida": 110,
+      "custo_estimado_usd": 0.000952,
+      "erro": null,
+      "decisao_humana": null,
+      "justificativa": null,
+      "revisor": null,
+      "extra": {
+        "polaridade": "indeterminada",
+        "necessita_revisao": true,
+        "falha": false
+      }
+    }
+  ]
+}

@@ -73,8 +73,30 @@ No Windows, `-X utf8` também permite rodar os testes antigos de áudio que leem
 arquivos UTF-8 sem declarar a codificação. Os testes usam SDK falso e Streamlit AppTest;
 verificam T04, T05, T11 e T13, falhas individuais, 12 avaliações e persistência.
 As respostas simuladas verificam integração e contratos, não qualidade do modelo.
-A classificação real e a conferência humana dos 12 rótulos continuam necessárias
-para a evidência final da entrega.
+
+## Rodada real (RF22)
+
+`python -m scripts.avaliar_sentimentos_d2`, perfil `principal` (`gpt-6.1-terra`),
+prompt `sentimento_v1`, contra `D2-sentimentos.json` escrito antes da execução.
+Uma chamada por avaliação, nenhuma falha. Evidência:
+`evidencias/integrante-3-sentimentos-openai.json` e os 12 eventos `sentimento`
+em `evidencias/integrante-3-auditoria-sentimentos.json`.
+
+| Medida | Resultado |
+|---|---|
+| Polaridade igual ao gabarito | 11/12 = 0,917 |
+| Positivas, negativas, neutras | 3/3, 3/3, 3/3 |
+| Ambíguas `indeterminada` com revisão | 2/3 (AV-10 ironia, AV-12 sem contexto) |
+| Tokens entrada / saída | 4.864 / 1.177 |
+| Custo estimado | US$ 0,0107 |
+
+**Divergência: AV-11** (gabarito `indeterminada`, aspectos opostos sem
+predominância) saiu `negativa` sem pedido de revisão: o modelo considerou que o
+pedido sem solução predomina sobre o elogio. O gabarito não foi alterado. A
+consequência é que uma avaliação mista entra no painel como negativa sem passar
+pelo operador; a regra do prompt não basta para esse caso.
+
+A conferência humana dos 12 rótulos e das justificativas segue pendente.
 
 As partes de NLP, índice e RAG da principal `9258998` estão integradas. O RAG
 valida contexto antes da geração, exclui documentos suspeitos, audita IDs e

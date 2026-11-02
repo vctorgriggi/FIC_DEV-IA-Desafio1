@@ -9,7 +9,8 @@ Os ids de referência de cada pergunta são os trechos indexados que contêm o t
 gabarito (espaços normalizados); não são escritos à mão, porque mudam com o hash e o chunking.
 Saída em resultados/metricas/, fora do git até a rodada final. Cada pergunta vira um evento
 "d2_consulta" em resultados/logs/execucoes.jsonl (RF21), com o id_execucao gravado na saída.
-As perguntas vão direto ao rag, sem guardrails: a avaliação mede a recuperação e a geração.
+As perguntas vão ao rag.responder, sem as camadas de entrada e saída do fluxo: a avaliação mede a
+recuperação e a geração. O filtro de trechos (rag.separar_trechos) se aplica.
 """
 
 from __future__ import annotations

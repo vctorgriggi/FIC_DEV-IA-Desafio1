@@ -1,0 +1,209 @@
+{
+  "executado_em": "2026-11-01T23:11:57-04:00",
+  "perfil": "principal",
+  "modelo": "gpt-6.1-terra",
+  "prompt": {
+    "identificador": "sentimento_v1",
+    "hash": "9023a8b184a7"
+  },
+  "gabarito": "dados/gabaritos/D2-sentimentos.json",
+  "acuracia": {
+    "numerador": 11,
+    "denominador": 12,
+    "valor": 0.917
+  },
+  "ambiguas_indeterminadas_com_revisao": {
+    "numerador": 2,
+    "denominador": 3,
+    "valor": 0.667
+  },
+  "painel": {
+    "total": 12,
+    "total_sem_filtro": 12,
+    "ids_repetidos": [],
+    "necessita_revisao": 2,
+    "por_polaridade": {
+      "positiva": {
+        "numerador": 3,
+        "denominador": 12,
+        "valor": 0.25
+      },
+      "negativa": {
+        "numerador": 4,
+        "denominador": 12,
+        "valor": 0.333
+      },
+      "neutra": {
+        "numerador": 3,
+        "denominador": 12,
+        "valor": 0.25
+      },
+      "indeterminada": {
+        "numerador": 2,
+        "denominador": 12,
+        "valor": 0.167
+      }
+    }
+  },
+  "tokens_entrada": 4864,
+  "tokens_saida": 1177,
+  "custo_estimado_usd": 0.010749,
+  "avaliacoes": [
+    {
+      "id": "AV-01",
+      "esperada": "positiva",
+      "obtida": "positiva",
+      "acerto": true,
+      "necessita_revisao": false,
+      "justificativa": "O texto elogia o atendimento e expressa satisfação.",
+      "confianca_declarada": null,
+      "chamadas": 1,
+      "tokens_entrada": 403,
+      "tokens_saida": 77,
+      "custo_estimado_usd": 0.000788
+    },
+    {
+      "id": "AV-02",
+      "esperada": "positiva",
+      "obtida": "positiva",
+      "acerto": true,
+      "necessita_revisao": false,
+      "justificativa": "O texto elogia o atendimento e a clareza da orientação.",
+      "confianca_declarada": null,
+      "chamadas": 1,
+      "tokens_entrada": 406,
+      "tokens_saida": 81,
+      "custo_estimado_usd": 0.000811
+    },
+    {
+      "id": "AV-03",
+      "esperada": "positiva",
+      "obtida": "positiva",
+      "acerto": true,
+      "necessita_revisao": false,
+      "justificativa": "A avaliação elogia a agilidade e expressa satisfação.",
+      "confianca_declarada": null,
+      "chamadas": 1,
+      "tokens_entrada": 404,
+      "tokens_saida": 84,
+      "custo_estimado_usd": 0.000824
+    },
+    {
+      "id": "AV-04",
+      "esperada": "negativa",
+      "obtida": "negativa",
+      "acerto": true,
+      "necessita_revisao": false,
+      "justificativa": "O texto critica o atendimento e a falta de explicações.",
+      "confianca_declarada": null,
+      "chamadas": 1,
+      "tokens_entrada": 406,
+      "tokens_saida": 96,
+      "custo_estimado_usd": 0.000886
+    },
+    {
+      "id": "AV-05",
+      "esperada": "negativa",
+      "obtida": "negativa",
+      "acerto": true,
+      "necessita_revisao": false,
+      "justificativa": "Relata longa espera, falta de orientação e insatisfação.",
+      "confianca_declarada": null,
+      "chamadas": 1,
+      "tokens_entrada": 409,
+      "tokens_saida": 92,
+      "custo_estimado_usd": 0.000869
+    },
+    {
+      "id": "AV-06",
+      "esperada": "negativa",
+      "obtida": "negativa",
+      "acerto": true,
+      "necessita_revisao": false,
+      "justificativa": "O texto critica o serviço e relata prejuízo pela demora.",
+      "confianca_declarada": null,
+      "chamadas": 1,
+      "tokens_entrada": 407,
+      "tokens_saida": 82,
+      "custo_estimado_usd": 0.000817
+    },
+    {
+      "id": "AV-07",
+      "esperada": "neutra",
+      "obtida": "neutra",
+      "acerto": true,
+      "necessita_revisao": false,
+      "justificativa": "O texto relata apenas o horário do atendimento, sem expressar satisfação ou insatisfação.",
+      "confianca_declarada": null,
+      "chamadas": 1,
+      "tokens_entrada": 403,
+      "tokens_saida": 97,
+      "custo_estimado_usd": 0.000888
+    },
+    {
+      "id": "AV-08",
+      "esperada": "neutra",
+      "obtida": "neutra",
+      "acerto": true,
+      "necessita_revisao": false,
+      "justificativa": "Relato factual sem expressão de satisfação ou insatisfação.",
+      "confianca_declarada": null,
+      "chamadas": 1,
+      "tokens_entrada": 405,
+      "tokens_saida": 81,
+      "custo_estimado_usd": 0.00081
+    },
+    {
+      "id": "AV-09",
+      "esperada": "neutra",
+      "obtida": "neutra",
+      "acerto": true,
+      "necessita_revisao": false,
+      "justificativa": "Relato factual, sem elogio ou crítica.",
+      "confianca_declarada": null,
+      "chamadas": 1,
+      "tokens_entrada": 404,
+      "tokens_saida": 84,
+      "custo_estimado_usd": 0.000824
+    },
+    {
+      "id": "AV-10",
+      "esperada": "indeterminada",
+      "obtida": "indeterminada",
+      "acerto": true,
+      "necessita_revisao": true,
+      "justificativa": "O elogio contrasta ironicamente com a necessidade de voltar quatro vezes.",
+      "confianca_declarada": null,
+      "chamadas": 1,
+      "tokens_entrada": 407,
+      "tokens_saida": 111,
+      "custo_estimado_usd": 0.000962
+    },
+    {
+      "id": "AV-11",
+      "esperada": "indeterminada",
+      "obtida": "negativa",
+      "acerto": false,
+      "necessita_revisao": false,
+      "justificativa": "Apesar do elogio à gentileza, o pedido ficou sem solução.",
+      "confianca_declarada": null,
+      "chamadas": 1,
+      "tokens_entrada": 408,
+      "tokens_saida": 182,
+      "custo_estimado_usd": 0.001318
+    },
+    {
+      "id": "AV-12",
+      "esperada": "indeterminada",
+      "obtida": "indeterminada",
+      "acerto": true,
+      "necessita_revisao": true,
+      "justificativa": "O texto não fornece contexto suficiente para identificar o sentimento.",
+      "confianca_declarada": null,
+      "chamadas": 1,
+      "tokens_entrada": 402,
+      "tokens_saida": 110,
+      "custo_estimado_usd": 0.000952
+    }
+  ]
+}

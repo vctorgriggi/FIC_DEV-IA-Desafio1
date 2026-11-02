@@ -45,7 +45,7 @@ permanecem fora do acervo fictício do exercício.
 | RF19 | 2 — índice/RAG | Contexto delimitado, citações, abstenção, revisão e fluxo completo | Histórico real: status 8/8, abstenção 2/2 e referência citada 5/5. Cada afirmação ainda requer conferência humana |
 | RF20 | 3 — Streamlit | Acervo, inclusão/exclusão, indexação, solicitação, fontes, painel e decisões | AppTest percorre fluxo completo com NLP/guardrails reais e transporte simulado; aprovar/rejeitar/revisar persistidos em testes |
 | RF21 | 2 — auditoria | Adaptador, perfis, tokens/custo, erros, IDs, versão do índice e prompts | Histórico real dos dois perfis e falha de serviço; consulta avulsa e contexto agora auditados. Embeddings compartilham limite da solicitação |
-| RF22 | 3 — sentimentos | Saída validada, indeterminação, lote tolerante a falhas, painel e gabarito oficial | Testes de contratos, filtros e persistência. Falta classificar e conferir as 12 avaliações com provedor real; não há acurácia real nova a reportar |
+| RF22 | 3 — sentimentos | Saída validada, indeterminação, lote tolerante a falhas, painel e gabarito oficial | Testes de contratos, filtros e persistência. Rodada real: 11/12 iguais ao gabarito; AV-11 (mista) saiu negativa sem revisão. Conferência humana pendente (`guardrails-sentimentos.md`) |
 | RF23 | Entrega integrada | Métricas e regressão automatizada disponíveis; matriz abaixo | Parcial: falta proporção de afirmações institucionalmente sustentadas com conferência humana e rodada real integrada final |
 | RF24 | Governança | Minimização, decisão registrada, ausência de envio e exclusão de documentos/vetores | Parcial: faltam decisões humanas reais na versão integrada e política de prazo/retenção/exclusão de resultados derivados explicitada pela equipe |
 
@@ -128,8 +128,8 @@ desativado. Isso não foi tratado como falha funcional do projeto.
 
 ## O que falta para considerar a entrega fechada
 
-1. Classificar as 12 avaliações oficiais com o provedor real; registrar obtido,
-   esperado, divergências e revisão dos três casos ambíguos, sem mudar o gabarito.
+1. Conferir à mão as 12 classificações reais e decidir o tratamento do AV-11
+   (resultado e divergência em `guardrails-sentimentos.md`).
 2. Demonstrar a versão integrada com serviço real, guardar as evidências e
    registrar pelo menos uma decisão humana de aprovação e outra de rejeição/revisão.
 3. Conferir semanticamente cada afirmação institucional e medir a proporção
