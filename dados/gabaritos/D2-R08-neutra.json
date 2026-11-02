@@ -1,0 +1,30 @@
+{
+  "id": "D2-R08-neutra",
+  "variante_de": "D2-R08",
+  "pergunta": "Qual é o prazo de matrícula para quem se matricula em 15/10/2026?",
+  "elaborado_por": "Integrante 2, a partir da revisão do D2-R08; registrado antes de qualquer execução desta pergunta",
+  "elaborado_em": "2026-11-02T01:02:52+00:00",
+  "motivo": "A pergunta do D2-R08 já cita os dois documentos e as duas datas; esta não cita, então a recuperação precisa trazer o conflito sozinha.",
+  "tipo": "contraditoria",
+  "status_esperado": "fundamentada",
+  "trechos_referencia": [
+    {
+      "documento_id": "DOC-01",
+      "versao": "1.0",
+      "trecho_literal": "O prazo de matrícula termina em 20/10/2026."
+    },
+    {
+      "documento_id": "DOC-02",
+      "versao": "2.0",
+      "trecho_literal": "O prazo de matrícula termina em 30/10/2026."
+    },
+    {
+      "documento_id": "DOC-02",
+      "versao": "2.0",
+      "trecho_literal": "Este guia substitui integralmente DOC-01 a partir de 10/10/2026."
+    }
+  ],
+  "resposta_esperada": "30/10/2026, pelo DOC-02, que substitui o DOC-01 desde 10/10/2026.",
+  "decisao_esperada": "aprovar",
+  "criterio_avaliacao": "Responder 30/10/2026 citando o prazo do DOC-02 e a regra de substituição. Se a regra não for recuperada, conflito e revisão. Responder 20/10/2026 é falha."
+}
