@@ -1,0 +1,5 @@
+# Preserva os bytes usados por hashes, referências literais e offsets de PDF.
+*.pdf binary
+dados/originais/** -text
+dados/processados/** -text
+dados/acervo/** -text

@@ -11,6 +11,7 @@ venv/
 env/
 *.egg-info/
 .pytest_cache/
+.tmp/
 .mypy_cache/
 .ruff_cache/
 .coverage

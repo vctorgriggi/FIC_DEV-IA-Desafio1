@@ -36,6 +36,9 @@ def processar_solicitacao(
     O `cliente` chega com guardrails.ControleRecursos e o limite vale para a execução.
     """
     geracao = config.perfil_geracao(perfil)
+    if cliente.controle is None:
+        cliente = cliente.nova_execucao(guardrails.ControleRecursos(config))
+    indice = indice.com_cliente(cliente)
     id_execucao = novo_id()
     base = {"id_execucao": id_execucao, "caso_id": rag.minimizar(origem, config), "modalidade": "solicitacao_d2"}
     comum = {"esquema_versao": ESQUEMA_VERSAO, "perfil_geracao": geracao["nome"], "modelo_geracao": geracao["modelo"]}
@@ -95,7 +98,8 @@ def processar_solicitacao(
             "indice": {chave: info[chave] for chave in ("colecao", "modelo_embedding", "dimensao", "chunking", "versao_indice")},
         }
         try:
-            gerada = rag.minuta_fundamentada(solicitacao, texto, indice=indice, cliente=cliente, config=config, perfil=perfil)
+            gerada = rag.minuta_fundamentada(solicitacao, texto, indice=indice, cliente=cliente, config=config, perfil=perfil,
+                                            auditoria=auditoria, id_execucao=id_execucao)
         except RespostaMalformada as erro:
             _anotar(evento, getattr(erro, "respostas", []), getattr(erro, "prompt", None))
             registro["problemas_validacao"] = _problemas_do_erro(erro)

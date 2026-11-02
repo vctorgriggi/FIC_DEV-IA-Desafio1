@@ -33,7 +33,7 @@ def executar(rotulo: str, funcao, *args, **kwargs):
         st.warning(f"Parte ainda não implementada: {erro}")
     except ErroLLM as erro:
         st.error(f"Erro do provedor: {erro}")
-    except (ArquivoInvalido, CasoInexistente, revisao.RevisaoInvalida, ValueError, KeyError) as erro:
+    except (ArquivoInvalido, CasoInexistente, revisao.RevisaoInvalida, ValueError, KeyError, OSError) as erro:
         st.error(f"Erro: {erro}")
     return None
 
@@ -44,6 +44,7 @@ def valor(campo):
 
 
 def mostrar_registro(registro) -> None:
+    st.caption(f"Execução: {registro.id_execucao} · Minuta gerada com IA, sujeita à revisão humana.")
     st.subheader(f"Situação: {registro.status}")
     if registro.status == "bloqueada":
         st.error("Solicitação bloqueada antes da minuta; nada foi gerado.")
@@ -62,6 +63,10 @@ def mostrar_registro(registro) -> None:
         for inferencia in registro.ficha.inferencias:
             st.caption(f"Inferido — {inferencia.campo}: {inferencia.valor} ({inferencia.justificativa})")
     if registro.resposta:
+        if registro.resposta.status == 'sem_evidencia':
+            st.warning('Não há evidência suficiente no acervo. Confira as fontes antes de decidir.')
+        elif registro.resposta.status == 'conflito':
+            st.warning('Há conflito entre fontes. A divergência exige revisão humana.')
         st.markdown(f"**Minuta — {registro.resposta.status}**")
         st.markdown(registro.resposta.resposta)
         with st.expander("Afirmações, fontes e trechos"):
@@ -90,8 +95,8 @@ with st.sidebar:
     chunking = st.selectbox("Configuração de chunking", chunkings, index=chunkings.index(config.dados["indice"]["chunking_ativo"]))
     tela = st.radio("Tela", ["Acervo e índice", "Solicitação", "Consulta ao acervo", "Avaliações"])
 
-cliente = executar("Conectando ao provedor…", ClienteLLM, config)
-indice = executar("Abrindo o índice…", IndiceVetorial, config, cliente, chunking=chunking) if cliente else None
+cliente = executar("Conectando ao provedor…", ClienteLLM, config, controle=guardrails.ControleRecursos(config))
+indice = executar("Abrindo o índice…", IndiceVetorial, config, cliente, chunking=chunking) if cliente and tela != 'Avaliações' else None
 
 if tela == "Acervo e índice":
     st.header("Acervo e índice")
@@ -130,11 +135,17 @@ if tela == "Acervo e índice":
 
 elif tela == "Solicitação":
     st.header("Solicitação")
+    with st.expander('Abrir minuta salva para revisão'):
+        id_salvo = st.text_input('ID da execução')
+        if st.button('Abrir minuta', disabled=not id_salvo.strip()):
+            salvo = executar('Lendo minuta…', revisao.ler_registro_rag, config, id_salvo.strip())
+            if salvo:
+                st.session_state['registro'] = salvo
     texto = st.text_area("Texto da solicitação (fictícia)", height=200)
     if st.button("Analisar e gerar minuta", disabled=not (texto.strip() and indice)):
         st.session_state.pop("registro", None)
         # Um controle por execução: o teto de chamadas e tokens do RF16 vale para esta solicitação.
-        cliente_execucao = ClienteLLM(config, controle=guardrails.ControleRecursos(config))
+        cliente_execucao = cliente.nova_execucao(guardrails.ControleRecursos(config))
         registro = executar(
             "Processando…", fluxo_rag.processar_solicitacao, texto, origem="interface", config=config,
             cliente=cliente_execucao, indice=indice, auditoria=auditoria, perfil=perfil,
@@ -154,7 +165,7 @@ elif tela == "Solicitação":
                                           decisao=decisao, justificativa=justificativa, revisor=revisor)
                     if atualizado:
                         st.session_state["registro"] = atualizado
-                        st.success("Decisão registrada. Nada foi enviado ao cidadão.")
+                        st.rerun()
 
 elif tela == "Consulta ao acervo":
     st.header("Consulta ao acervo")
@@ -169,24 +180,50 @@ elif tela == "Consulta ao acervo":
             if not trechos:
                 st.info("Nenhum trecho encontrado: o índice está vazio ou desatualizado.")
     if coluna_resposta.button("Responder com fontes", disabled=not (pergunta.strip() and indice)):
-        resultado = executar("Gerando…", rag.responder, pergunta, indice=indice, cliente=cliente, config=config, perfil=perfil)
+        resultado = executar("Gerando…", rag.responder, pergunta, indice=indice, cliente=cliente, config=config,
+                             perfil=perfil, top_k=top_k, auditoria=auditoria)
         if resultado:
             resposta = resultado.valor
             st.subheader(resposta.status)
             st.markdown(resposta.resposta)
+            if resposta.necessita_revisao:
+                st.warning('Resposta requer revisão humana; confira a evidência e as divergências.')
             for afirmacao in resposta.afirmacoes:
                 st.write(f"- {afirmacao.texto} → {', '.join(afirmacao.fontes) or 'sem fonte'}")
+            with st.expander('Passagens originais das fontes'):
+                st.caption(EXPLICACAO_DISTANCIA)
+                st.json([t.model_dump() for t in resposta.trechos])
 
 else:
     st.header("Avaliações de atendimento")
     avaliacoes = executar("Lendo as avaliações…", sentiment.ler_avaliacoes, config) or []
     st.caption(f"{len(avaliacoes)} avaliações em dados/avaliacoes/{sentiment.ARQUIVO_AVALIACOES}.")
+    st.caption('Mensagens mistas, irônicas ou sem contexto recebem indeterminada e revisão. A classificação descreve o texto da avaliação.')
     if st.button("Classificar avaliações", disabled=not (avaliacoes and cliente)):
         resultados = executar("Classificando…", sentiment.classificar_lote, avaliacoes, cliente=cliente, config=config, perfil=perfil)
         if resultados:
-            classificadas = [r.valor for r in resultados]
-            st.dataframe([c.model_dump() for c in classificadas], hide_index=True)
-            painel = executar("Agregando…", metrics.agregar_sentimentos, classificadas)
-            if painel:
-                st.json(painel)
-            st.caption("A confiança declarada pelo modelo é estimativa não calibrada e não entra nas contagens.")
+            st.success('Lote concluído e salvo. Falhas individuais são encaminhadas à revisão.')
+    classificadas = executar('Lendo último lote…', sentiment.ler_resultados, config) or []
+    filtros = st.multiselect('Polaridades', config.dados['sentimentos']['polaridades'],
+                             default=config.dados['sentimentos']['polaridades'])
+    painel = metrics.agregar_sentimentos(classificadas, polaridades=filtros)
+    col_total, col_revisao = st.columns(2)
+    col_total.metric('Avaliações no filtro', painel['total'])
+    col_revisao.metric('Precisam de revisão', painel['necessita_revisao'])
+    linhas = [{'polaridade': p, 'quantidade': v['numerador'], 'denominador': v['denominador'],
+               'proporção': v['valor']} for p, v in painel['por_polaridade'].items()]
+    st.bar_chart(linhas, x='polaridade', y='quantidade')
+    st.dataframe(linhas, hide_index=True)
+    st.dataframe([c.model_dump() for c in classificadas if c.polaridade in filtros], hide_index=True)
+    if painel['ids_repetidos']:
+        st.warning(f"IDs repetidos contados uma vez: {', '.join(painel['ids_repetidos'])}.")
+    if not classificadas:
+        st.info('Nenhum lote classificado. Classifique as avaliações para preencher o painel.')
+    gabarito = executar('Lendo gabarito…', sentiment.ler_gabarito, config) or {}
+    if classificadas and gabarito:
+        conferencia = metrics.conferir_sentimentos(classificadas, gabarito)
+        taxa = conferencia['acuracia']
+        st.write(f"Conferência do lote completo: {taxa['numerador']}/{taxa['denominador']} rótulos iguais ao gabarito.")
+        with st.expander('Conferência por avaliação'):
+            st.dataframe(conferencia['avaliacoes'], hide_index=True)
+    st.caption('Proporção = quantidade / total de IDs únicos no filtro. A confiança declarada pelo modelo é estimativa não calibrada e não entra nas contagens. Estes dados fictícios não medem o sentimento da população.')

@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+from copy import copy
 
 import chromadb
 from chromadb.config import Settings
@@ -57,6 +58,13 @@ class IndiceVetorial:
                 f"Índice {self._colecao.name} foi gerado com {gravado} e o config pede {self.modelo}. "
                 f"Apague a pasta {config.relativo(config.caminho('indice'))} e indexe o acervo de novo."
             )
+
+    def com_cliente(self, cliente: ClienteLLM) -> IndiceVetorial:
+        """Compartilha o índice persistente com o orçamento da execução atual."""
+        indice = copy(self)
+        indice.cliente = cliente
+        indice.ultima_resposta = None
+        return indice
 
     def indexar(self, documento: DocumentoAcervo) -> int:
         """Extrai, divide e grava os trechos do documento; devolve quantos trechos dele ficaram no índice.

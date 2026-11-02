@@ -65,4 +65,30 @@ def agregar_sentimentos(avaliacoes: list[AvaliacaoSentimento], *, polaridades: l
     por polaridade, ids repetidos contados uma vez e registrados, conjunto vazio sem erro (T13). Não usa
     confianca_declarada em nenhuma conta.
     """
-    raise PendenteDeImplementacao("RF22", "sentimentos")
+    rotulos = ['positiva', 'negativa', 'neutra', 'indeterminada']
+    if polaridades is not None and set(polaridades) - set(rotulos):
+        raise ValueError('Filtro contém polaridade inválida.')
+    unicas = {}
+    duplicados = set()
+    for avaliacao in avaliacoes:
+        if avaliacao.id in unicas:
+            duplicados.add(avaliacao.id)
+        else:
+            unicas[avaliacao.id] = avaliacao
+    filtradas = [a for a in unicas.values() if polaridades is None or a.polaridade in polaridades]
+    total = len(filtradas)
+    return {
+        'total': total, 'total_sem_filtro': len(unicas), 'ids_repetidos': sorted(duplicados),
+        'necessita_revisao': sum(a.necessita_revisao for a in filtradas),
+        'por_polaridade': {p: proporcao(sum(a.polaridade == p for a in filtradas), total) for p in rotulos},
+    }
+
+
+def conferir_sentimentos(avaliacoes: list[AvaliacaoSentimento], esperadas: dict[str, str]) -> dict:
+    """Conferência por ID contra gabarito prévio; faltantes contam como erro."""
+    obtidas = {}
+    for avaliacao in avaliacoes:
+        obtidas.setdefault(avaliacao.id, avaliacao.polaridade)
+    linhas = [{'id': id_, 'esperada': p, 'obtida': obtidas.get(id_),
+               'acerto': obtidas.get(id_) == p} for id_, p in esperadas.items()]
+    return {'acuracia': proporcao(sum(linha['acerto'] for linha in linhas), len(linhas)), 'avaliacoes': linhas}

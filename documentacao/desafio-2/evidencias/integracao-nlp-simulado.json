@@ -1,0 +1,519 @@
+{
+  "modo": "simulado",
+  "executado_em": "2026-11-02T01:18:40.604393+00:00",
+  "dados": {
+    "documentos": 6,
+    "solicitacoes": 6,
+    "perguntas": 8,
+    "ataques": 3,
+    "avaliacoes": 12,
+    "ids_unicos": 35,
+    "status": "validado offline"
+  },
+  "casos": [
+    {
+      "id": "D2-S01",
+      "status": "valido",
+      "solicitacao": {
+        "protocolo": "2026-000142",
+        "data": "14 de outubro de 2026",
+        "solicitante": "Marcos Vinícius de Almeida Santos",
+        "assunto": "matrícula",
+        "pedido": "Peço que informe quais os documentos ainda preciso apresentar.",
+        "categoria": "matricula",
+        "entidades": {
+          "pessoas": [
+            "Marcos Vinícius de Almeida Santos",
+            "Lúcia Helena de Almeida Santos"
+          ],
+          "orgaos": [],
+          "locais": [
+            "Cuiabá"
+          ],
+          "datas": [
+            "14 de outubro de 2026",
+            "12 de agosto de 2008"
+          ],
+          "protocolos": [
+            "2026-000142"
+          ]
+        },
+        "campos_ausentes": [],
+        "necessita_revisao": false,
+        "motivo_revisao": ""
+      },
+      "ficha": {
+        "resumo": "Meu protocolo é 2026-000142, de 14 de outubro de 2026. … Meu nome é Marcos Vinícius de Almeida Santos … quero pedir a efetivação da minha matrícula no curso técnico em enfermagem do eixo tecnológico de saúde, com carga horária de 1.200 horas, no turno noturno. … Peço que informe quais os documentos ainda preciso apresentar.",
+        "inferencias": []
+      },
+      "palavras_resumo": 56,
+      "regras": [],
+      "fatos_essenciais_omitidos": [],
+      "entidades_omitidas": {
+        "pessoas": [],
+        "orgaos": [],
+        "locais": [],
+        "datas": [],
+        "protocolos": []
+      },
+      "entidades_incorretas": {
+        "pessoas": [],
+        "orgaos": [],
+        "locais": [],
+        "datas": [],
+        "protocolos": []
+      },
+      "fatos_sem_suporte": "Passagens não literais recusadas por código; seleção e contexto exigem revisão humana.",
+      "abstencao_categoria_correta": false,
+      "chamadas": 2,
+      "tokens_entrada": 20,
+      "tokens_saida": 10,
+      "custo_estimado_usd": 7e-05,
+      "duracao_s": 0.001,
+      "prompts": [
+        {
+          "id": "solicitacao_d2_v4",
+          "hash": "b844ed6249e5"
+        },
+        {
+          "id": "compreensao_d2_v3",
+          "hash": "4737e2a82352"
+        }
+      ]
+    },
+    {
+      "id": "D2-S02",
+      "status": "valido",
+      "solicitacao": {
+        "protocolo": "2026-000201",
+        "data": "15/10/2026",
+        "solicitante": "Lia Exemplo",
+        "assunto": "declaração de matrícula",
+        "pedido": "Solicito emissão de declaração de matrícula.",
+        "categoria": "solicitacao_documentos",
+        "entidades": {
+          "pessoas": [
+            "Lia Exemplo"
+          ],
+          "orgaos": [
+            "Escola Técnica Fictícia Horizonte"
+          ],
+          "locais": [
+            "Vila Exemplo"
+          ],
+          "datas": [
+            "15/10/2026"
+          ],
+          "protocolos": [
+            "2026-000201"
+          ]
+        },
+        "campos_ausentes": [],
+        "necessita_revisao": false,
+        "motivo_revisao": ""
+      },
+      "ficha": {
+        "resumo": "Lia Exemplo … Solicito emissão de declaração de matrícula.",
+        "inferencias": []
+      },
+      "palavras_resumo": 9,
+      "regras": [],
+      "fatos_essenciais_omitidos": [],
+      "entidades_omitidas": {
+        "pessoas": [],
+        "orgaos": [],
+        "locais": [],
+        "datas": [],
+        "protocolos": []
+      },
+      "entidades_incorretas": {
+        "pessoas": [],
+        "orgaos": [],
+        "locais": [],
+        "datas": [],
+        "protocolos": []
+      },
+      "fatos_sem_suporte": "Passagens não literais recusadas por código; seleção e contexto exigem revisão humana.",
+      "abstencao_categoria_correta": false,
+      "chamadas": 2,
+      "tokens_entrada": 20,
+      "tokens_saida": 10,
+      "custo_estimado_usd": 7e-05,
+      "duracao_s": 0.0,
+      "prompts": [
+        {
+          "id": "solicitacao_d2_v4",
+          "hash": "b844ed6249e5"
+        },
+        {
+          "id": "compreensao_d2_v3",
+          "hash": "4737e2a82352"
+        }
+      ]
+    },
+    {
+      "id": "D2-S03",
+      "status": "valido",
+      "solicitacao": {
+        "protocolo": "2026-000202",
+        "data": "15/10/2026",
+        "solicitante": "Ivo Exemplo",
+        "assunto": "cancelamento",
+        "pedido": "Solicito cancelamento da matrícula.",
+        "categoria": "cancelamento",
+        "entidades": {
+          "pessoas": [
+            "Ivo Exemplo"
+          ],
+          "orgaos": [
+            "Escola Técnica Fictícia Horizonte"
+          ],
+          "locais": [
+            "Vila Exemplo"
+          ],
+          "datas": [
+            "15/10/2026"
+          ],
+          "protocolos": [
+            "2026-000202"
+          ]
+        },
+        "campos_ausentes": [],
+        "necessita_revisao": false,
+        "motivo_revisao": ""
+      },
+      "ficha": {
+        "resumo": "Ivo Exemplo … Solicito cancelamento da matrícula.",
+        "inferencias": []
+      },
+      "palavras_resumo": 7,
+      "regras": [],
+      "fatos_essenciais_omitidos": [],
+      "entidades_omitidas": {
+        "pessoas": [],
+        "orgaos": [],
+        "locais": [],
+        "datas": [],
+        "protocolos": []
+      },
+      "entidades_incorretas": {
+        "pessoas": [],
+        "orgaos": [],
+        "locais": [],
+        "datas": [],
+        "protocolos": []
+      },
+      "fatos_sem_suporte": "Passagens não literais recusadas por código; seleção e contexto exigem revisão humana.",
+      "abstencao_categoria_correta": false,
+      "chamadas": 2,
+      "tokens_entrada": 20,
+      "tokens_saida": 10,
+      "custo_estimado_usd": 7e-05,
+      "duracao_s": 0.0,
+      "prompts": [
+        {
+          "id": "solicitacao_d2_v4",
+          "hash": "b844ed6249e5"
+        },
+        {
+          "id": "compreensao_d2_v3",
+          "hash": "4737e2a82352"
+        }
+      ]
+    },
+    {
+      "id": "D2-S04",
+      "status": "valido",
+      "solicitacao": {
+        "protocolo": "2026-000203",
+        "data": "15/10/2026",
+        "solicitante": "Bia Exemplo",
+        "assunto": "reclamação",
+        "pedido": "Reclamo da demora no atendimento e peço registro da reclamação.",
+        "categoria": "reclamacao",
+        "entidades": {
+          "pessoas": [
+            "Bia Exemplo"
+          ],
+          "orgaos": [
+            "Escola Técnica Fictícia Horizonte"
+          ],
+          "locais": [
+            "Vila Exemplo"
+          ],
+          "datas": [
+            "15/10/2026"
+          ],
+          "protocolos": [
+            "2026-000203"
+          ]
+        },
+        "campos_ausentes": [],
+        "necessita_revisao": false,
+        "motivo_revisao": ""
+      },
+      "ficha": {
+        "resumo": "Bia Exemplo … Reclamo da demora no atendimento e peço registro da reclamação.",
+        "inferencias": []
+      },
+      "palavras_resumo": 13,
+      "regras": [],
+      "fatos_essenciais_omitidos": [],
+      "entidades_omitidas": {
+        "pessoas": [],
+        "orgaos": [],
+        "locais": [],
+        "datas": [],
+        "protocolos": []
+      },
+      "entidades_incorretas": {
+        "pessoas": [],
+        "orgaos": [],
+        "locais": [],
+        "datas": [],
+        "protocolos": []
+      },
+      "fatos_sem_suporte": "Passagens não literais recusadas por código; seleção e contexto exigem revisão humana.",
+      "abstencao_categoria_correta": false,
+      "chamadas": 2,
+      "tokens_entrada": 20,
+      "tokens_saida": 10,
+      "custo_estimado_usd": 7e-05,
+      "duracao_s": 0.0,
+      "prompts": [
+        {
+          "id": "solicitacao_d2_v4",
+          "hash": "b844ed6249e5"
+        },
+        {
+          "id": "compreensao_d2_v3",
+          "hash": "4737e2a82352"
+        }
+      ]
+    },
+    {
+      "id": "D2-S05",
+      "status": "valido",
+      "solicitacao": {
+        "protocolo": null,
+        "data": "14/10/2026",
+        "solicitante": "MARCOS VINICIUS DE ALMEIDA SANTOS",
+        "assunto": "FICHA DE MATRÍCULA",
+        "pedido": null,
+        "categoria": "matricula",
+        "entidades": {
+          "pessoas": [
+            "MARCOS VINICIUS DE ALMEIDA SANTOS",
+            "LÚCIA HELENA DE ALMEIDA SANTOS"
+          ],
+          "orgaos": [
+            "SECRETARIA DE ESTADO DE CIÊNCIA, TECNOLOGIA E INOVAÇÃO - SECITECI/MT",
+            "ESCOLA TÉCNICA ESTADUAL DE CUIABÁ"
+          ],
+          "locais": [
+            "CUIABÁ"
+          ],
+          "datas": [
+            "12/08/2008",
+            "01/02/2027",
+            "14/10/2026"
+          ],
+          "protocolos": []
+        },
+        "campos_ausentes": [
+          "protocolo",
+          "pedido"
+        ],
+        "necessita_revisao": true,
+        "motivo_revisao": "OCR tem protocolo parcialmente ilegível e não traz pedido; não completar usando outra modalidade."
+      },
+      "ficha": {
+        "resumo": "FICHA DE MATRÍCULA … CÓDIGO: 202[ilegível]-000142 … NOME: MARCOS VINICIUS DE ALMEIDA SANTOS … TURNO: NOTURNO … DATA MATRÍCULA: 14/10/2026",
+        "inferencias": []
+      },
+      "palavras_resumo": 20,
+      "regras": [],
+      "fatos_essenciais_omitidos": [],
+      "entidades_omitidas": {
+        "pessoas": [],
+        "orgaos": [],
+        "locais": [],
+        "datas": [],
+        "protocolos": []
+      },
+      "entidades_incorretas": {
+        "pessoas": [],
+        "orgaos": [],
+        "locais": [],
+        "datas": [],
+        "protocolos": []
+      },
+      "fatos_sem_suporte": "Passagens não literais recusadas por código; seleção e contexto exigem revisão humana.",
+      "abstencao_categoria_correta": false,
+      "chamadas": 2,
+      "tokens_entrada": 20,
+      "tokens_saida": 10,
+      "custo_estimado_usd": 7e-05,
+      "duracao_s": 0.0,
+      "prompts": [
+        {
+          "id": "solicitacao_d2_v4",
+          "hash": "b844ed6249e5"
+        },
+        {
+          "id": "compreensao_d2_v3",
+          "hash": "4737e2a82352"
+        }
+      ]
+    },
+    {
+      "id": "D2-S06",
+      "status": "valido",
+      "solicitacao": {
+        "protocolo": "2026-000205",
+        "data": "16/10/2026",
+        "solicitante": "Rui Exemplo",
+        "assunto": "matrícula",
+        "pedido": null,
+        "categoria": null,
+        "entidades": {
+          "pessoas": [
+            "Rui Exemplo"
+          ],
+          "orgaos": [],
+          "locais": [],
+          "datas": [
+            "16/10/2026"
+          ],
+          "protocolos": [
+            "2026-000205"
+          ]
+        },
+        "campos_ausentes": [
+          "pedido",
+          "categoria"
+        ],
+        "necessita_revisao": true,
+        "motivo_revisao": "Sem intenção definida, pedido e categoria null; revisão humana é o fallback do contrato atual."
+      },
+      "ficha": {
+        "resumo": "Rui Exemplo … Quero resolver minha matrícula; talvez cancelar, talvez apenas saber como continuar. Não decidi.",
+        "inferencias": []
+      },
+      "palavras_resumo": 16,
+      "regras": [],
+      "fatos_essenciais_omitidos": [],
+      "entidades_omitidas": {
+        "pessoas": [],
+        "orgaos": [],
+        "locais": [],
+        "datas": [],
+        "protocolos": []
+      },
+      "entidades_incorretas": {
+        "pessoas": [],
+        "orgaos": [],
+        "locais": [],
+        "datas": [],
+        "protocolos": []
+      },
+      "fatos_sem_suporte": "Passagens não literais recusadas por código; seleção e contexto exigem revisão humana.",
+      "abstencao_categoria_correta": true,
+      "chamadas": 2,
+      "tokens_entrada": 20,
+      "tokens_saida": 10,
+      "custo_estimado_usd": 7e-05,
+      "duracao_s": 0.0,
+      "prompts": [
+        {
+          "id": "solicitacao_d2_v4",
+          "hash": "b844ed6249e5"
+        },
+        {
+          "id": "compreensao_d2_v3",
+          "hash": "4737e2a82352"
+        }
+      ]
+    }
+  ],
+  "limitacoes": [
+    "SDK falso alimentado por referências prévias; mede integração e validações, não qualidade de um modelo.",
+    "Caso ambíguo tem categoria null no gabarito: entra na acurácia do gabarito original e fica fora da de categorias definidas."
+  ],
+  "comparacao_json_esquema": {
+    "origem": "D2-S06",
+    "prompt": "solicitacao_d2_v4",
+    "hash_prompt": "b844ed6249e5",
+    "abordagens": {
+      "json_livre": {
+        "json_valido": true,
+        "esquema_valido": false,
+        "campos_obrigatorios_ausentes": [
+          {
+            "type": "missing",
+            "loc": [
+              "pedido"
+            ]
+          }
+        ],
+        "tipos_incorretos": [
+          {
+            "type": "bool_type",
+            "loc": [
+              "necessita_revisao"
+            ]
+          }
+        ],
+        "campos_extras": [
+          {
+            "type": "extra_forbidden",
+            "loc": [
+              "extra"
+            ]
+          }
+        ],
+        "outros_erros": [],
+        "saida": "{\"protocolo\": \"2026-000205\", \"data\": \"16/10/2026\", \"solicitante\": \"Rui Exemplo\", \"assunto\": \"matr\\u00edcula\", \"categoria\": null, \"campos_ausentes\": [\"pedido\", \"categoria\"], \"necessita_revisao\": \"true\", \"motivo_revisao\": \"Sem inten\\u00e7\\u00e3o definida, pedido e categoria null; revis\\u00e3o humana \\u00e9 o fallback do contrato atual.\", \"entidades\": {\"pessoas\": [\"Rui Exemplo\"], \"orgaos\": [], \"locais\": [], \"datas\": [\"16/10/2026\"], \"protocolos\": [\"2026-000205\"]}, \"extra\": \"indevida\"}",
+        "modelo": "gpt-6.1-terra",
+        "tokens_entrada": 10,
+        "tokens_saida": 5,
+        "duracao_s": 0.0,
+        "custo_estimado_usd": 3.5e-05
+      },
+      "esquema": {
+        "json_valido": true,
+        "esquema_valido": true,
+        "campos_obrigatorios_ausentes": [],
+        "tipos_incorretos": [],
+        "campos_extras": [],
+        "outros_erros": [],
+        "saida": "{\"protocolo\": \"2026-000205\", \"data\": \"16/10/2026\", \"solicitante\": \"Rui Exemplo\", \"assunto\": \"matr\\u00edcula\", \"pedido\": null, \"categoria\": null, \"campos_ausentes\": [\"pedido\", \"categoria\"], \"necessita_revisao\": true, \"motivo_revisao\": \"Sem inten\\u00e7\\u00e3o definida, pedido e categoria null; revis\\u00e3o humana \\u00e9 o fallback do contrato atual.\", \"entidades\": {\"pessoas\": [\"Rui Exemplo\"], \"orgaos\": [], \"locais\": [], \"datas\": [\"16/10/2026\"], \"protocolos\": [\"2026-000205\"]}}",
+        "modelo": "gpt-6.1-terra",
+        "tokens_entrada": 10,
+        "tokens_saida": 5,
+        "duracao_s": 0.0,
+        "custo_estimado_usd": 3.5e-05
+      }
+    }
+  },
+  "acuracia_gabarito_original": {
+    "numerador": 6,
+    "denominador": 6,
+    "valor": 1.0,
+    "percentual": 100.0,
+    "divergencias": []
+  },
+  "acuracia_categorias_definidas": {
+    "numerador": 5,
+    "denominador": 5,
+    "valor": 1.0,
+    "percentual": 100.0,
+    "divergencias": []
+  },
+  "cobertura_categorias": {
+    "com_rotulo_definido": 5,
+    "casos_planejados": 6,
+    "casos_executados": 6
+  },
+  "status": "concluido"
+}

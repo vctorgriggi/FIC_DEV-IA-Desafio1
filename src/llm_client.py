@@ -106,6 +106,10 @@ class ClienteLLM:
             sdk = OpenAI(api_key=self._chave, max_retries=0)
         self._sdk = sdk
 
+    def nova_execucao(self, controle: Any) -> ClienteLLM:
+        """Reutiliza o adaptador com orçamento independente, sem recriar conexão."""
+        return ClienteLLM(self.config, chave=self._chave, sdk=self._sdk, controle=controle)
+
     def gerar(
         self,
         *,
@@ -134,6 +138,9 @@ class ClienteLLM:
 
         resposta, duracao = self._executar(lambda: self._sdk.responses.create(**argumentos, timeout=self._timeout()))
 
+        uso = getattr(resposta, "usage", None)
+        entrada_tokens, saida_tokens = getattr(uso, "input_tokens", None), getattr(uso, "output_tokens", None)
+        self._contabilizar(entrada_tokens, saida_tokens)
         status = getattr(resposta, "status", "completed")
         if status == "incomplete":
             motivo = getattr(getattr(resposta, "incomplete_details", None), "reason", None)
@@ -146,9 +153,6 @@ class ClienteLLM:
         texto = (getattr(resposta, "output_text", None) or "").strip()
         if not texto:
             raise RespostaVazia()
-        uso = getattr(resposta, "usage", None)
-        entrada_tokens, saida_tokens = getattr(uso, "input_tokens", None), getattr(uso, "output_tokens", None)
-        self._contabilizar(entrada_tokens, saida_tokens)
         preco = self._preco(modelo)
         return RespostaLLM(
             texto=texto,
@@ -289,7 +293,8 @@ class ClienteLLM:
     def _executar(self, operacao: Callable[[], Any]) -> tuple[Any, float]:
         # RF16: no máximo limites.repeticoes_falha_transitoria novas tentativas, só para 5xx e conexão.
         # 429 e timeout não se repetem: o primeiro só atrasaria a mesma recusa, o segundo dobraria a espera.
-        tentativas = 1 + self.config.dados.get("limites", {}).get("repeticoes_falha_transitoria", 0)
+        repeticoes = self.config.dados.get("limites", {}).get("repeticoes_falha_transitoria", 0)
+        tentativas = 1 + max(0, min(1, repeticoes))
         for tentativa in range(tentativas):
             if self.controle is not None:
                 self.controle.antes_da_chamada()

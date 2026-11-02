@@ -64,7 +64,7 @@ def indice(config, sdk, acervo):
 
 def gerador(config, *saidas):
     """Cliente de geração separado do índice: as respostas JSON são escritas depois de saber os ids dos trechos."""
-    sdk = falsos.SDKFalso(respostas=[falsos.resposta(json.dumps(s, ensure_ascii=False)) for s in saidas])
+    sdk = SDKComEmbeddings(respostas=[falsos.resposta(json.dumps(s, ensure_ascii=False)) for s in saidas])
     return ClienteLLM(config, chave="c", sdk=sdk), sdk
 
 
@@ -274,8 +274,9 @@ def test_resposta_fundamentada_cita_trechos_delimitados(config, indice):
     alvo = id_de(indice, "DOC-02")
     cliente, sdk = gerador(config, fundamentada(alvo))
     resultado = rag.responder("Quais documentos levo na matrícula? CPF 123.456.789-00", indice=indice, cliente=cliente, config=config)
-    assert resultado.valor.status == "fundamentada" and not resultado.valor.necessita_revisao
-    assert resultado.valor.fontes() == [alvo] and len(resultado.valor.trechos) == indice.contar()
+    assert resultado.valor.status == "fundamentada" and resultado.valor.necessita_revisao
+    assert resultado.valor.fontes() == [alvo] and len(resultado.valor.trechos) < indice.contar()
+    assert all(t.trecho.documento_id != 'DOC-06' for t in resultado.valor.trechos)
     assert resultado.prompt.identificador == "rag_d2_v1" and len(resultado.respostas) == 1
     [chamada] = sdk.chamadas
     assert chamada["model"] == config.perfil_geracao()["modelo"] and chamada["text"]["format"]["strict"] is True
@@ -399,8 +400,8 @@ def test_fluxo_grava_minuta_pendente_e_audita_cada_etapa(config, indice, auditor
     assert "123.456.789-00" not in registro.entrada
     assert revisao.ler_registro_rag(config, registro.id_execucao) == registro
     eventos = auditoria.eventos(id_execucao=registro.id_execucao)
-    assert [e["etapa"] for e in eventos] == ["d2_entrada", "d2_extracao", "d2_compreensao", "d2_recuperacao_geracao", "d2_registro"]
-    extracao, geracao = eventos[1], eventos[3]
+    assert [e["etapa"] for e in eventos] == ["d2_entrada", "d2_extracao", "d2_compreensao", "d2_contexto", "d2_recuperacao_geracao", "d2_registro"]
+    extracao, geracao = eventos[1], eventos[4]
     assert extracao["tokens_entrada"] == 200 and extracao["parametros"]["chamadas"] == 2
     assert geracao["versao_prompt"] == "minuta_rag_d2_v1" and geracao["extra"]["esquema_versao"] == "2.0"
     assert geracao["extra"]["ids_recuperados"] and geracao["extra"]["indice"]["versao_indice"] == indice.info()["versao_indice"]

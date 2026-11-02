@@ -15,8 +15,8 @@ from .audit import Auditoria, Evento, agora_iso
 from .comparacao import tokens
 from .config import Config
 from .minuta import cabecalho
-from .schemas import RegistroMinutaRAG
-from .tipos import PendenteDeImplementacao
+from .privacidade import mascarar
+from .schemas import DecisaoOperador, RegistroMinutaRAG
 
 AGUARDANDO = "aguardando_revisao"
 DECISOES = {
@@ -179,6 +179,8 @@ def registrar_revisao_audio(
 
 
 def caminho_registro_rag(config: Config, id_execucao: str) -> Path:
+    if not id_execucao or any(c not in 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-' for c in id_execucao):
+        raise RevisaoInvalida('Identificador de execução inválido.')
     return config.caminho("minutas_rag") / f"{id_execucao}.json"
 
 
@@ -212,7 +214,31 @@ def registrar_decisao_rag(
     justificativa e revisor obrigatórios, em DecisaoOperador; decisão registrada não muda; gravar_registro_rag;
     evento na auditoria; nada é enviado ao cidadão.
     """
-    raise PendenteDeImplementacao("RF20", "interface")
+    estados = {'aprovar': 'aprovada', 'rejeitar': 'rejeitada', 'revisar': 'revisar'}
+    if decisao not in estados:
+        raise RevisaoInvalida('Decisão deve ser aprovar, rejeitar ou revisar.')
+    if not justificativa.strip() or not revisor.strip():
+        raise RevisaoInvalida('Justificativa e revisor são obrigatórios.')
+    registro = ler_registro_rag(config, id_execucao)
+    if registro.status != 'pendente' or registro.decisao is not None:
+        raise RevisaoInvalida('Somente minuta pendente aceita decisão; decisão registrada não muda.')
+    if registro.resposta is None:
+        raise RevisaoInvalida('Não há minuta para revisar.')
+    if decisao == 'aprovar' and any(d.decisao == 'bloquear' for d in registro.guardrails):
+        raise RevisaoInvalida('Minuta com bloqueio de guardrail não pode ser aprovada.')
+    registro.status = estados[decisao]
+    registro.decisao = DecisaoOperador(decisao=decisao, justificativa=justificativa.strip(),
+                                      revisor=revisor.strip(), data_hora=agora_iso())
+    gravar_registro_rag(config, registro)
+    auditoria.registrar(Evento(
+        id_execucao=id_execucao, caso_id=id_execucao, etapa='revisao_rag',
+        modalidade='texto', saida=config.relativo(caminho_registro_rag(config, id_execucao)),
+        decisao_humana=decisao,
+        justificativa=mascarar(justificativa.strip(), config.dados['privacidade']['mascarar_antes_de_enviar'])[0],
+        revisor=mascarar(revisor.strip(), config.dados['privacidade']['mascarar_antes_de_enviar'])[0],
+        extra={'status': registro.status, 'esquema_versao': registro.esquema_versao},
+    ))
+    return registro
 
 
 def resumo_revisoes(config: Config) -> dict:
