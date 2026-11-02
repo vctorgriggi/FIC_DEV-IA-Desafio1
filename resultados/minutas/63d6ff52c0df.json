@@ -1,0 +1,22 @@
+{
+  "id_execucao": "63d6ff52c0df",
+  "caso_id": "imagem-01",
+  "modalidade": "imagem",
+  "arquivo_origem": "dados/originais/entrada_pdf-imagem.pdf",
+  "extracao": "dados/processados/imagem-01/63d6ff52c0df/extracao.json",
+  "arquivo_minuta": "resultados/minutas/63d6ff52c0df.md",
+  "arquivo_renderizado": null,
+  "campos_ausentes": [],
+  "fontes": [
+    "dados/originais/entrada_pdf-imagem.pdf"
+  ],
+  "gerada_em": "2026-11-02T12:05:52-04:00",
+  "status": "aprovada",
+  "revisao": {
+    "decisao": "aprovar",
+    "justificativa": "T15, imagem-01: protocolo confirmado como 2026-000142 contra a ficha original (quarto dígito rasurado), data e solicitante conferidos; a minuta não inventa pedido nem data e deixa a análise ao setor competente.",
+    "revisor": "Victor Griggi Moreira Regis da Silva",
+    "data_hora": "2026-11-02T12:06:12-04:00",
+    "sha256_minuta": "3e47c7f40d46abe4ae25914ef0fa66ba91ff8d38fb2cd4a115a95e1191811b52"
+  }
+}

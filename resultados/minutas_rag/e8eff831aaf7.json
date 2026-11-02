@@ -1,6 +1,6 @@
 {
   "id_execucao": "e8eff831aaf7",
-  "status": "pendente",
+  "status": "aprovada",
   "criado_em": "2026-11-01T23:20:18-04:00",
   "origem": "D2-S03",
   "esquema_versao": "2.0",
@@ -152,5 +152,10 @@
     ],
     "necessita_revisao": false
   },
-  "decisao": null
+  "decisao": {
+    "decisao": "aprovar",
+    "justificativa": "D2-S03: procedimento de cancelamento conferido com DOC-04; não declara o cancelamento como feito.",
+    "revisor": "Victor Griggi Moreira Regis da Silva",
+    "data_hora": "2026-11-02T12:05:35-04:00"
+  }
 }

@@ -1,6 +1,6 @@
 {
   "id_execucao": "d86b377b8b1b",
-  "status": "pendente",
+  "status": "revisar",
   "criado_em": "2026-11-01T23:20:47-04:00",
   "origem": "D2-S05",
   "esquema_versao": "2.0",
@@ -157,5 +157,10 @@
     ],
     "necessita_revisao": true
   },
-  "decisao": null
+  "decisao": {
+    "decisao": "revisar",
+    "justificativa": "D2-S05: ficha sem pedido e com código parcialmente ilegível; pedir esclarecimento antes de qualquer orientação.",
+    "revisor": "Victor Griggi Moreira Regis da Silva",
+    "data_hora": "2026-11-02T12:05:35-04:00"
+  }
 }

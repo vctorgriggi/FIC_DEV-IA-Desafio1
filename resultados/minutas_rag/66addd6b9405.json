@@ -1,6 +1,6 @@
 {
   "id_execucao": "66addd6b9405",
-  "status": "pendente",
+  "status": "revisar",
   "criado_em": "2026-11-01T23:22:04-04:00",
   "origem": "imagem-01",
   "esquema_versao": "2.0",
@@ -168,5 +168,10 @@
     ],
     "necessita_revisao": true
   },
-  "decisao": null
+  "decisao": {
+    "decisao": "revisar",
+    "justificativa": "imagem-01: OCR com protocolo e CPF parcialmente ilegíveis e sem pedido explícito; conferir o original antes de responder.",
+    "revisor": "Victor Griggi Moreira Regis da Silva",
+    "data_hora": "2026-11-02T12:05:35-04:00"
+  }
 }

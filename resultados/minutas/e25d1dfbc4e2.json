@@ -11,5 +11,13 @@
     "dados/originais/entrada_texto.txt"
   ],
   "gerada_em": "2026-11-01T23:23:03-04:00",
-  "status": "aguardando_revisao"
+  "status": "aprovada_com_correcao",
+  "minuta_gerada": "resultados/minutas/e25d1dfbc4e2_gerada.md",
+  "revisao": {
+    "decisao": "aprovar_com_correcao",
+    "justificativa": "T15, texto-01: dados conferidos com o original. O fecho repetia a data da solicitação (14/10/2026) como data da comunicação, mesma falha registrada no Desafio 1; trocada por 'não localizado'.",
+    "revisor": "Victor Griggi Moreira Regis da Silva",
+    "data_hora": "2026-11-02T12:06:12-04:00",
+    "sha256_minuta": "8a63ee0dd2e533e09807abdd3b3ec05f5b020eedc9db319d7eb3540062dac140"
+  }
 }

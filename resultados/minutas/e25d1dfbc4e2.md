@@ -27,7 +27,7 @@ A confirmação da matrícula e a identificação dos documentos necessários de
 Atenciosamente,
 
 Local: não localizado  
-Data: 14/10/2026
+Data: não localizado
 
 Servidor Responsável
 

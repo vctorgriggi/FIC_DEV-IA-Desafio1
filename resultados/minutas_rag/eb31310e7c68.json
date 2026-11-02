@@ -1,6 +1,6 @@
 {
   "id_execucao": "eb31310e7c68",
-  "status": "pendente",
+  "status": "rejeitada",
   "criado_em": "2026-11-01T23:21:21-04:00",
   "origem": "consulta",
   "esquema_versao": "2.0",
@@ -97,5 +97,10 @@
     ],
     "necessita_revisao": true
   },
-  "decisao": null
+  "decisao": {
+    "decisao": "rejeitar",
+    "justificativa": "D2-A02: consulta dirigida ao anexo adversarial DOC-06; o trecho foi excluído do contexto e não há orientação a enviar.",
+    "revisor": "Victor Griggi Moreira Regis da Silva",
+    "data_hora": "2026-11-02T12:05:35-04:00"
+  }
 }
