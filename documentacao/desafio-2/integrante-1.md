@@ -71,6 +71,13 @@ a validação confere igualdade dos bytes. Não se completa o protocolo do OCR
 com a transcrição do áudio. Pessoas e identificadores destes casos anteriores
 são fictícios, conforme a documentação do Desafio 1.
 
+`fontes_esperadas` das solicitações (trecho do acervo que a minuta RAG deve
+citar) foi preenchido pelo Integrante 2 depois da avaliação RF14/RF15 e antes
+de qualquer minuta RAG; o campo `fontes_esperadas_elaboradas_por` registra
+isso. Nenhum outro campo dos gabaritos mudou. S05 e S06 não têm pedido
+decidido: as fontes indicam a orientação geral (documentos da matrícula e
+encaminhamento de dúvida à revisão), não uma resposta ao cidadão.
+
 | Pergunta | Resultado esperado |
 |---|---|
 | D2-R01 | Documentos da matrícula, DOC-02 |
@@ -127,6 +134,8 @@ sobre nascimento e datas do curso. Não há validação por relógio: datas futu
 em documentos não são automaticamente erros. A regra de categoria de emissão
 explícita de declaração/histórico/certificado/documento bloqueia confusão com
 efetivação de matrícula. A categoria revisao exige necessita_revisao=true.
+Data impossível no próprio original é apontada uma vez ("o original contém data
+impossível") e não faz a data extraída, se válida, ser dada como inexistente.
 Pedidos múltiplos podem reunir passagens literais com ` … `, cada uma validada
 contra o original; não se descarta o pedido adicional de esclarecimento.
 
@@ -176,7 +185,9 @@ de pedido não torna o tema ambíguo. Emissão de declaração é solicitacao_do
 divergências por ID. Todos os IDs esperados entram no denominador; ID sem saída
 não conta como acerto, inclusive quando o gabarito histórico contém null.
 Denominador zero retorna valor/percentual null. Os gabaritos não foram alterados
-para adaptar as métricas à categoria nova.
+para adaptar as métricas à categoria nova. Os dois avaliadores (real e
+offline) publicam as mesmas duas contas: `acuracia_gabarito_original` (seis
+casos, S06 com null) e `acuracia_categorias_definidas` (cinco casos).
 
 ## Evidências reais e correções
 
@@ -195,7 +206,33 @@ O .env foi carregado sem exibir seu conteúdo, continua ignorado e não versiona
 com permissão 0600. Nenhuma chave foi registrada nos artefatos. As gerações ficam
 em artefato de experimento explicitamente solicitado, separado do log de auditoria.
 
-| Medida final | Resultado real |
+### Rodada final com os prompts ativos
+
+A tabela "histórico" mistura versões de prompt: só S01 chegou a rodar com
+`solicitacao_d2_v4`; S02, S03, S04 e S06 rodaram com v2 e S05 com v3. Em
+01/11/2026 os seis casos, a comparação de S02 e a variante de data impossível
+foram reexecutados com os prompts ativos (`solicitacao_d2_v4`,
+`compreensao_d2_v3`), num ledger próprio para não reiniciar o saldo da missão
+original. Gabaritos de RF14/RF15 inalterados.
+
+| Medida, prompts ativos | Resultado real |
+|---|---|
+| Extração e ficha válidas | 6/6, nenhum reparo acionado |
+| Acurácia contra os seis gabaritos originais | 5/6 = 0,833 (divergência: S06, null × revisao) |
+| Acurácia nas categorias com rótulo definido | 5/5 = 1,0 |
+| Palavras dos resumos S01 a S06 | 75, 21, 19, 24, 67, 26 |
+| Entidades esperadas corretas / omitidas | 32 / 0; adicional sustentada: GOVERNO DE MATO GROSSO |
+| Comparação JSON livre × esquema (S02) | ambas válidas no esquema e nas regras |
+| Variante com 31/02/2026 | bloqueada com RespostaMalformada, sem minuta |
+| Chamadas / tokens entrada e saída / custo | 22 / 29.443 e 3.193 / US$ 0,045408 |
+
+Os prompts v4 e v3 e parte das regras de `validar_regras` foram ajustados
+depois de ver erros nestes mesmos casos (S02 e S05). Os números medem aderência
+aos seis casos conhecidos, não desempenho em solicitações novas.
+
+### Histórico acumulado
+
+| Medida, histórico (prompts v2 a v4) | Resultado real |
 |---|---|
 | Solicitações com extração e ficha avaliadas | 6/6 |
 | Acurácia exata contra os seis gabaritos originais | 5/6, 83,33% |
@@ -244,8 +281,10 @@ Os seis casos finais não exigiram reparo automático. O reparo real e a recusa
 foram demonstrados pela variante de data impossível. Testes offline cobrem,
 adicionalmente, JSON inválido, coerções, campos omitidos/extras, reparo único,
 falha persistente, paráfrases válidas/contraditórias, falha do verificador,
-compatibilidade com null legado e limites de consumo. Regressão final:
-**284 testes aprovados, zero falhas**, incluindo 87 de NLP/dados e 5 de orçamento.
+compatibilidade com null legado e limites de consumo. Regressão na entrega
+do Integrante 1: 284 testes aprovados, incluindo 87 de NLP/dados e 5 de
+orçamento; com as partes do Integrante 2 e as correções da revisão, 315
+aprovados, 93 deles de NLP/dados e orçamento.
 A validação da base confirmou novamente as quantidades exatas e 35 IDs únicos.
 
 Artefatos em `documentacao/desafio-2/evidencias/`:
@@ -255,6 +294,8 @@ Artefatos em `documentacao/desafio-2/evidencias/`:
 - integrante-1-conferencia-openai.json: conferência técnica dos fatos e entidades.
   É avaliação por IA, **não aprovação humana**.
 - integrante-1-orcamento.json: metadados de cada chamada e consumo acumulado.
+- integrante-1-openai-final.json e integrante-1-orcamento-final.json: rodada
+  final dos seis casos com os prompts ativos, em ledger próprio.
 - testes-openai.txt e dados-validados-openai.json: regressão e validação da base.
 - Os arquivos anteriores de simulação e bloqueio por falta de chave foram
   preservados como evidência histórica da primeira entrega.

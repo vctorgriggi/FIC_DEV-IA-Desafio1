@@ -1,0 +1,225 @@
+{
+  "limite_usd": 1.0,
+  "chamadas": [
+    {
+      "contexto": "D2-S01:extracao",
+      "modelo": "gpt-6.1-terra",
+      "custo_contabilizado_usd": 0.002626,
+      "custo_estimado_usd": 0.002626,
+      "status": "medido",
+      "tokens_entrada": 1651,
+      "tokens_saida": 195,
+      "duracao_s": 79.202
+    },
+    {
+      "contexto": "D2-S01:compreensao",
+      "modelo": "gpt-6.1-terra",
+      "custo_contabilizado_usd": 0.001879,
+      "custo_estimado_usd": 0.001879,
+      "status": "medido",
+      "tokens_entrada": 1224,
+      "tokens_saida": 131,
+      "duracao_s": 3.034
+    },
+    {
+      "contexto": "D2-S01:compreensao",
+      "modelo": "gpt-6.1-terra",
+      "custo_contabilizado_usd": 0.002217,
+      "custo_estimado_usd": 0.002217,
+      "status": "medido",
+      "tokens_entrada": 1152,
+      "tokens_saida": 213,
+      "duracao_s": 3.684
+    },
+    {
+      "contexto": "D2-S02:extracao",
+      "modelo": "gpt-6.1-terra",
+      "custo_contabilizado_usd": 0.002232,
+      "custo_estimado_usd": 0.002232,
+      "status": "medido",
+      "tokens_entrada": 1527,
+      "tokens_saida": 141,
+      "duracao_s": 2.684
+    },
+    {
+      "contexto": "D2-S02:compreensao",
+      "modelo": "gpt-6.1-terra",
+      "custo_contabilizado_usd": 0.001356,
+      "custo_estimado_usd": 0.001356,
+      "status": "medido",
+      "tokens_entrada": 1046,
+      "tokens_saida": 62,
+      "duracao_s": 1.9
+    },
+    {
+      "contexto": "D2-S02:compreensao",
+      "modelo": "gpt-6.1-terra",
+      "custo_contabilizado_usd": 0.00141,
+      "custo_estimado_usd": 0.00141,
+      "status": "medido",
+      "tokens_entrada": 905,
+      "tokens_saida": 101,
+      "duracao_s": 2.608
+    },
+    {
+      "contexto": "D2-S03:extracao",
+      "modelo": "gpt-6.1-terra",
+      "custo_contabilizado_usd": 0.002196,
+      "custo_estimado_usd": 0.002196,
+      "status": "medido",
+      "tokens_entrada": 1526,
+      "tokens_saida": 134,
+      "duracao_s": 3.095
+    },
+    {
+      "contexto": "D2-S03:compreensao",
+      "modelo": "gpt-6.1-terra",
+      "custo_contabilizado_usd": 0.001338,
+      "custo_estimado_usd": 0.001338,
+      "status": "medido",
+      "tokens_entrada": 1038,
+      "tokens_saida": 60,
+      "duracao_s": 1.843
+    },
+    {
+      "contexto": "D2-S03:compreensao",
+      "modelo": "gpt-6.1-terra",
+      "custo_contabilizado_usd": 0.00144,
+      "custo_estimado_usd": 0.00144,
+      "status": "medido",
+      "tokens_entrada": 895,
+      "tokens_saida": 109,
+      "duracao_s": 2.681
+    },
+    {
+      "contexto": "D2-S04:extracao",
+      "modelo": "gpt-6.1-terra",
+      "custo_contabilizado_usd": 0.002259,
+      "custo_estimado_usd": 0.002259,
+      "status": "medido",
+      "tokens_entrada": 1534,
+      "tokens_saida": 145,
+      "duracao_s": 2.82
+    },
+    {
+      "contexto": "D2-S04:compreensao",
+      "modelo": "gpt-6.1-terra",
+      "custo_contabilizado_usd": 0.001347,
+      "custo_estimado_usd": 0.001347,
+      "status": "medido",
+      "tokens_entrada": 1057,
+      "tokens_saida": 58,
+      "duracao_s": 1.688
+    },
+    {
+      "contexto": "D2-S04:compreensao",
+      "modelo": "gpt-6.1-terra",
+      "custo_contabilizado_usd": 0.001627,
+      "custo_estimado_usd": 0.001627,
+      "status": "medido",
+      "tokens_entrada": 912,
+      "tokens_saida": 143,
+      "duracao_s": 2.755
+    },
+    {
+      "contexto": "D2-S05:extracao",
+      "modelo": "gpt-6.1-terra",
+      "custo_contabilizado_usd": 0.002984,
+      "custo_estimado_usd": 0.002984,
+      "status": "medido",
+      "tokens_entrada": 1824,
+      "tokens_saida": 232,
+      "duracao_s": 3.851
+    },
+    {
+      "contexto": "D2-S05:compreensao",
+      "modelo": "gpt-6.1-terra",
+      "custo_contabilizado_usd": 0.002039,
+      "custo_estimado_usd": 0.002039,
+      "status": "medido",
+      "tokens_entrada": 1434,
+      "tokens_saida": 121,
+      "duracao_s": 2.43
+    },
+    {
+      "contexto": "D2-S05:compreensao",
+      "modelo": "gpt-6.1-terra",
+      "custo_contabilizado_usd": 0.002527,
+      "custo_estimado_usd": 0.002527,
+      "status": "medido",
+      "tokens_entrada": 1352,
+      "tokens_saida": 235,
+      "duracao_s": 3.698
+    },
+    {
+      "contexto": "D2-S06:extracao",
+      "modelo": "gpt-6.1-terra",
+      "custo_contabilizado_usd": 0.002209,
+      "custo_estimado_usd": 0.002209,
+      "status": "medido",
+      "tokens_entrada": 1519,
+      "tokens_saida": 138,
+      "duracao_s": 2.684
+    },
+    {
+      "contexto": "D2-S06:compreensao",
+      "modelo": "gpt-6.1-terra",
+      "custo_contabilizado_usd": 0.00133,
+      "custo_estimado_usd": 0.00133,
+      "status": "medido",
+      "tokens_entrada": 1035,
+      "tokens_saida": 59,
+      "duracao_s": 1.706
+    },
+    {
+      "contexto": "D2-S06:compreensao",
+      "modelo": "gpt-6.1-terra",
+      "custo_contabilizado_usd": 0.001431,
+      "custo_estimado_usd": 0.001431,
+      "status": "medido",
+      "tokens_entrada": 891,
+      "tokens_saida": 108,
+      "duracao_s": 2.425
+    },
+    {
+      "contexto": "RF14-data-impossivel:extracao",
+      "modelo": "gpt-6.1-terra",
+      "custo_contabilizado_usd": 0.002389,
+      "custo_estimado_usd": 0.002389,
+      "status": "medido",
+      "tokens_entrada": 1529,
+      "tokens_saida": 172,
+      "duracao_s": 3.392
+    },
+    {
+      "contexto": "RF14-data-impossivel:extracao",
+      "modelo": "gpt-6.1-terra",
+      "custo_contabilizado_usd": 0.003197,
+      "custo_estimado_usd": 0.003197,
+      "status": "medido",
+      "tokens_entrada": 1597,
+      "tokens_saida": 320,
+      "duracao_s": 4.749
+    },
+    {
+      "contexto": "D2-S02:comparacao",
+      "modelo": "gpt-6.1-terra",
+      "custo_contabilizado_usd": 0.002551,
+      "custo_estimado_usd": 0.002551,
+      "status": "medido",
+      "tokens_entrada": 1676,
+      "tokens_saida": 175,
+      "duracao_s": 3.148
+    },
+    {
+      "contexto": "D2-S02:comparacao",
+      "modelo": "gpt-6.1-terra",
+      "custo_contabilizado_usd": 0.002824,
+      "custo_estimado_usd": 0.002824,
+      "status": "medido",
+      "tokens_entrada": 2119,
+      "tokens_saida": 141,
+      "duracao_s": 2.682
+    }
+  ]
+}
