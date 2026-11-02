@@ -454,7 +454,7 @@ def test_falha_do_provedor_e_auditada_e_levantada(config, indice, auditoria, par
     with pytest.raises(ServicoIndisponivel):
         processar(config, indice, auditoria, cliente)
     [evento] = auditoria.eventos(etapa="d2_recuperacao_geracao")
-    assert evento["erro"].startswith("ServicoIndisponivel") and evento["extra"]["indice"]["chunking"] == "A"
+    assert evento["erro"].startswith("ServicoIndisponivel") and evento["extra"]["indice"]["chunking"] == config.dados["indice"]["chunking_ativo"]
     assert list(config.caminho("minutas_rag").glob("*.json")) == []
 
 

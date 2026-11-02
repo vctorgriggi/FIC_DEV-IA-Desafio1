@@ -59,7 +59,7 @@
   "indice": {
     "colecao": "acervo",
     "top_k": 4,
-    "chunking_ativo": "A",
+    "chunking_ativo": "B",
     "chunking": {
       "A": { "unidade": "caracteres", "tamanho": 250, "sobreposicao": 50 },
       "B": { "unidade": "caracteres", "tamanho": 500, "sobreposicao": 100 }

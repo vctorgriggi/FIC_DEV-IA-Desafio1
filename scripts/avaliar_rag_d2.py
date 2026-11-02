@@ -2,6 +2,7 @@
 
 python -m scripts.avaliar_rag_d2 chunking    # RF18/T07: A contra B nas cinco perguntas respondíveis
 python -m scripts.avaliar_rag_d2 perguntas   # RF19/T08-T10: as oito perguntas no chunking ativo
+python -m scripts.avaliar_rag_d2 perguntas --chunking B --perfil alternativo
 
 Os ids de referência de cada pergunta são os trechos indexados que contêm o trecho literal do
 gabarito (espaços normalizados); não são escritos à mão, porque mudam com o hash e o chunking.
@@ -37,9 +38,13 @@ def _indexar(config, cliente, chunking: str) -> IndiceVetorial:
 
 
 def _referencias(indice: IndiceVetorial, gabarito: dict) -> list[str]:
-    dados = indice._colecao.get(include=["documents"])
-    literais = [_normal(t["trecho_literal"]) for t in gabarito["trechos_referencia"]]
-    return [i for i, texto in zip(dados["ids"], dados["documents"]) if any(l in _normal(texto) for l in literais)]
+    # Só no documento que o gabarito indica: DOC-01 repete frases do DOC-02, mas foi substituído.
+    dados = indice._colecao.get(include=["documents", "metadatas"])
+    return [
+        i for i, texto, metadados in zip(dados["ids"], dados["documents"], dados["metadatas"])
+        if any(r["documento_id"] == metadados["documento_id"] and _normal(r["trecho_literal"]) in _normal(texto)
+               for r in gabarito["trechos_referencia"])
+    ]
 
 
 def chunking(config, cliente) -> dict:
@@ -72,8 +77,8 @@ def _por_documento(indice: IndiceVetorial) -> dict:
     return dict(sorted(contagem.items()))
 
 
-def perguntas(config, cliente, perfil: str | None) -> dict:
-    indice = _indexar(config, cliente, config.dados["indice"]["chunking_ativo"])
+def perguntas(config, cliente, perfil: str | None, chunking_nome: str | None = None) -> dict:
+    indice = _indexar(config, cliente, chunking_nome or config.dados["indice"]["chunking_ativo"])
     prompt = carregar_prompt(config, "rag_d2", 1)
     resultado = {"perfil": config.perfil_geracao(perfil), "indice": indice.info(), "prompt": prompt.identificador,
                  "hash_prompt": prompt.hash, "perguntas": []}
@@ -119,11 +124,12 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("etapa", choices=["chunking", "perguntas"])
     parser.add_argument("--perfil", default=None, help="perfil de geração (perguntas); padrão: o ativo")
+    parser.add_argument("--chunking", default=None, help="índice A ou B (perguntas); padrão: o ativo")
     args = parser.parse_args(argv)
     config = carregar_config()
     cliente = ClienteLLM(config)
-    resultado = chunking(config, cliente) if args.etapa == "chunking" else perguntas(config, cliente, args.perfil)
-    sufixo = f"-{args.perfil}" if args.perfil else ""
+    resultado = chunking(config, cliente) if args.etapa == "chunking" else perguntas(config, cliente, args.perfil, args.chunking)
+    sufixo = "".join(f"-{v}" for v in (args.chunking, args.perfil) if v)
     destino = config.caminho("metricas") / f"rag-d2-{args.etapa}{sufixo}.json"
     destino.parent.mkdir(parents=True, exist_ok=True)
     destino.write_text(json.dumps(resultado, ensure_ascii=False, indent=2), encoding="utf-8")

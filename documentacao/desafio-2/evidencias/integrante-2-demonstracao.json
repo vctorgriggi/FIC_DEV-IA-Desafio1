@@ -1,0 +1,63 @@
+{
+  "indice": {
+    "modelo_embedding": "text-embedding-3-small",
+    "dimensao": 1536,
+    "chunking": "B",
+    "parametros_chunking": {
+      "unidade": "caracteres",
+      "tamanho": 500,
+      "sobreposicao": 100
+    },
+    "total_trechos": 12,
+    "versao_indice": "652bc7c9e779"
+  },
+  "T06": {
+    "trechos_antes": 12,
+    "trechos_apos_reabrir": 12,
+    "trechos_apos_reindexar": 12,
+    "chamadas_ao_provedor_na_reindexacao": 0,
+    "versao_indice_igual": true,
+    "desatualizados": []
+  },
+  "T12_falha": {
+    "erro_tratado": "RequisicaoInvalida: O provedor recusou a requisição. Confira o nome do modelo e os parâmetros no config.json.",
+    "evento_auditoria": {
+      "etapa": "d2_resposta",
+      "erro": "RequisicaoInvalida: O provedor recusou a requisição. Confira o nome do modelo e os parâmetros no config.json.",
+      "duracao_s": 1.348
+    },
+    "versao_indice_igual": true
+  },
+  "T14": {
+    "consulta": "Qual é o horário de atendimento do balcão acadêmico?",
+    "documentos_no_top_k_antes": [
+      "DOC-05",
+      "DOC-02",
+      "DOC-02",
+      "DOC-01"
+    ],
+    "documentos_no_top_k_depois": [
+      "DOC-02",
+      "DOC-02",
+      "DOC-01",
+      "DOC-03"
+    ],
+    "removido": {
+      "documento_id": "DOC-05",
+      "versao": "1.0",
+      "arquivo": "dados/acervo/doc-05.txt",
+      "trechos_removidos": 6,
+      "minutas_que_citam": 0
+    },
+    "DOC-05_no_manifesto": false,
+    "DOC-05_em_A": false,
+    "DOC-05_em_B": false,
+    "evento_auditoria": {
+      "documento_id": "DOC-05",
+      "versao": "1.0",
+      "arquivo": "dados/acervo/doc-05.txt",
+      "trechos_removidos": 6,
+      "minutas_que_citam": 0
+    }
+  }
+}
