@@ -1,6 +1,6 @@
 {
   "modo": "simulado",
-  "executado_em": "2026-11-01T01:00:10.201866+00:00",
+  "executado_em": "2026-11-02T01:04:47.713746+00:00",
   "dados": {
     "documentos": 6,
     "solicitacoes": 6,
@@ -72,12 +72,12 @@
       "duracao_s": 0.0,
       "prompts": [
         {
-          "id": "solicitacao_d2_v1",
-          "hash": "e6b79cf808c7"
+          "id": "solicitacao_d2_v4",
+          "hash": "b844ed6249e5"
         },
         {
-          "id": "compreensao_d2_v1",
-          "hash": "f4d2c58f8901"
+          "id": "compreensao_d2_v3",
+          "hash": "4737e2a82352"
         }
       ]
     },
@@ -142,12 +142,12 @@
       "duracao_s": 0.0,
       "prompts": [
         {
-          "id": "solicitacao_d2_v1",
-          "hash": "e6b79cf808c7"
+          "id": "solicitacao_d2_v4",
+          "hash": "b844ed6249e5"
         },
         {
-          "id": "compreensao_d2_v1",
-          "hash": "f4d2c58f8901"
+          "id": "compreensao_d2_v3",
+          "hash": "4737e2a82352"
         }
       ]
     },
@@ -212,12 +212,12 @@
       "duracao_s": 0.0,
       "prompts": [
         {
-          "id": "solicitacao_d2_v1",
-          "hash": "e6b79cf808c7"
+          "id": "solicitacao_d2_v4",
+          "hash": "b844ed6249e5"
         },
         {
-          "id": "compreensao_d2_v1",
-          "hash": "f4d2c58f8901"
+          "id": "compreensao_d2_v3",
+          "hash": "4737e2a82352"
         }
       ]
     },
@@ -282,12 +282,12 @@
       "duracao_s": 0.0,
       "prompts": [
         {
-          "id": "solicitacao_d2_v1",
-          "hash": "e6b79cf808c7"
+          "id": "solicitacao_d2_v4",
+          "hash": "b844ed6249e5"
         },
         {
-          "id": "compreensao_d2_v1",
-          "hash": "f4d2c58f8901"
+          "id": "compreensao_d2_v3",
+          "hash": "4737e2a82352"
         }
       ]
     },
@@ -357,12 +357,12 @@
       "duracao_s": 0.0,
       "prompts": [
         {
-          "id": "solicitacao_d2_v1",
-          "hash": "e6b79cf808c7"
+          "id": "solicitacao_d2_v4",
+          "hash": "b844ed6249e5"
         },
         {
-          "id": "compreensao_d2_v1",
-          "hash": "f4d2c58f8901"
+          "id": "compreensao_d2_v3",
+          "hash": "4737e2a82352"
         }
       ]
     },
@@ -426,24 +426,24 @@
       "duracao_s": 0.0,
       "prompts": [
         {
-          "id": "solicitacao_d2_v1",
-          "hash": "e6b79cf808c7"
+          "id": "solicitacao_d2_v4",
+          "hash": "b844ed6249e5"
         },
         {
-          "id": "compreensao_d2_v1",
-          "hash": "f4d2c58f8901"
+          "id": "compreensao_d2_v3",
+          "hash": "4737e2a82352"
         }
       ]
     }
   ],
   "limitacoes": [
     "SDK falso alimentado por referências prévias; mede integração e validações, não qualidade de um modelo.",
-    "Caso ambíguo usa categoria null e revisão; não entra na acurácia de categorias definidas. A abstenção é avaliada separadamente."
+    "Caso ambíguo tem categoria null no gabarito: entra na acurácia do gabarito original e fica fora da de categorias definidas."
   ],
   "comparacao_json_esquema": {
     "origem": "D2-S06",
-    "prompt": "solicitacao_d2_v1",
-    "hash_prompt": "e6b79cf808c7",
+    "prompt": "solicitacao_d2_v4",
+    "hash_prompt": "b844ed6249e5",
     "abordagens": {
       "json_livre": {
         "json_valido": true,
@@ -496,7 +496,14 @@
       }
     }
   },
-  "acuracia_categorias": {
+  "acuracia_gabarito_original": {
+    "numerador": 6,
+    "denominador": 6,
+    "valor": 1.0,
+    "percentual": 100.0,
+    "divergencias": []
+  },
+  "acuracia_categorias_definidas": {
     "numerador": 5,
     "denominador": 5,
     "valor": 1.0,

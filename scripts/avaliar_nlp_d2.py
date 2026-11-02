@@ -34,10 +34,13 @@ def avaliar(*, real=False):
     ids=[f'D2-S{i:02}' for i in range(1,3 if real else 7)]
     obtidas={}
     esperadas={}
+    definidos={}
+    # As duas contas da avaliação real (validar_nlp_real): gabarito original inteiro e só rótulos definidos.
     for id in ids:
         g=json.loads((config.raiz/f'dados/gabaritos/{id}.json').read_text(encoding='utf-8'))
-        if g['solicitacao_esperada']['categoria'] is not None:
-            esperadas[id]=g['solicitacao_esperada']['categoria']
+        esperadas[id]=g['solicitacao_esperada']['categoria']
+        if esperadas[id] is not None:
+            definidos[id]=esperadas[id]
     for id in ids:
         g=json.loads((config.raiz/f'dados/gabaritos/{id}.json').read_text(encoding='utf-8'))
         texto=(config.raiz/g['arquivo']).read_text(encoding='utf-8')
@@ -85,9 +88,10 @@ def avaliar(*, real=False):
             relatorio['comparacao_json_esquema']=comparar_sintatico_e_esquema(texto,origem=ids[-1],cliente=cliente,config=config)
         except ErroLLM as erro:
             relatorio['comparacao_json_esquema']={'status':'bloqueado','erro':type(erro).__name__}
-    relatorio['acuracia_categorias']=acuracia_categorias(obtidas,esperadas)
-    relatorio['cobertura_categorias']={'com_rotulo_definido':len(esperadas),'casos_planejados':len(ids),'casos_executados':len(relatorio['casos'])}
-    relatorio['limitacoes'].append('Caso ambíguo usa categoria null e revisão; não entra na acurácia de categorias definidas. A abstenção é avaliada separadamente.')
+    relatorio['acuracia_gabarito_original']=acuracia_categorias(obtidas,esperadas)
+    relatorio['acuracia_categorias_definidas']=acuracia_categorias(obtidas,definidos)
+    relatorio['cobertura_categorias']={'com_rotulo_definido':len(definidos),'casos_planejados':len(ids),'casos_executados':len(relatorio['casos'])}
+    relatorio['limitacoes'].append('Caso ambíguo tem categoria null no gabarito: entra na acurácia do gabarito original e fica fora da de categorias definidas.')
     relatorio['status']='concluido' if all(c['status']=='valido' for c in relatorio['casos']) else 'bloqueado'
     return relatorio
 
