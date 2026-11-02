@@ -7,8 +7,6 @@ dados críticos do OCR e conferência humana das métricas (lista no fim).
 "Funcionou nos testes" não é evidência de atendimento: cada linha abaixo aponta
 a execução real ou declara que é offline.
 
-O canvas visual da integração está em [canvas-integracao.html](canvas-integracao.html).
-
 ## Conjunto de dados
 
 | Conjunto oficial do grupo | Quantidade conferida |
