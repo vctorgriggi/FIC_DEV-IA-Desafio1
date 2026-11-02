@@ -36,7 +36,18 @@
     "Lia Exemplo",
     "declaração de matrícula"
   ],
-  "fontes_esperadas": [],
+  "fontes_esperadas": [
+    {
+      "documento_id": "DOC-03",
+      "versao": "1.0",
+      "trecho_referencia": "A declaração de matrícula pode ser solicitada no balcão acadêmico."
+    },
+    {
+      "documento_id": "DOC-03",
+      "versao": "1.0",
+      "trecho_referencia": "O prazo de emissão da declaração é de cinco dias úteis após a conferência dos dados."
+    }
+  ],
   "decisao_esperada": "aprovar",
   "justificativa_rotulo": "Pedido explícito; categoria definida pela providência solicitada.",
   "campos_presentes": [
@@ -48,5 +59,6 @@
     "categoria"
   ],
   "resumo_esperado": "Lia Exemplo solicita emissão de declaração de matrícula.",
-  "criterio_avaliacao": "Categoria exata, entidades literais, fatos essenciais preservados; paráfrases no resumo são aceitas; nenhuma ação concluída inventada."
+  "criterio_avaliacao": "Categoria exata, entidades literais, fatos essenciais preservados; paráfrases no resumo são aceitas; nenhuma ação concluída inventada.",
+  "fontes_esperadas_elaboradas_por": "Integrante 2, em 01/11/2026, depois da avaliação RF14/RF15 e antes de qualquer minuta RAG; não altera nenhum outro campo deste gabarito."
 }

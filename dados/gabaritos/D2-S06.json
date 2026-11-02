@@ -35,7 +35,13 @@
     "matrícula",
     "Não decidi"
   ],
-  "fontes_esperadas": [],
+  "fontes_esperadas": [
+    {
+      "documento_id": "DOC-04",
+      "versao": "1.0",
+      "trecho_referencia": "Casos com dúvida devem ser encaminhados à revisão."
+    }
+  ],
   "decisao_esperada": "revisar",
   "justificativa_rotulo": "Sem intenção definida, pedido e categoria null; revisão humana é o fallback do contrato atual.",
   "campos_presentes": [
@@ -45,5 +51,6 @@
     "assunto"
   ],
   "resumo_esperado": "Rui Exemplo não decidiu entre cancelar e continuar a matrícula; é necessário esclarecer o pedido.",
-  "criterio_avaliacao": "Categoria exata, entidades literais, fatos essenciais preservados; paráfrases no resumo são aceitas; nenhuma ação concluída inventada."
+  "criterio_avaliacao": "Categoria exata, entidades literais, fatos essenciais preservados; paráfrases no resumo são aceitas; nenhuma ação concluída inventada.",
+  "fontes_esperadas_elaboradas_por": "Integrante 2, em 01/11/2026, depois da avaliação RF14/RF15 e antes de qualquer minuta RAG; não altera nenhum outro campo deste gabarito."
 }

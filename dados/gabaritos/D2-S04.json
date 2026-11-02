@@ -36,7 +36,13 @@
     "Bia Exemplo",
     "reclamação"
   ],
-  "fontes_esperadas": [],
+  "fontes_esperadas": [
+    {
+      "documento_id": "DOC-05",
+      "versao": "1.0",
+      "trecho_referencia": "Reclamações podem ser registradas no balcão acadêmico, com descrição do ocorrido."
+    }
+  ],
   "decisao_esperada": "aprovar",
   "justificativa_rotulo": "Pedido explícito; categoria definida pela providência solicitada.",
   "campos_presentes": [
@@ -48,5 +54,6 @@
     "categoria"
   ],
   "resumo_esperado": "Bia Exemplo reclama da demora no atendimento e pede registro.",
-  "criterio_avaliacao": "Categoria exata, entidades literais, fatos essenciais preservados; paráfrases no resumo são aceitas; nenhuma ação concluída inventada."
+  "criterio_avaliacao": "Categoria exata, entidades literais, fatos essenciais preservados; paráfrases no resumo são aceitas; nenhuma ação concluída inventada.",
+  "fontes_esperadas_elaboradas_por": "Integrante 2, em 01/11/2026, depois da avaliação RF14/RF15 e antes de qualquer minuta RAG; não altera nenhum outro campo deste gabarito."
 }

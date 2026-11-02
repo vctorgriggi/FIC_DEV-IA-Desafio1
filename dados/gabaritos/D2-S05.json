@@ -42,7 +42,13 @@
     "NOTURNO",
     "14/10/2026"
   ],
-  "fontes_esperadas": [],
+  "fontes_esperadas": [
+    {
+      "documento_id": "DOC-02",
+      "versao": "2.0",
+      "trecho_referencia": "Para matrícula, apresente documento de identificação e histórico escolar."
+    }
+  ],
   "decisao_esperada": "revisar",
   "justificativa_rotulo": "OCR tem protocolo parcialmente ilegível e não traz pedido; não completar usando outra modalidade.",
   "campos_presentes": [
@@ -54,5 +60,6 @@
   "resumo_esperado": "Ficha de matrícula em enfermagem, turno noturno, com data de matrícula de 14/10/2026. O protocolo está ilegível e não há pedido explícito.",
   "criterio_avaliacao": "Categoria exata, entidades literais, fatos essenciais preservados; paráfrases no resumo são aceitas; nenhuma ação concluída inventada.",
   "reaproveitado_de": "dados/processados/imagem-01/0b8591d5a30b/texto_revisado.txt",
-  "hash_origem": "d2d2c21b88c75bfbd29f8732f3e386a1f263e0cc97f6937e25f6715085031f7c"
+  "hash_origem": "d2d2c21b88c75bfbd29f8732f3e386a1f263e0cc97f6937e25f6715085031f7c",
+  "fontes_esperadas_elaboradas_por": "Integrante 2, em 01/11/2026, depois da avaliação RF14/RF15 e antes de qualquer minuta RAG; não altera nenhum outro campo deste gabarito."
 }

@@ -38,7 +38,13 @@
     "noturno",
     "documentos"
   ],
-  "fontes_esperadas": [],
+  "fontes_esperadas": [
+    {
+      "documento_id": "DOC-02",
+      "versao": "2.0",
+      "trecho_referencia": "Para matrícula, apresente documento de identificação e histórico escolar."
+    }
+  ],
   "decisao_esperada": "aprovar",
   "justificativa_rotulo": "Pedido explícito de efetivação; prevalece matrícula sobre informação acessória.",
   "campos_presentes": [
@@ -52,5 +58,6 @@
   "resumo_esperado": "Marcos Vinícius de Almeida Santos pede efetivação da matrícula em enfermagem, turno noturno, e informação sobre documentos pendentes, no protocolo 2026-000142.",
   "criterio_avaliacao": "Categoria exata, entidades literais, fatos essenciais preservados; paráfrases no resumo são aceitas; nenhuma ação concluída inventada.",
   "reaproveitado_de": "dados/processados/audio-01/638263b33c98/texto_revisado.txt",
-  "hash_origem": "f231913dbd70d831ebc77d97a70bdd4c20a8eb5c08cba14d35f700badf15da5e"
+  "hash_origem": "f231913dbd70d831ebc77d97a70bdd4c20a8eb5c08cba14d35f700badf15da5e",
+  "fontes_esperadas_elaboradas_por": "Integrante 2, em 01/11/2026, depois da avaliação RF14/RF15 e antes de qualquer minuta RAG; não altera nenhum outro campo deste gabarito."
 }
