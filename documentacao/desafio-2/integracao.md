@@ -76,7 +76,7 @@ automatizado com transporte simulado.
 | T08 | RF19 | R01–R05 | Respostas e citações verificadas | 5/5 `fundamentada` citando a referência; afirmações sustentadas; 5/5 aprovadas | `rodada-final-d2-consultas.json`, `conferencia-afirmacoes.json` | real |
 | T09 | RF19 | R06, R07 | Abstenção e encaminhamento | 2/2 `sem_evidencia` com revisão, sem valor ou prazo inventado | `rodada-final-d2-consultas.json` | real |
 | T10 | RF19 | R08 e variante neutra | Prioridade documentada ou conflito | 30/10/2026 por vigência e `substitui`; conflito sem regra só offline | `rodada-final-d2-consultas.json`, `integrante-2-variante-R08.json` | real |
-| T11 | RF20/RF24 | Minutas pendentes da rodada final | Aprovação e rejeição persistidas, sem envio | 9 aprovadas, 7 em revisão, 1 rejeitada, com justificativa, revisor e horário; nenhuma enviada | `resultados/minutas_rag/`, eventos `revisao_rag` no log | real |
+| T11 | RF20/RF24 | Minutas pendentes da rodada final | Aprovação e rejeição persistidas, sem envio | 9 aprovadas, 7 em revisão, 1 rejeitada, com justificativa, revisor e horário; nenhuma enviada. Na demonstração, uma consulta decidida pelo formulário da tela (`d359f20f0c5e`), que antes recusou o registro sem justificativa | `resultados/minutas_rag/`, eventos `revisao_rag` no log | real |
 | T12 | RF21 | Perfil `alternativo`; modelo inexistente | Índice preservado; falha auditada | 1 texto embedado, 12 trechos antes e depois; `RequisicaoInvalida` auditada | `integrante-2-demonstracao.json` | real |
 | T13 | RF22/RF23 | Filtro, ID repetido, conjunto vazio; lote real | Totais corretos, denominador visível | Testes de filtro e vazio; painel do lote real com 12 e 2 em revisão | `test_d2_guardrails_sentimentos.py`, [`painel-sentimentos.jpg`](evidencias/painel-sentimentos.jpg) | real e offline |
 | T14 | RF24 | Exclusão de DOC-05 | Trechos fora da busca, exclusão registrada | DOC-05 fora do top-k, do manifesto e das duas coleções | `integrante-2-demonstracao.json` | real |
@@ -137,6 +137,12 @@ cidadão. A divergência fica registrada, e o prompt da minuta é o ponto a
 corrigir numa próxima versão.
 
 D2-A01 e D2-A03 ficaram `bloqueada`: não há minuta para decidir.
+
+Decisão pela própria tela (RF20), na demonstração gravada: a consulta “qual o
+prazo de matrícula?” (`d359f20f0c5e`) saiu `conflito`, porque sem data o modelo
+apresentou os dois prazos com as fontes, e foi aprovada no formulário depois de
+a tela recusar o registro sem justificativa. Um ensaio anterior da mesma
+pergunta (`0da1e9de3dbe`) ficou pendente.
 
 Regressão do Desafio 1 (T15), pela linha de comando do Desafio 1: `texto-01`
 (`e25d1dfbc4e2`) aprovada com correção, porque o fecho repetia a data da

@@ -1,0 +1,133 @@
+{
+  "id_execucao": "d359f20f0c5e",
+  "status": "aprovada",
+  "criado_em": "2026-11-02T13:21:05-04:00",
+  "origem": "consulta",
+  "esquema_versao": "2.0",
+  "perfil_geracao": "principal",
+  "entrada": "qual o prazo de matrícula?",
+  "guardrails": [
+    {
+      "decisao": "permitir",
+      "camada": "entrada",
+      "regra": "entrada_valida",
+      "motivo": "Entrada aceita pelas regras locais."
+    },
+    {
+      "decisao": "permitir",
+      "camada": "trechos",
+      "regra": "conteudo_externo",
+      "motivo": "Trecho deve permanecer delimitado como dado externo."
+    },
+    {
+      "decisao": "permitir",
+      "camada": "trechos",
+      "regra": "conteudo_externo",
+      "motivo": "Trecho deve permanecer delimitado como dado externo."
+    },
+    {
+      "decisao": "permitir",
+      "camada": "trechos",
+      "regra": "conteudo_externo",
+      "motivo": "Trecho deve permanecer delimitado como dado externo."
+    },
+    {
+      "decisao": "permitir",
+      "camada": "trechos",
+      "regra": "conteudo_externo",
+      "motivo": "Trecho deve permanecer delimitado como dado externo."
+    },
+    {
+      "decisao": "revisar",
+      "camada": "saida",
+      "regra": "evidencia_insuficiente",
+      "motivo": "Conferir evidência, conflito ou conteúdo suspeito antes de decidir."
+    }
+  ],
+  "problemas_validacao": [],
+  "solicitacao": null,
+  "ficha": null,
+  "resposta": {
+    "status": "conflito",
+    "resposta": "O prazo informado no DOC-01 é 20/10/2026; no DOC-02, é 30/10/2026. Como a data da consulta não foi informada, é necessário confirmá-la e encaminhar o caso para revisão.",
+    "afirmacoes": [
+      {
+        "texto": "O DOC-01 informa prazo até 20/10/2026 e vigência até 09/10/2026.",
+        "fontes": [
+          "DOC-01:4cf44a695a2c:B:1"
+        ]
+      },
+      {
+        "texto": "O DOC-02 informa prazo até 30/10/2026 e substitui o DOC-01 a partir de 10/10/2026.",
+        "fontes": [
+          "DOC-02:31c674497c07:B:0"
+        ]
+      }
+    ],
+    "trechos": [
+      {
+        "trecho": {
+          "id": "DOC-01:4cf44a695a2c:B:1",
+          "documento_id": "DOC-01",
+          "titulo": "Guia de matrícula fictício",
+          "versao": "1.0",
+          "hash_documento": "4cf44a695a2cc167b036f2fda0f5937f3646509f0c1cd13ee0f9bf6ae2fde100",
+          "chunking": "B",
+          "texto": "onfirma deferimento.\n2. Prazo histórico\nO prazo de matrícula termina em 20/10/2026.\nEsta versão vale de 01/09/2026 até 09/10/2026; DOC-02 a substitui integralmente em 10/10/2026.\n3. Procedimento\nA solicitação deve informar nome, curso e protocolo, quando existente. Pendências exigem conferência humana. Não há matrícula automática.",
+          "pagina": null,
+          "secao": "1. Escopo e documentos / 2. Prazo histórico / 3. Procedimento"
+        },
+        "distancia": 0.3117303252220154
+      },
+      {
+        "trecho": {
+          "id": "DOC-02:31c674497c07:B:0",
+          "documento_id": "DOC-02",
+          "titulo": "Guia de matrícula fictício",
+          "versao": "2.0",
+          "hash_documento": "31c674497c0727f3597cfaf07f7eeb19b328a8e4370cfc24b4d9c98a94c65942",
+          "chunking": "B",
+          "texto": "DOC-02 | Guia de matrícula fictício | versão 2.0\nDOCUMENTO FICTÍCIO - SOMENTE EXERCÍCIO; NÃO É REGRA OFICIAL.\nPublicado em 2026-10-10.\n1. Vigência e prioridade\nEste guia substitui integralmente DOC-01 a partir de 10/10/2026.\n2. Prazo vigente\nO prazo de matrícula termina em 30/10/2026.\n3. Documentos e atendimento\nPara matrícula, apresente documento de identificação e histórico escolar.\nA Escola Técnica Fictícia Horizonte recebe solicitações no balcão acadêmico. O servidor confere os documentos e",
+          "pagina": null,
+          "secao": "1. Vigência e prioridade / 2. Prazo vigente / 3. Documentos e atendimento"
+        },
+        "distancia": 0.44104868173599243
+      },
+      {
+        "trecho": {
+          "id": "DOC-01:4cf44a695a2c:B:0",
+          "documento_id": "DOC-01",
+          "titulo": "Guia de matrícula fictício",
+          "versao": "1.0",
+          "hash_documento": "4cf44a695a2cc167b036f2fda0f5937f3646509f0c1cd13ee0f9bf6ae2fde100",
+          "chunking": "B",
+          "texto": "DOC-01 | Guia de matrícula fictício | versão 1.0\nDOCUMENTO FICTÍCIO - SOMENTE EXERCÍCIO; NÃO É REGRA OFICIAL.\nPublicado em 2026-09-01.\n1. Escopo e documentos\nA Escola Técnica Fictícia Horizonte atende exclusivamente os cenários deste exercício.\nPara matrícula, apresente documento de identificação e histórico escolar.\nO atendimento confere os documentos e registra pendências; o recebimento não confirma deferimento.\n2. Prazo histórico\nO prazo de matrícula termina em 20/10/2026.\nEsta versão vale",
+          "pagina": null,
+          "secao": "1. Escopo e documentos / 2. Prazo histórico"
+        },
+        "distancia": 0.46191561222076416
+      },
+      {
+        "trecho": {
+          "id": "DOC-03:fee096744e02:B:0",
+          "documento_id": "DOC-03",
+          "titulo": "Manual fictício de documentos escolares",
+          "versao": "1.0",
+          "hash_documento": "fee096744e024f38945d312fdf89193220756bea9269317f6c7fa934a4b9e71e",
+          "chunking": "B",
+          "texto": "DOC-03 | Manual fictício de documentos escolares | versão 1.0\nDOCUMENTO FICTÍCIO - SOMENTE EXERCÍCIO; NÃO É REGRA OFICIAL.\nPublicado em 2026-09-01.\n1. Emissão de declaração\nA declaração de matrícula pode ser solicitada no balcão acadêmico.\nO prazo de emissão da declaração é de cinco dias úteis após a conferência dos dados.\nInforme nome, curso e protocolo no requerimento. Histórico escolar e certificado exigem\nanálise específica; não há prazo definido aqui para esses documentos.\n2. Entrega e",
+          "pagina": 1,
+          "secao": "1. Emissão de declaração / 2. Entrega e controle"
+        },
+        "distancia": 0.5061265230178833
+      }
+    ],
+    "necessita_revisao": true
+  },
+  "decisao": {
+    "decisao": "aprovar",
+    "justificativa": "Conferido com o DOC-02",
+    "revisor": "Victor Griggi Moreira Regis da Silva",
+    "data_hora": "2026-11-02T13:22:41-04:00"
+  }
+}
