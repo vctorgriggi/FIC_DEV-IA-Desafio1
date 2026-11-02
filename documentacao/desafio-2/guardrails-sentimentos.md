@@ -103,7 +103,17 @@ teste, não o classificador. Uma nova versão só vale com avaliações mistas n
 rotuladas antes da execução. Até lá, o operador confere as negativas no painel
 sabendo que uma mensagem mista pode estar entre elas.
 
-A conferência humana dos 12 rótulos e das justificativas segue pendente.
+**Conferência dos 12 rótulos:** o gabarito é coerente com os textos e as 12
+justificativas descrevem o texto, sem traço do autor. AV-11 ("gentil, mas o
+pedido ficou sem solução") é limítrofe: o "mas" desloca a ênfase para o
+problema, então a leitura do modelo é defensável; o gabarito escrito antes da
+execução foi mantido.
+
+**Falso positivo de escopo observado na rodada final:** "Qual o horário do
+balcão acadêmico?" (D2-R05) e "Minha declaração individual já foi emitida?"
+(D2-R07) receberam `revisar` na entrada porque `_ESCOPO` não reconhece "balcão"
+nem "declaração". O fluxo seguiu, só com marcação de revisão; a regra ficou
+como estava para não mudar o que a rodada mediu.
 
 As partes de NLP, índice e RAG da principal `9258998` estão integradas. O RAG
 valida contexto antes da geração, exclui documentos suspeitos, audita IDs e

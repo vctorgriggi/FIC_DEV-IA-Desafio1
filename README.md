@@ -87,7 +87,7 @@ Códigos de saída: `0` sucesso, `1` erro de uso (caso, arquivo ou revisão inv�
 
 ## Desafio 2 — assistente de documentos
 
-O mesmo projeto, ampliado (RF14 a RF24): a solicitação passa por guardrails, extração validada e ficha de compreensão, busca orientações no acervo indexado e vira minuta com fontes, que só vale com a decisão do operador. Avaliações de atendimento são classificadas e agregadas num painel. Estado da entrega, métricas, matriz T01–T15 e pendências em [`documentacao/desafio-2/integracao.md`](documentacao/desafio-2/integracao.md).
+O mesmo projeto, ampliado (RF14 a RF24): a solicitação passa por guardrails, extração validada e ficha de compreensão, busca orientações no acervo indexado e vira minuta com fontes, que só vale com a decisão do operador. Avaliações de atendimento são classificadas e agregadas num painel. Estado da entrega, métricas, matriz T01–T15 e decisões do operador em [`documentacao/desafio-2/integracao.md`](documentacao/desafio-2/integracao.md).
 
 ```bash
 python -m src.main assistente      # Streamlit em http://127.0.0.1:8501

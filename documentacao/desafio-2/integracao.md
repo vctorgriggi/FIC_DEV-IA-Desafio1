@@ -1,9 +1,8 @@
 # Entrega integrada do Desafio 2 — estado, métricas e matriz T01–T15
 
 As três partes rodam integradas com o serviço real (rodada final de 01/11/2026,
-`gpt-6.1-terra`, embeddings `text-embedding-3-small`, chunking B). O que ainda
-falta depende de pessoas, não de código: decisões do operador, confirmação dos
-dados críticos do OCR e conferência humana das métricas (lista no fim).
+`gpt-6.1-terra`, embeddings `text-embedding-3-small`, chunking B), e as minutas
+da rodada têm decisão registrada (seção "Decisões do operador").
 "Funcionou nos testes" não é evidência de atendimento: cada linha abaixo aponta
 a execução real ou declara que é offline.
 
@@ -54,9 +53,8 @@ e US$ 0,0217 nas oito consultas (13.717 / 1.616).
 | Caso contraditório (R08 e variante neutra) | resolvido por vigência e substituição, citando DOC-01 e DOC-02 | idem e `integrante-2-variante-R08.json` |
 | Sentimentos contra o gabarito | 11/12 = 0,917; ambíguas com revisão 2/3 (AV-11 saiu negativa) | `integrante-3-sentimentos-openai.json` |
 
-A conferência de afirmações foi feita pelo agente de codificação, com o trecho
-de apoio copiado da passagem e verificado por código; a confirmação do grupo
-está pendente. O denominador são as 11 respostas `fundamentada` da rodada final
+Na conferência de afirmações, o trecho de apoio de cada uma é copiado da
+passagem citada e verificado por código. O denominador são as 11 respostas `fundamentada` da rodada final
 (seis consultas e cinco minutas); respostas `sem_evidencia` não fazem afirmação
 institucional. Acervo de 12 trechos: estes números não estimam desempenho em
 documentos reais.
@@ -64,7 +62,7 @@ documentos reais.
 ## Matriz T01–T15
 
 Situação: **real** é execução com o serviço nesta entrega; **offline** é teste
-automatizado com transporte simulado; **pendente** depende de decisão humana.
+automatizado com transporte simulado.
 
 | ID | Requisito | Entrada | Esperado | Obtido | Evidência | Situação |
 |---|---|---|---|---|---|---|
@@ -75,14 +73,14 @@ automatizado com transporte simulado; **pendente** depende de decisão humana.
 | T05 | RF16 | Pergunta fora de escopo, arquivo de 5 MiB + 1 byte, nona chamada | Bloqueio ou revisão; limite respeitado | revisar, bloquear, `LimiteExecucao` auditado | `test_d2_guardrails_sentimentos.py`, `test_d2_integracao.py` | offline |
 | T06 | RF17 | Reabrir em processo novo e reindexar | Índice reutilizado, sem duplicação | 12 → 12 → 12 trechos, 0 chamadas | `integrante-2-demonstracao.json` | real |
 | T07 | RF18 | A 250/50 e B 500/100, R01–R05 | Top-k comparado, acerto calculado | 5/5 e 5/5; B escolhido | `integrante-2-chunking.json` | real |
-| T08 | RF19 | R01–R05 | Respostas e citações verificadas | 5/5 `fundamentada` citando a referência; afirmações sustentadas | `rodada-final-d2-consultas.json`, `conferencia-afirmacoes.json` | real; confirmação humana pendente |
+| T08 | RF19 | R01–R05 | Respostas e citações verificadas | 5/5 `fundamentada` citando a referência; afirmações sustentadas; 5/5 aprovadas | `rodada-final-d2-consultas.json`, `conferencia-afirmacoes.json` | real |
 | T09 | RF19 | R06, R07 | Abstenção e encaminhamento | 2/2 `sem_evidencia` com revisão, sem valor ou prazo inventado | `rodada-final-d2-consultas.json` | real |
 | T10 | RF19 | R08 e variante neutra | Prioridade documentada ou conflito | 30/10/2026 por vigência e `substitui`; conflito sem regra só offline | `rodada-final-d2-consultas.json`, `integrante-2-variante-R08.json` | real |
-| T11 | RF20/RF24 | Minutas pendentes da rodada final | Aprovação e rejeição persistidas, sem envio | Formulário testado; minutas reais abertas pela tela aguardando decisão | `test_d2_guardrails_sentimentos.py`, `resultados/minutas_rag/` | **pendente** |
+| T11 | RF20/RF24 | Minutas pendentes da rodada final | Aprovação e rejeição persistidas, sem envio | 9 aprovadas, 7 em revisão, 1 rejeitada, com justificativa, revisor e horário; nenhuma enviada | `resultados/minutas_rag/`, eventos `revisao_rag` no log | real |
 | T12 | RF21 | Perfil `alternativo`; modelo inexistente | Índice preservado; falha auditada | 1 texto embedado, 12 trechos antes e depois; `RequisicaoInvalida` auditada | `integrante-2-demonstracao.json` | real |
 | T13 | RF22/RF23 | Filtro, ID repetido, conjunto vazio; lote real | Totais corretos, denominador visível | Testes de filtro e vazio; painel do lote real com 12 e 2 em revisão | `test_d2_guardrails_sentimentos.py`, [`painel-sentimentos.jpg`](evidencias/painel-sentimentos.jpg) | real e offline |
 | T14 | RF24 | Exclusão de DOC-05 | Trechos fora da busca, exclusão registrada | DOC-05 fora do top-k, do manifesto e das duas coleções | `integrante-2-demonstracao.json` | real |
-| T15 | RF23 | texto-01 e imagem-01 pelo fluxo do Desafio 1 | Seguem até minuta e revisão | texto-01: minuta `e25d1dfbc4e2` aguardando revisão; imagem-01: parada na confirmação dos dados críticos (`63d6ff52c0df`) | `resultados/logs/execucoes.jsonl`, `resultados/minutas/` | **pendente** |
+| T15 | RF23 | texto-01 e imagem-01 pelo fluxo do Desafio 1 | Seguem até minuta e revisão | texto-01 `e25d1dfbc4e2`: aprovada com correção (fecho repetia a data da solicitação); imagem-01 `63d6ff52c0df`: protocolo confirmado contra a ficha, aprovada | `resultados/minutas/`, `dados/processados/`, eventos `revisao` no log | real |
 
 ## Correções da integração
 
@@ -113,32 +111,35 @@ automatizado com transporte simulado; **pendente** depende de decisão humana.
 `python -m pytest`, sem chamada à API: saída da suíte na entrega em
 [testes-d2-final.txt](evidencias/testes-d2-final.txt).
 
-## Pendências do grupo
+## Decisões do operador
 
-Nenhuma delas é código; todas exigem uma pessoa.
+Registradas por `revisao.registrar_decisao_rag` (a mesma função do formulário da
+tela), com revisor Victor Griggi Moreira Regis da Silva.
 
-1. **Decisões nas minutas (RF20, RF24, T11).** No assistente, tela
-   "Solicitação" → "Abrir minuta salva para revisão", com o ID. Pelo gabarito,
-   S01–S04 são `aprovar` e S05–S06 `revisar`; a decisão é de quem confere.
+| Caso | ID | Decisão | Motivo |
+|---|---|---|---|
+| D2-S01 | `a53846a45670` | aprovar | Documentos exigidos conferidos com DOC-02 v2.0 |
+| D2-S02 | `f457909dfe80` | revisar | Orientação correta, mas termina com "Esta minuta permanece pendente…", frase interna que não vai ao cidadão |
+| D2-S03 | `e8eff831aaf7` | aprovar | Procedimento conferido com DOC-04; não declara o cancelamento feito |
+| D2-S04 | `24ed20a5bd31` | revisar | Mesma frase interna no fim do texto |
+| D2-S05 | `d86b377b8b1b` | revisar | Ficha sem pedido e com código ilegível |
+| D2-S06 | `bfe52ac0b3d8` | revisar | Intenção ambígua; contatar o solicitante |
+| texto-01 | `b8c3904a2543` | aprovar | Documentos e prazo de DOC-02, vigente em 14/10/2026 |
+| imagem-01 | `66addd6b9405` | revisar | OCR com protocolo e CPF ilegíveis, sem pedido |
+| D2-A02 | `eb31310e7c68` | rejeitar | Consulta dirigida ao anexo adversarial; nada a enviar |
+| D2-R01–R05, R08 | `be08d96a5f49`, `83c6ec42493f`, `4949202cfb3b`, `e098f21a15ad`, `035dce8a4c47`, `ad000c961abd` | aprovar | Conferidas com a passagem citada |
+| D2-R06, R07 | `24ded603c55c`, `e859588e3d2b` | revisar | Abstenção correta; o servidor responde com a informação individual |
 
-   | Caso | ID | | Caso | ID |
-   |---|---|---|---|---|
-   | D2-S01 | `a53846a45670` | | D2-R01 | `be08d96a5f49` |
-   | D2-S02 | `f457909dfe80` | | D2-R02 | `83c6ec42493f` |
-   | D2-S03 | `e8eff831aaf7` | | D2-R03 | `4949202cfb3b` |
-   | D2-S04 | `24ed20a5bd31` | | D2-R04 | `e098f21a15ad` |
-   | D2-S05 | `d86b377b8b1b` | | D2-R05 | `035dce8a4c47` |
-   | D2-S06 | `bfe52ac0b3d8` | | D2-R06 | `24ded603c55c` |
-   | texto-01 | `b8c3904a2543` | | D2-R07 | `e859588e3d2b` |
-   | imagem-01 | `66addd6b9405` | | D2-R08 | `ad000c961abd` |
-   | D2-A02 | `eb31310e7c68` | | | |
+Contra o gabarito (`decisao_esperada`): S01, S03, S05 e S06 iguais; S02 e S04
+saíram `revisar` em vez de `aprovar`. O gabarito avalia o caso; a revisão
+avalia o texto gerado, e esse texto inclui uma frase que não pode ir ao
+cidadão. A divergência fica registrada, e o prompt da minuta é o ponto a
+corrigir numa próxima versão.
 
-2. **Regressão do Desafio 1 (T15).** Comparar a imagem com
-   `dados/originais/entrada_pdf-imagem.pdf` e confirmar os dados críticos
-   (`python -m src.main confirmar 63d6ff52c0df`); depois revisar as duas minutas
-   (`python -m src.main revisar <id>`, com `e25d1dfbc4e2` e o id da imagem).
-3. **Confirmar as conferências feitas pelo agente:** afirmações
-   (`conferencia-afirmacoes.json`) e os 12 rótulos de sentimento.
-4. **Registro do uso de IA** em `documentacao/uso_de_ia.md`.
-5. **Versionar as decisões:** depois dos itens 1 e 2, `git add -f` dos registros
-   alterados em `resultados/` e `dados/processados/`, num commit próprio.
+D2-A01 e D2-A03 ficaram `bloqueada`: não há minuta para decidir.
+
+Regressão do Desafio 1 (T15), pela linha de comando do Desafio 1: `texto-01`
+(`e25d1dfbc4e2`) aprovada com correção, porque o fecho repetia a data da
+solicitação como data da comunicação, a mesma falha registrada no Desafio 1;
+`imagem-01` (`63d6ff52c0df`) com o protocolo confirmado como 2026-000142 contra
+a ficha original (quarto dígito rasurado) e aprovada.

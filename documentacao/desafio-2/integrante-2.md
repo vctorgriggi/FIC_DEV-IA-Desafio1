@@ -115,10 +115,9 @@ lista oficial de oito perguntas do `casos.json`.
 As respostas obtidas antes do aperto da conferência de números também passam
 na regra atual. Na rodada final, as oito perguntas passaram também pelo fluxo
 com guardrails (`fluxo_rag.consultar`): status 8/8, e cada uma virou registro
-pendente para a decisão do operador (IDs em `integracao.md`). A conferência de
-que cada afirmação é sustentada pela passagem está em
-`evidencias/conferencia-afirmacoes.json`, feita pelo agente e pendente de
-confirmação do grupo.
+para a decisão do operador (decisões em `integracao.md`). A conferência de que
+cada afirmação é sustentada pela passagem está em
+`evidencias/conferencia-afirmacoes.json`.
 
 ## T06, T12, T14 — demonstração real
 

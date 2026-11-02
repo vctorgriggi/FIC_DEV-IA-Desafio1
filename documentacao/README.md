@@ -14,7 +14,7 @@ Documentos que o enunciado pede além do código (seções 7, 10 e 11).
 
 Desafio 2 (seção 13 do enunciado):
 
-- [x] Estado da entrega, métricas do RF23, matriz T01–T15 e pendências — [`desafio-2/integracao.md`](desafio-2/integracao.md).
+- [x] Estado da entrega, métricas do RF23, matriz T01–T15 e decisões do operador — [`desafio-2/integracao.md`](desafio-2/integracao.md).
 - [x] Dados, gabaritos, RF14 e RF15 (comparação JSON sintático × esquema, resumo, categoria, entidades) — [`desafio-2/integrante-1.md`](desafio-2/integrante-1.md).
 - [x] Índice, chunking, RAG, provedor configurável, retenção e exclusão (RF17–RF19, RF21, RF24) — [`desafio-2/integrante-2.md`](desafio-2/integrante-2.md).
 - [x] Guardrails, revisão, sentimentos e painel (RF16, RF20, RF22) — [`desafio-2/guardrails-sentimentos.md`](desafio-2/guardrails-sentimentos.md).

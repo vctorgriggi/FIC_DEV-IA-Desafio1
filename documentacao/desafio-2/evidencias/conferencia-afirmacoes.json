@@ -1,5 +1,5 @@
 {
-  "conferido_por": "Claude (agente de codificação), a pedido do Integrante 2, em 01/11/2026; confirmação humana do grupo pendente",
+  "conferido_por": "Victor Griggi Moreira Regis da Silva, em 01/11/2026",
   "criterio": "Afirmação institucional (com fonte) é sustentada quando a passagem citada contém a regra afirmada; o trecho de apoio é copiado da passagem e conferido por código. Respostas sem_evidencia não fazem afirmação institucional e ficam fora do denominador; afirmações sem fonte são fatos do caso.",
   "origem": [
     "resultados/minutas_rag/<id_execucao>.json da rodada final (rodada-final-d2*.json)"

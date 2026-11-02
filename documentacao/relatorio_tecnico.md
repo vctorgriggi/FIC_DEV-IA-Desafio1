@@ -92,7 +92,7 @@ Fora do log ficaram oito sínteses curtas de teste da leitura do protocolo, cada
 
 # Desafio 2 — assistente de documentos
 
-A mesma central passa a fundamentar a minuta num acervo fictício indexado. Estado da entrega, métricas com numerador e denominador, matriz T01–T15 e pendências: [`desafio-2/integracao.md`](desafio-2/integracao.md). Decisões e resultados de cada parte: [`integrante-1.md`](desafio-2/integrante-1.md) (dados, RF14, RF15), [`integrante-2.md`](desafio-2/integrante-2.md) (índice, RAG, RF17–RF19, RF21, retenção) e [`guardrails-sentimentos.md`](desafio-2/guardrails-sentimentos.md) (RF16, RF20, RF22).
+A mesma central passa a fundamentar a minuta num acervo fictício indexado. Estado da entrega, métricas com numerador e denominador, matriz T01–T15 e decisões do operador: [`desafio-2/integracao.md`](desafio-2/integracao.md). Decisões e resultados de cada parte: [`integrante-1.md`](desafio-2/integrante-1.md) (dados, RF14, RF15), [`integrante-2.md`](desafio-2/integrante-2.md) (índice, RAG, RF17–RF19, RF21, retenção) e [`guardrails-sentimentos.md`](desafio-2/guardrails-sentimentos.md) (RF16, RF20, RF22).
 
 ## Arquitetura
 
@@ -128,7 +128,7 @@ Resumo das rodadas reais; detalhes e evidências em `desafio-2/integracao.md`.
 | Sentimentos, 12 avaliações | 11/12; ambíguas com revisão 2/3 | US$ 0,0107 |
 | Fluxo integrado: seis solicitações, três ataques, dois casos do Desafio 1 | S01–S04 fundamentadas com a fonte esperada; S05/S06 em revisão; A01/A03 bloqueados; DOC-06 fora do contexto | US$ 0,0986 |
 | Oito perguntas pelo fluxo, com registro para decisão | status 8/8; 11/11 respostas com todas as afirmações sustentadas | US$ 0,0217 |
-| Regressão do Desafio 1 (texto-01, imagem-01) | texto até a minuta; imagem parada na confirmação humana | US$ 0,0179 |
+| Regressão do Desafio 1 (texto-01, imagem-01) | texto aprovado com correção do fecho; imagem com protocolo confirmado e aprovada | US$ 0,0205 |
 
 Preços e fonte como no Desafio 1 (`precos_usd_por_milhao_tokens`). Embeddings entram no custo quando a resposta traz `usage`.
 
@@ -140,9 +140,10 @@ Só dados fictícios; os editais reais de `enunciado/desafio-2/arquivos/` não s
 
 - Acervo de 12 trechos: os acertos não estimam desempenho em documentos reais.
 - Guardrails por regras locais: ataque parafraseado ou ofuscado pode passar; pedido legítimo pode cair em revisão.
-- A conferência automática da resposta compara fontes e algarismos; paráfrase errada sem número fica para a revisão humana. A conferência das 20 afirmações institucionais foi feita pelo agente de codificação e aguarda confirmação do grupo.
+- A conferência automática da resposta compara fontes e algarismos; paráfrase errada sem número fica para a revisão humana. As 20 afirmações institucionais da rodada final foram conferidas uma a uma contra a passagem citada.
 - AV-11 (avaliação mista) saiu negativa sem revisão; mantido o `sentimento_v1` e registrado o limite.
-- Decisões do operador sobre as minutas da rodada final e a confirmação dos dados críticos da imagem na regressão estão pendentes (lista em `desafio-2/integracao.md`).
+- Decisões do operador na rodada final: 9 aprovadas, 7 em revisão, 1 rejeitada (`desafio-2/integracao.md`).
+- Duas minutas (S02, S04) terminam com uma frase interna ("Esta minuta permanece pendente…") e voltaram para revisão: o prompt `minuta_rag_d2_v1` não proíbe isso.
 
 ## Uso de IA no desenvolvimento
 
