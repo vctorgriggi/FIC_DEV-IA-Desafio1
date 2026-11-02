@@ -16,11 +16,11 @@ from pypdf import PdfReader
 from pypdf.errors import PdfReadError
 
 from . import guardrails
-from .audit import Auditoria, Evento, novo_id
+from .audit import Auditoria, Evento, agora_iso, novo_id
 from .config import Config
 from .entradas import ArquivoInvalido
-from .revisao import hash_arquivo
-from .schemas import DocumentoAcervo, Trecho
+from .revisao import gravar_registro_rag, hash_arquivo
+from .schemas import DocumentoAcervo, RegistroMinutaRAG, Trecho
 
 if TYPE_CHECKING:
     from .embeddings import IndiceVetorial
@@ -193,9 +193,11 @@ def incluir_documento(
 
 
 def excluir_documento(config: Config, documento_id: str, *, indice: IndiceVetorial, auditoria: Auditoria) -> dict:
-    """Remove trechos (todas as coleções), entrada do manifesto e arquivo; minutas já geradas ficam como histórico.
+    """Remove trechos (todas as coleções), entrada do manifesto e arquivo, e o texto do documento nas minutas.
 
-    Documento que outro `substitui` não sai: o manifesto ficaria inválido e o conflito de fontes (T10), sem regra.
+    Retenção (RF24): a minuta já gerada continua como registro da decisão, com id, versão e hash dos trechos,
+    mas o texto copiado do documento excluído sai dela. Documento que outro `substitui` não sai: o manifesto
+    ficaria inválido e o conflito de fontes (T10), sem regra.
     """
     documentos = ler_manifesto(config)
     alvo = next((d for d in documentos if d.id == documento_id), None)
@@ -204,16 +206,27 @@ def excluir_documento(config: Config, documento_id: str, *, indice: IndiceVetori
     dependentes = [d.id for d in documentos if documento_id in d.substitui]
     if dependentes:
         raise ArquivoInvalido(f"{', '.join(dependentes)} substitui {documento_id}; ajuste `substitui` antes de excluir.")
+    # Ler as minutas antes de apagar qualquer coisa: arquivo ilegível não pode interromper a exclusão no meio.
+    minutas, ilegiveis = _minutas_com_documento(config, documento_id)
     arquivo = caminho_documento(config, alvo)
     trechos_removidos = indice.excluir(documento_id)
     _gravar_manifesto(config, [d for d in _manifesto_bruto(config)["documentos"] if d["id"] != documento_id])
     arquivo.unlink(missing_ok=True)
+    marca = f"[texto removido: {documento_id} excluído do acervo em {agora_iso()}]"
+    for registro in minutas:
+        trechos = [
+            t.model_copy(update={"trecho": t.trecho.model_copy(update={"texto": marca})}) if t.trecho.documento_id == documento_id else t
+            for t in registro.resposta.trechos
+        ]
+        gravar_registro_rag(config, registro.model_copy(update={"resposta": registro.resposta.model_copy(update={"trechos": trechos})}))
     removido = {
         "documento_id": documento_id,
         "versao": alvo.versao,
         "arquivo": config.relativo(arquivo),
         "trechos_removidos": trechos_removidos,
-        "minutas_que_citam": _minutas_que_citam(config, documento_id),
+        "minutas_que_citam": sum(_cita(r, documento_id) for r in minutas),
+        "minutas_com_texto_removido": len(minutas),
+        "minutas_ilegiveis": ilegiveis,
     }
     auditoria.registrar(
         Evento(id_execucao=novo_id(), caso_id=documento_id, etapa="acervo_exclusao", arquivo_origem=removido["arquivo"], extra=removido)
@@ -231,10 +244,21 @@ def _gravar_manifesto(config: Config, documentos: list[dict]) -> None:
     caminho.write_text(json.dumps(bruto, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
-def _minutas_que_citam(config: Config, documento_id: str) -> int:
-    total = 0
-    for caminho in config.caminho("minutas_rag").glob("*.json"):
-        resposta = json.loads(caminho.read_text(encoding="utf-8")).get("resposta") or {}
-        if any(t["trecho"]["documento_id"] == documento_id for t in resposta.get("trechos", [])):
-            total += 1
-    return total
+def _minutas_com_documento(config: Config, documento_id: str) -> tuple[list[RegistroMinutaRAG], list[str]]:
+    """Minutas com algum trecho recuperado do documento, e os arquivos que não se leem como registro."""
+    minutas, ilegiveis = [], []
+    for caminho in sorted(config.caminho("minutas_rag").glob("*.json")):
+        try:
+            registro = RegistroMinutaRAG.model_validate_json(caminho.read_text(encoding="utf-8"))
+        except (OSError, ValidationError):
+            ilegiveis.append(config.relativo(caminho))
+            continue
+        if registro.resposta and any(t.trecho.documento_id == documento_id for t in registro.resposta.trechos):
+            minutas.append(registro)
+    return minutas, ilegiveis
+
+
+def _cita(registro: RegistroMinutaRAG, documento_id: str) -> bool:
+    """Cita = alguma afirmação usa um trecho do documento; ter sido só recuperado não conta."""
+    do_documento = {t.trecho.id for t in registro.resposta.trechos if t.trecho.documento_id == documento_id}
+    return any(set(a.fontes) & do_documento for a in registro.resposta.afirmacoes)
