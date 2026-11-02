@@ -435,3 +435,13 @@ def test_artefatos_reais_finais_podem_ser_revalidados_sem_api():
         assert not nlp.validar_regras(s,texto,config=carregar_config())
         ficha=FichaCompreensao.model_validate(c['fichas'][-1]['ficha'])
         assert len(ficha.resumo.split())<=100
+
+
+def test_data_rotulada_impossivel_nao_culpa_a_data_extraida(config):
+    texto='Protocolo: 2026-000001\nData: 31/02/2026\nAssunto: Matrícula\nPedido fictício. Também escrevi 10/10/2026.'
+    s=exemplos.solicitacao(data='10/10/2026',solicitante=None,assunto='Matrícula',pedido=None,categoria='matricula',
+                           entidades=exemplos.entidades(protocolos=['2026-000001']),
+                           campos_ausentes=['solicitante','pedido'],necessita_revisao=True,motivo_revisao='conferir')
+    problemas=nlp.validar_regras(s,texto,config=config)
+    assert 'data: o original contém data impossível; requer conferência.' in problemas
+    assert 'data: inexistente ou formato inválido.' not in problemas

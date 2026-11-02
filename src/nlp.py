@@ -112,13 +112,19 @@ def validar_regras(solicitacao: SolicitacaoEstruturada, texto_original: str, *, 
     if solicitacao.data is not None:
         try:
             extraida = _data(solicitacao.data)
-            if extraida not in datas_originais:
-                problemas.append('data: valor sem suporte no original.')
-            # Uma data de nascimento literal não deve substituir a data do requerimento.
-            if rotulada and extraida != _data(rotulada[1]):
-                problemas.append('data: não corresponde à data identificada da solicitação.')
         except ValueError:
             problemas.append('data: inexistente ou formato inválido.')
+            extraida = None
+        if extraida is not None and extraida not in datas_originais:
+            problemas.append('data: valor sem suporte no original.')
+        try:
+            data_rotulada = _data(rotulada[1]) if rotulada else None
+        except ValueError:
+            # A data impossível do original já foi apontada acima; a extraída não leva a culpa.
+            data_rotulada = None
+        # Uma data de nascimento literal não deve substituir a data do requerimento.
+        if extraida is not None and data_rotulada is not None and extraida != data_rotulada:
+            problemas.append('data: não corresponde à data identificada da solicitação.')
     for tipo, valores in solicitacao.entidades.model_dump().items():
         for valor in valores:
             if not valor.strip() or not _literal(valor, texto_original):
