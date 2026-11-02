@@ -35,7 +35,8 @@ indice/           # índice Chroma, fora do git; recria-se a partir do acervo
 interface/        # front-end Vite/React; dist/ é versionado e servido por src/web.py
 ```
 
-Desafio 2 em andamento: base, contratos e divisão por estudante em
+Desafio 2: estado da entrega, métricas e matriz em
+`documentacao/desafio-2/integracao.md`; divisão por estudante em
 `documentacao/desafio-2/plano.md`.
 
 ## Nunca fazer
