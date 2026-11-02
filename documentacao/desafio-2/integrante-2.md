@@ -113,11 +113,12 @@ de substituição (`evidencias/integrante-2-variante-R08.json`). Ela fica fora d
 lista oficial de oito perguntas do `casos.json`.
 
 As respostas obtidas antes do aperto da conferência de números também passam
-na regra atual. "Cita o trecho de referência" é verificação por código; a
-conferência de que **cada afirmação** é sustentada pela passagem, e a decisão
-do operador sobre cada uma das oito (seção 13), são humanas e estão pendentes.
-Para registrá-las, cada pergunta feita em "Consulta ao acervo" vira um registro
-pendente com formulário de decisão.
+na regra atual. Na rodada final, as oito perguntas passaram também pelo fluxo
+com guardrails (`fluxo_rag.consultar`): status 8/8, e cada uma virou registro
+pendente para a decisão do operador (IDs em `integracao.md`). A conferência de
+que cada afirmação é sustentada pela passagem está em
+`evidencias/conferencia-afirmacoes.json`, feita pelo agente e pendente de
+confirmação do grupo.
 
 ## T06, T12, T14 — demonstração real
 
@@ -145,11 +146,10 @@ aprovados. Os testes não dependem dos valores de chunking do `config.json`.
 
 ## Limites e riscos residuais
 
-- O fluxo completo (solicitação, caso do Desafio 1, consulta pela interface)
-  com os guardrails do Integrante 3 só rodou em testes offline
-  (`test_d2_integracao.py`); não houve execução real de ponta a ponta. As oito
-  perguntas foram avaliadas com `rag.responder` antes do guardrail de trechos
-  existir; nenhuma recuperou DOC-06, então o filtro não mudaria o contexto.
+- As oito perguntas das tabelas acima foram avaliadas com `rag.responder`,
+  antes do guardrail de trechos existir; nenhuma recuperou DOC-06, então o
+  filtro não mudaria o contexto. O fluxo completo com os guardrails rodou na
+  rodada final (`integracao.md`).
 - Acervo pequeno: com 12 trechos e top-k 4, um terço do índice volta em cada
   busca. O acerto de 5/5 não indica desempenho num acervo real.
 - A conferência compara algarismos: "cinco dias úteis" por extenso não é

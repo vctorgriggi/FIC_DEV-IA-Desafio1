@@ -85,9 +85,41 @@ Códigos de saída: `0` sucesso, `1` erro de uso (caso, arquivo ou revisão inv�
 | A interface não abre porque a porta está em uso | `python -m src.main interface --porta 8001`. |
 | O navegador mostra "Interface não compilada" | `interface/dist` foi apagado: rode `npm install && npm run build` em `interface/`. |
 
-## Desafio 2 (em andamento)
+## Desafio 2 — assistente de documentos
 
-Assistente de documentos (RF14 a RF24): `python -m src.main assistente` abre o Streamlit em http://127.0.0.1:8501. Base, contratos e divisão de tarefas em [`documentacao/desafio-2/plano.md`](documentacao/desafio-2/plano.md); enquanto uma parte não está implementada, a tela avisa qual requisito falta.
+O mesmo projeto, ampliado (RF14 a RF24): a solicitação passa por guardrails, extração validada e ficha de compreensão, busca orientações no acervo indexado e vira minuta com fontes, que só vale com a decisão do operador. Avaliações de atendimento são classificadas e agregadas num painel. Estado da entrega, métricas, matriz T01–T15 e pendências em [`documentacao/desafio-2/integracao.md`](documentacao/desafio-2/integracao.md).
+
+```bash
+python -m src.main assistente      # Streamlit em http://127.0.0.1:8501
+```
+
+- **Acervo e índice:** documentos fictícios em `dados/acervo/`, com o manifesto `acervo.json` (id, título, versão, vigência). Para indexar, abra "Acervo e índice" e use "Indexar o acervo"; a tela avisa quando o índice está desatualizado. O índice fica em `indice/`, fora do git, e se recria assim a partir do acervo. Reindexar o mesmo acervo não duplica trechos nem chama o provedor. Depois de mudar o modelo de embedding ou o chunking no `config.json`, apague `indice/` antes: o índice recusa abrir com outra configuração.
+- **Solicitação:** texto digitado ou caso do Desafio 1 (texto, áudio ou imagem passam pela transcrição ou OCR). Mostra ficha, resumo, categoria, minuta marcada como texto de IA, fontes com a passagem original e o formulário de decisão (aprovar, rejeitar, revisar, com justificativa e revisor). Uma minuta salva reabre pelo ID da execução.
+- **Consulta ao acervo:** busca com distância de cosseno explicada, e resposta com fontes, que também fica pendente de decisão.
+- **Avaliações:** classifica as 12 avaliações, filtra por polaridade e mostra contagens com denominador, gráfico e conferência contra o gabarito. O último lote fica salvo.
+
+Nada é enviado ao cidadão: não há função de envio.
+
+### Testes e rodadas reais
+
+`python -m pytest` não chama a API. As rodadas abaixo chamam a API e gravam em `resultados/metricas/`; as cópias da entrega ficam em `documentacao/desafio-2/evidencias/`.
+
+```bash
+python -m scripts.validar_dados_d2          # conjunto de dados, offline
+python -m scripts.avaliar_nlp_d2 --real     # RF14, RF15
+python -m scripts.avaliar_rag_d2 chunking   # RF18; também: perguntas, variante
+python -m scripts.demonstrar_indice_d2      # T06, T12, T14, numa cópia do projeto
+python -m scripts.avaliar_sentimentos_d2    # RF22
+python -m scripts.rodada_final_d2           # fluxo integrado: solicitações, ataques, consultas, casos do Desafio 1
+```
+
+### Limitações do Desafio 2
+
+- Acervo de 6 documentos e 12 trechos: com top-k 4, um terço do índice volta em cada busca. As métricas não estimam desempenho com documentos reais.
+- Guardrails são regras locais: paráfrase ou ataque ofuscado pode passar, e pedido legítimo pode cair em revisão.
+- A conferência automática da resposta compara fontes e algarismos; paráfrase errada sem número só a revisão humana pega. Similaridade vetorial e confiança declarada não são garantia de verdade.
+- Sentimentos: uma avaliação mista (AV-11) saiu negativa sem pedido de revisão; a decisão está em [`guardrails-sentimentos.md`](documentacao/desafio-2/guardrails-sentimentos.md).
+- Um único provedor (OpenAI); a segunda configuração de geração é outro modelo do mesmo provedor, sem alegação de qualidade equivalente.
 
 ## Requisitos e onde estão
 
@@ -97,12 +129,15 @@ Assistente de documentos (RF14 a RF24): `python -m src.main assistente` abre o S
 | Texto | RF02, RF03 (caso de prompt injection), RF05, RF09 | `extracao.py`, `minuta.py`, `experimento.py`, `prompts/` | pronta, com testes |
 | Áudio | RF06, RF07 | `audio.py` | pronta, com testes |
 | Imagem | RF08, RF10 | `vision.py`, `comparacao.py`, `image_generation.py`, `prompts/ocr_v1.md`, `prompts/peca_visual_v1.json` | pronta, com testes |
+| Dados e NLP (D2) | RF14, RF15 | `schemas.py`, `nlp.py`, `dados/`, `prompts/*_d2_v*.md` | pronta, com rodada real |
+| Índice e RAG (D2) | RF17, RF18, RF19, RF21 | `ingestion.py`, `embeddings.py`, `rag.py`, `fluxo_rag.py` | pronta, com rodada real |
+| Proteção, interface e sentimentos (D2) | RF16, RF20, RF22 | `guardrails.py`, `app.py`, `sentiment.py`, `metrics.py`, `revisao.py` | pronta, com rodada real |
 
 As três modalidades terminam na mesma extração de campos e na mesma minuta. O contrato entre elas é o formato de `TextoExtraido` (`tipos.py`) e o esquema de `extracao.py`.
 
 ## Documentação da entrega
 
-Em [`documentacao/`](documentacao/README.md): relatório técnico, experimento de prompts (RF02), visão, OCR e peça visual (RF08, RF10), matriz LGPD (RF12), avaliação com as decisões humanas e a taxa de aprovação (RF13) e registro do uso de IA. As saídas da rodada final ficam em `resultados/` e `dados/processados/`.
+Em [`documentacao/`](documentacao/README.md): relatório técnico, experimento de prompts (RF02), visão, OCR e peça visual (RF08, RF10), matriz LGPD (RF12), avaliação com as decisões humanas e a taxa de aprovação (RF13) e registro do uso de IA. Do Desafio 2: estado da entrega e matriz T01–T15 em [`documentacao/desafio-2/integracao.md`](documentacao/desafio-2/integracao.md). As saídas da rodada final ficam em `resultados/` e `dados/processados/`.
 
 ## Categorias (RF05)
 
@@ -140,20 +175,6 @@ Cada caso tem um resultado esperado escrito antes da execução (seção 6 do en
 - **Peça visual (RF10):** o modelo gera só a ilustração; o texto e o selo de conteúdo sintético são aplicados com Pillow, para o texto sair exato. Cada peça em `resultados/imagens/` tem ao lado a ilustração original do modelo e um `.json` com prompt, especificação, modelo, data, nota de proveniência e revisão. A composição usa Arial ou DejaVu Sans; sem nenhuma das duas, a peça não é gerada (a fonte embutida do Pillow não tem acentos). A API recebe tamanho em pixels, não proporção: `image_generation.TAMANHOS` converte a proporção da especificação.
 - **Comparação com gabarito (RF06, RF08):** para áudio e imagem, quando o gabarito do caso tem `texto_referencia`, o fluxo grava `comparacao_gabarito.json` com similaridade, acertos por palavra, erros e dados críticos não encontrados.
 - **Resposta vazia (RF04):** a checagem vale para o tipo de saída pedido. TTS sem áudio ou geração sem imagem também é erro, mesmo que venha texto.
-
-## Guardrails, revisão e sentimentos (Desafio 2)
-
-Execute `python -m src.main assistente` e abra a tela **Avaliações** para
-classificar os 12 exemplos fictícios, filtrar polaridades e consultar o gráfico
-com contagens, proporções e conferência contra gabarito. O último lote é salvo e
-pode ser consultado após reiniciar. Em **Solicitação**, minutas pendentes aceitam
-aprovação, rejeição ou revisão com justificativa e revisor; também é possível
-abrir uma minuta salva pelo ID.
-
-Regras, testes e dependências de integração em
-[guardrails e sentimentos](documentacao/desafio-2/guardrails-sentimentos.md).
-As três partes estão integradas à principal `9258998`. Cobertura, correções e
-pendências de validação final em [análise da integração](documentacao/desafio-2/integracao.md).
 
 ## Áudio (RF06 e RF07)
 

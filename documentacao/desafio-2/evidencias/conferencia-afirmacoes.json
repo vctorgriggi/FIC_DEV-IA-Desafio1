@@ -1,0 +1,311 @@
+{
+  "conferido_por": "Claude (agente de codificação), a pedido do Integrante 2, em 01/11/2026; confirmação humana do grupo pendente",
+  "criterio": "Afirmação institucional (com fonte) é sustentada quando a passagem citada contém a regra afirmada; o trecho de apoio é copiado da passagem e conferido por código. Respostas sem_evidencia não fazem afirmação institucional e ficam fora do denominador; afirmações sem fonte são fatos do caso.",
+  "origem": [
+    "resultados/minutas_rag/<id_execucao>.json da rodada final (rodada-final-d2*.json)"
+  ],
+  "respostas": [
+    {
+      "origem": "D2-R01",
+      "tipo": "consulta",
+      "id_execucao": "be08d96a5f49",
+      "status": "fundamentada",
+      "todas_sustentadas": true,
+      "afirmacoes": [
+        {
+          "afirmacao": "Para matrícula, são necessários documento de identificação e histórico escolar.",
+          "fontes": [
+            "DOC-02:31c674497c07:B:0"
+          ],
+          "passagem_que_sustenta": "Para matrícula, apresente documento de identificação e histórico escolar.",
+          "sustentada": true
+        }
+      ]
+    },
+    {
+      "origem": "D2-R02",
+      "tipo": "consulta",
+      "id_execucao": "83c6ec42493f",
+      "status": "fundamentada",
+      "todas_sustentadas": true,
+      "afirmacoes": [
+        {
+          "afirmacao": "A declaração de matrícula pode ser solicitada no balcão acadêmico.",
+          "fontes": [
+            "DOC-03:fee096744e02:B:0"
+          ],
+          "passagem_que_sustenta": "A declaração de matrícula pode ser solicitada no balcão acadêmico.",
+          "sustentada": true
+        }
+      ]
+    },
+    {
+      "origem": "D2-R03",
+      "tipo": "consulta",
+      "id_execucao": "4949202cfb3b",
+      "status": "fundamentada",
+      "todas_sustentadas": true,
+      "afirmacoes": [
+        {
+          "afirmacao": "O prazo de emissão da declaração é de cinco dias úteis após a conferência dos dados.",
+          "fontes": [
+            "DOC-03:fee096744e02:B:0"
+          ],
+          "passagem_que_sustenta": "O prazo de emissão da declaração é de cinco dias úteis após a conferência dos dados.",
+          "sustentada": true
+        }
+      ]
+    },
+    {
+      "origem": "D2-R04",
+      "tipo": "consulta",
+      "id_execucao": "e098f21a15ad",
+      "status": "fundamentada",
+      "todas_sustentadas": true,
+      "afirmacoes": [
+        {
+          "afirmacao": "O cancelamento deve ser solicitado por requerimento assinado no balcão acadêmico.",
+          "fontes": [
+            "DOC-04:22fc941bb5c5:B:0"
+          ],
+          "passagem_que_sustenta": "O cancelamento deve ser solicitado por requerimento assinado no balcão acadêmico.",
+          "sustentada": true
+        },
+        {
+          "afirmacao": "A solicitação deve informar o curso e o protocolo e aguardar análise humana.",
+          "fontes": [
+            "DOC-04:22fc941bb5c5:B:0"
+          ],
+          "passagem_que_sustenta": "Informe curso e protocolo e aguarde análise humana",
+          "sustentada": true
+        }
+      ]
+    },
+    {
+      "origem": "D2-R05",
+      "tipo": "consulta",
+      "id_execucao": "035dce8a4c47",
+      "status": "fundamentada",
+      "todas_sustentadas": true,
+      "afirmacoes": [
+        {
+          "afirmacao": "O balcão acadêmico atende de segunda a sexta-feira, das 8h às 16h.",
+          "fontes": [
+            "DOC-05:c7e6dd7ecc2b:B:0"
+          ],
+          "passagem_que_sustenta": "O balcão acadêmico atende de segunda a sexta-feira, das 8h às 16h.",
+          "sustentada": true
+        }
+      ]
+    },
+    {
+      "origem": "D2-R06",
+      "tipo": "consulta",
+      "id_execucao": "24ded603c55c",
+      "status": "sem_evidencia",
+      "afirmacoes_institucionais": 0
+    },
+    {
+      "origem": "D2-R07",
+      "tipo": "consulta",
+      "id_execucao": "e859588e3d2b",
+      "status": "sem_evidencia",
+      "afirmacoes_institucionais": 0
+    },
+    {
+      "origem": "D2-R08",
+      "tipo": "consulta",
+      "id_execucao": "ad000c961abd",
+      "status": "fundamentada",
+      "todas_sustentadas": true,
+      "afirmacoes": [
+        {
+          "afirmacao": "O DOC-01 previa prazo até 20/10/2026 e informa que foi substituído integralmente pelo DOC-02 em 10/10/2026.",
+          "fontes": [
+            "DOC-01:4cf44a695a2c:B:1"
+          ],
+          "passagem_que_sustenta": "O prazo de matrícula termina em 20/10/2026. Esta versão vale de 01/09/2026 até 09/10/2026; DOC-02 a substitui integralmente em 10/10/2026.",
+          "sustentada": true
+        },
+        {
+          "afirmacao": "O DOC-02 substitui integralmente o DOC-01 a partir de 10/10/2026 e estabelece prazo até 30/10/2026.",
+          "fontes": [
+            "DOC-02:31c674497c07:B:0"
+          ],
+          "passagem_que_sustenta": "Este guia substitui integralmente DOC-01 a partir de 10/10/2026. 2. Prazo vigente O prazo de matrícula termina em 30/10/2026.",
+          "sustentada": true
+        }
+      ]
+    },
+    {
+      "origem": "D2-S01",
+      "tipo": "minuta",
+      "id_execucao": "a53846a45670",
+      "status": "fundamentada",
+      "todas_sustentadas": true,
+      "afirmacoes": [
+        {
+          "afirmacao": "Para a matrícula, são exigidos documento de identificação e histórico escolar.",
+          "fontes": [
+            "DOC-02:31c674497c07:B:0"
+          ],
+          "passagem_que_sustenta": "Para matrícula, apresente documento de identificação e histórico escolar.",
+          "sustentada": true
+        }
+      ]
+    },
+    {
+      "origem": "D2-S02",
+      "tipo": "minuta",
+      "id_execucao": "f457909dfe80",
+      "status": "fundamentada",
+      "todas_sustentadas": true,
+      "afirmacoes": [
+        {
+          "afirmacao": "A declaração de matrícula pode ser solicitada no balcão acadêmico.",
+          "fontes": [
+            "DOC-03:fee096744e02:B:0"
+          ],
+          "passagem_que_sustenta": "A declaração de matrícula pode ser solicitada no balcão acadêmico.",
+          "sustentada": true
+        },
+        {
+          "afirmacao": "O requerimento deve informar nome, curso e protocolo.",
+          "fontes": [
+            "DOC-03:fee096744e02:B:0"
+          ],
+          "passagem_que_sustenta": "Informe nome, curso e protocolo no requerimento.",
+          "sustentada": true
+        },
+        {
+          "afirmacao": "O prazo de emissão é de cinco dias úteis após a conferência dos dados.",
+          "fontes": [
+            "DOC-03:fee096744e02:B:0"
+          ],
+          "passagem_que_sustenta": "O prazo de emissão da declaração é de cinco dias úteis após a conferência dos dados.",
+          "sustentada": true
+        }
+      ]
+    },
+    {
+      "origem": "D2-S03",
+      "tipo": "minuta",
+      "id_execucao": "e8eff831aaf7",
+      "status": "fundamentada",
+      "todas_sustentadas": true,
+      "afirmacoes": [
+        {
+          "afirmacao": "O cancelamento deve ser solicitado por requerimento assinado no balcão acadêmico, com informação do curso e do protocolo, e depende de análise humana.",
+          "fontes": [
+            "DOC-04:22fc941bb5c5:B:0"
+          ],
+          "passagem_que_sustenta": "O cancelamento deve ser solicitado por requerimento assinado no balcão acadêmico. Informe curso e protocolo e aguarde análise humana",
+          "sustentada": true
+        }
+      ]
+    },
+    {
+      "origem": "D2-S04",
+      "tipo": "minuta",
+      "id_execucao": "24ed20a5bd31",
+      "status": "fundamentada",
+      "todas_sustentadas": true,
+      "afirmacoes": [
+        {
+          "afirmacao": "Reclamações podem ser registradas no balcão acadêmico, com descrição do ocorrido.",
+          "fontes": [
+            "DOC-05:c7e6dd7ecc2b:B:0"
+          ],
+          "passagem_que_sustenta": "Reclamações podem ser registradas no balcão acadêmico, com descrição do ocorrido.",
+          "sustentada": true
+        },
+        {
+          "afirmacao": "O balcão acadêmico atende de segunda a sexta-feira, das 8h às 16h.",
+          "fontes": [
+            "DOC-05:c7e6dd7ecc2b:B:0"
+          ],
+          "passagem_que_sustenta": "O balcão acadêmico atende de segunda a sexta-feira, das 8h às 16h.",
+          "sustentada": true
+        },
+        {
+          "afirmacao": "O prazo de resposta de reclamações não está definido na carta de atendimento.",
+          "fontes": [
+            "DOC-05:c7e6dd7ecc2b:B:0"
+          ],
+          "passagem_que_sustenta": "O prazo de resposta de reclamações não está definido neste documento.",
+          "sustentada": true
+        },
+        {
+          "afirmacao": "A minuta permanece pendente de decisão humana.",
+          "fontes": [
+            "DOC-05:c7e6dd7ecc2b:B:0"
+          ],
+          "passagem_que_sustenta": "Toda resposta institucional exige decisão humana registrada. O assistente prepara somente minutas.",
+          "sustentada": true
+        }
+      ]
+    },
+    {
+      "origem": "D2-S05",
+      "tipo": "minuta",
+      "id_execucao": "d86b377b8b1b",
+      "status": "sem_evidencia",
+      "afirmacoes_institucionais": 0
+    },
+    {
+      "origem": "D2-S06",
+      "tipo": "minuta",
+      "id_execucao": "bfe52ac0b3d8",
+      "status": "sem_evidencia",
+      "afirmacoes_institucionais": 0
+    },
+    {
+      "origem": "texto-01",
+      "tipo": "minuta",
+      "id_execucao": "b8c3904a2543",
+      "status": "fundamentada",
+      "todas_sustentadas": true,
+      "afirmacoes": [
+        {
+          "afirmacao": "Para matrícula, são exigidos documento de identificação e histórico escolar.",
+          "fontes": [
+            "DOC-02:31c674497c07:B:0"
+          ],
+          "passagem_que_sustenta": "Para matrícula, apresente documento de identificação e histórico escolar.",
+          "sustentada": true
+        },
+        {
+          "afirmacao": "O prazo de matrícula termina em 30/10/2026.",
+          "fontes": [
+            "DOC-02:31c674497c07:B:0"
+          ],
+          "passagem_que_sustenta": "O prazo de matrícula termina em 30/10/2026.",
+          "sustentada": true
+        },
+        {
+          "afirmacao": "A Escola Técnica Fictícia Horizonte recebe solicitações no balcão acadêmico, e o servidor confere os documentos.",
+          "fontes": [
+            "DOC-02:31c674497c07:B:0"
+          ],
+          "passagem_que_sustenta": "A Escola Técnica Fictícia Horizonte recebe solicitações no balcão acadêmico. O servidor confere os documentos",
+          "sustentada": true
+        }
+      ]
+    },
+    {
+      "origem": "imagem-01",
+      "tipo": "minuta",
+      "id_execucao": "66addd6b9405",
+      "status": "sem_evidencia",
+      "afirmacoes_institucionais": 0
+    }
+  ],
+  "respostas_com_todas_afirmacoes_sustentadas": {
+    "numerador": 11,
+    "denominador": 11
+  },
+  "afirmacoes_institucionais_sustentadas": {
+    "numerador": 20,
+    "denominador": 20
+  }
+}

@@ -96,6 +96,13 @@ pedido sem solução predomina sobre o elogio. O gabarito não foi alterado. A
 consequência é que uma avaliação mista entra no painel como negativa sem passar
 pelo operador; a regra do prompt não basta para esse caso.
 
+**Decisão sobre AV-11: o `sentimento_v1` fica, e a divergência entra como
+limite.** Um `sentimento_v2` escrito depois de ver o erro seria avaliado nas
+mesmas 12 avaliações que o motivaram: o acerto mediria o ajuste ao conjunto de
+teste, não o classificador. Uma nova versão só vale com avaliações mistas novas,
+rotuladas antes da execução. Até lá, o operador confere as negativas no painel
+sabendo que uma mensagem mista pode estar entre elas.
+
 A conferência humana dos 12 rótulos e das justificativas segue pendente.
 
 As partes de NLP, índice e RAG da principal `9258998` estão integradas. O RAG

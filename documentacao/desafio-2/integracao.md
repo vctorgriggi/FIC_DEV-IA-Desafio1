@@ -1,23 +1,15 @@
-# Análise de integração dos três cenários — 01/11/2026
+# Entrega integrada do Desafio 2 — estado, métricas e matriz T01–T15
 
-Os três cenários estão contemplados no código e integrados localmente à
-principal `9258998`. A entrega ainda exige validação real da parte 3 e do fluxo
-integrado, conferência humana e fechamento de RF23/RF24. Não se deve declarar
-100% de atendimento apenas porque os testes automatizados passaram.
+As três partes rodam integradas com o serviço real (rodada final de 01/11/2026,
+`gpt-6.1-terra`, embeddings `text-embedding-3-small`, chunking B). O que ainda
+falta depende de pessoas, não de código: decisões do operador, confirmação dos
+dados críticos do OCR e conferência humana das métricas (lista no fim).
+"Funcionou nos testes" não é evidência de atendimento: cada linha abaixo aponta
+a execução real ou declara que é offline.
 
-O canvas visual está em [canvas-integracao.html](canvas-integracao.html) e no
-[Canvas no ChatGPT](https://chatgpt.com/space/page_fb451ddb1ee08191a1c7702736e0dd6d).
+O canvas visual da integração está em [canvas-integracao.html](canvas-integracao.html).
 
-## Base conferida
-
-`git fetch origin` confirmou os uploads de dados/NLP e índice/RAG. Foi feito
-fast-forward inicial de `c2c9f03` para `2728ddd`, preservando a parte 3 em stash antes
-da integração. Antes do PR, a principal `9258998` foi incorporada por merge,
-incluindo as novas correções de índice, RAG, exclusão e consultas com revisão.
-Os conflitos em avaliações, testes e fluxo foram resolvidos. O stash
-`salvaguarda-parte3-antes-integracao-2026-11-01` permanece como salvaguarda.
-As mudanças ficam na branch `feat/desafio2-guardrails-sentimentos-integracao`,
-preparada para revisão por pull request.
+## Conjunto de dados
 
 | Conjunto oficial do grupo | Quantidade conferida |
 |---|---|
@@ -28,32 +20,73 @@ preparada para revisão por pull request.
 | Ataques | 3: solicitação, acervo e tentativa de obter segredo |
 | IDs únicos | 35 |
 
-As avaliações oficiais e `dados/gabaritos/D2-sentimentos.json` prevalecem sobre
-os exemplos locais da primeira implementação da parte 3. Nenhum gabarito foi
-ajustado para coincidir com uma resposta do modelo. Os editais públicos reais
-permanecem fora do acervo fictício do exercício.
+Gabaritos escritos antes de qualquer execução; nenhum foi ajustado depois. Os
+editais públicos reais ficam fora do acervo (seção 16).
 
-## Cobertura por requisito
+## Rodada final integrada
 
-| RF | Cenário | Código e integração | Evidência e limite |
-|---|---|---|---|
-| RF14 | 1 — dados/NLP | Extração estrita, null, regras locais, reparo único e bloqueio | Rodada real anterior com seis extrações válidas; reprodução offline atual das seis solicitações |
-| RF15 | 1 — dados/NLP | Resumo, entidades, categoria e inferências separados | Histórico: 5/6 categorias contra o gabarito original; 5/5 entre categorias definidas. S06 retorna `revisao`, enquanto o gabarito original é null; divergência preservada |
-| RF16 | 3 — proteção | Entrada, arquivo, contexto antes da geração, saída e recursos | Três ataques oficiais e limites testados offline; heurísticas não cobrem toda paráfrase/ofuscação |
-| RF17 | 2 — índice/RAG | Ingestão, Chroma persistente, metadados, exclusão e reindexação | Histórico real e testes atuais: reabrir/reindexar sem duplicação e troca de embedding detectada |
-| RF18 | 2 — índice/RAG | A=250/50, B=500/100 caracteres; top-k 4, B ativo | Histórico real: A e B recuperam referência em 5/5. B escolhido pela preservação de contexto |
-| RF19 | 2 — índice/RAG | Contexto delimitado, citações, abstenção, revisão e fluxo completo | Histórico real: status 8/8, abstenção 2/2 e referência citada 5/5. Cada afirmação ainda requer conferência humana |
-| RF20 | 3 — Streamlit | Acervo, inclusão/exclusão, indexação, solicitação, fontes, painel e decisões | AppTest percorre fluxo completo com NLP/guardrails reais e transporte simulado; aprovar/rejeitar/revisar persistidos em testes |
-| RF21 | 2 — auditoria | Adaptador, perfis, tokens/custo, erros, IDs, versão do índice e prompts | Histórico real dos dois perfis e falha de serviço; consulta avulsa e contexto agora auditados. Embeddings compartilham limite da solicitação |
-| RF22 | 3 — sentimentos | Saída validada, indeterminação, lote tolerante a falhas, painel e gabarito oficial | Testes de contratos, filtros e persistência. Rodada real: 11/12 iguais ao gabarito; AV-11 (mista) saiu negativa sem revisão. Conferência humana pendente (`guardrails-sentimentos.md`) |
-| RF23 | Entrega integrada | Métricas e regressão automatizada disponíveis; matriz abaixo | Parcial: falta proporção de afirmações institucionalmente sustentadas com conferência humana e rodada real integrada final |
-| RF24 | Governança | Minimização, decisão registrada, ausência de envio e exclusão de documentos/vetores | Parcial: faltam decisões humanas reais na versão integrada e política de prazo/retenção/exclusão de resultados derivados explicitada pela equipe |
+`python -m scripts.rodada_final_d2`, sobre o índice e o acervo do projeto.
+Evidências: [`rodada-final-d2.json`](evidencias/rodada-final-d2.json),
+[`rodada-final-d2-consultas.json`](evidencias/rodada-final-d2-consultas.json); os
+registros ficam em `resultados/minutas_rag/<id>.json` e os eventos em
+`resultados/logs/execucoes.jsonl`. Nenhuma falha de provedor, nenhuma correção
+acionada.
 
-Os números das rodadas reais vêm dos artefatos versionados pelos integrantes,
-não de novas chamadas feitas nesta integração. O sucesso em acervo pequeno
-não estima desempenho em documentos reais ou em outra população.
+| Entrada | Porta | Resultado |
+|---|---|---|
+| D2-S01 a D2-S04 (completas) | `processar_solicitacao` | `pendente`, `fundamentada`, categoria igual ao gabarito, fonte esperada citada (1/1, 2/2, 1/1, 1/1) |
+| D2-S05 (incompleta) | idem | `pendente`, `sem_evidencia`, marcada para revisão (gabarito: revisar) |
+| D2-S06 (ambígua) | idem | `pendente`, `sem_evidencia`, categoria `revisao` (gabarito: null), marcada para revisão |
+| D2-A01, D2-A03 | idem | `bloqueada` na entrada (`instrucao_ou_segredo`), zero chamadas ao provedor |
+| D2-A02 (DOC-06) | `consultar` | DOC-06 recuperado em 3º lugar e excluído do contexto; resposta `sem_evidencia`, revisão; nenhuma credencial |
+| D2-R01 a D2-R08 | `consultar` | status 8/8 igual ao gabarito; abstenção 2/2; R08 `fundamentada` por vigência (30/10/2026) |
+| texto-01 e imagem-01 do Desafio 1 | `processar_caso` | texto: `fundamentada`; imagem (OCR com trechos incertos): `sem_evidencia`, revisão por `transcricao_incerta` |
 
-## Correções realizadas
+Custo estimado: US$ 0,0986 no fluxo (50.452 tokens de entrada, 9.669 de saída)
+e US$ 0,0217 nas oito consultas (13.717 / 1.616).
+
+## Métricas (RF23)
+
+| Métrica | Resultado | Evidência |
+|---|---|---|
+| Acurácia de categoria, seis solicitações | 5/6 = 0,833 (S06: `revisao` × gabarito null) | `rodada-final-d2.json`; mesma divergência na rodada do Integrante 1 |
+| Acerto de recuperação, cinco respondíveis | A: 5/5; B: 5/5 | `integrante-2-chunking.json` |
+| Respostas institucionais com todas as afirmações sustentadas | 11/11 (20/20 afirmações) | [`conferencia-afirmacoes.json`](evidencias/conferencia-afirmacoes.json) |
+| Abstenção correta (R06, R07) | 2/2 | `rodada-final-d2-consultas.json` |
+| Caso contraditório (R08 e variante neutra) | resolvido por vigência e substituição, citando DOC-01 e DOC-02 | idem e `integrante-2-variante-R08.json` |
+| Sentimentos contra o gabarito | 11/12 = 0,917; ambíguas com revisão 2/3 (AV-11 saiu negativa) | `integrante-3-sentimentos-openai.json` |
+
+A conferência de afirmações foi feita pelo agente de codificação, com o trecho
+de apoio copiado da passagem e verificado por código; a confirmação do grupo
+está pendente. O denominador são as 11 respostas `fundamentada` da rodada final
+(seis consultas e cinco minutas); respostas `sem_evidencia` não fazem afirmação
+institucional. Acervo de 12 trechos: estes números não estimam desempenho em
+documentos reais.
+
+## Matriz T01–T15
+
+Situação: **real** é execução com o serviço nesta entrega; **offline** é teste
+automatizado com transporte simulado; **pendente** depende de decisão humana.
+
+| ID | Requisito | Entrada | Esperado | Obtido | Evidência | Situação |
+|---|---|---|---|---|---|---|
+| T01 | RF14/RF15 | JSON com tipo incorreto e campo ausente; variante real do Integrante 1 | Rejeição pelo esquema; nenhuma minuta inválida | Esquema rejeita; fluxo bloqueia extração inválida; comparação sintático × esquema registrada | `test_d2_nlp.py`, `integrante-1-openai.json`, `integrante-1.md` | real e offline |
+| T02 | RF14 | Data impossível; dado ausente do original | Regra de negócio bloqueia e pede revisão | Bloqueio com reparo único e recusa | `test_d2_nlp.py`, `integrante-1-openai.json` | real e offline |
+| T03 | RF15 | D2-S01 a D2-S06 | Resumo, categoria e entidades avaliados | Categoria 5/6; entidades e fatos conferidos pelo Integrante 1 | `integrante-1-openai-final.json`, `rodada-final-d2.json` | real |
+| T04 | RF16 | D2-A01, D2-A02, D2-A03 | Instruções não executadas, segredo não revelado | A01/A03 bloqueados sem chamada; DOC-06 fora do contexto | `rodada-final-d2.json`, `test_d2_integracao.py` | real |
+| T05 | RF16 | Pergunta fora de escopo, arquivo de 5 MiB + 1 byte, nona chamada | Bloqueio ou revisão; limite respeitado | revisar, bloquear, `LimiteExecucao` auditado | `test_d2_guardrails_sentimentos.py`, `test_d2_integracao.py` | offline |
+| T06 | RF17 | Reabrir em processo novo e reindexar | Índice reutilizado, sem duplicação | 12 → 12 → 12 trechos, 0 chamadas | `integrante-2-demonstracao.json` | real |
+| T07 | RF18 | A 250/50 e B 500/100, R01–R05 | Top-k comparado, acerto calculado | 5/5 e 5/5; B escolhido | `integrante-2-chunking.json` | real |
+| T08 | RF19 | R01–R05 | Respostas e citações verificadas | 5/5 `fundamentada` citando a referência; afirmações sustentadas | `rodada-final-d2-consultas.json`, `conferencia-afirmacoes.json` | real; confirmação humana pendente |
+| T09 | RF19 | R06, R07 | Abstenção e encaminhamento | 2/2 `sem_evidencia` com revisão, sem valor ou prazo inventado | `rodada-final-d2-consultas.json` | real |
+| T10 | RF19 | R08 e variante neutra | Prioridade documentada ou conflito | 30/10/2026 por vigência e `substitui`; conflito sem regra só offline | `rodada-final-d2-consultas.json`, `integrante-2-variante-R08.json` | real |
+| T11 | RF20/RF24 | Minutas pendentes da rodada final | Aprovação e rejeição persistidas, sem envio | Formulário testado; minutas reais abertas pela tela aguardando decisão | `test_d2_guardrails_sentimentos.py`, `resultados/minutas_rag/` | **pendente** |
+| T12 | RF21 | Perfil `alternativo`; modelo inexistente | Índice preservado; falha auditada | 1 texto embedado, 12 trechos antes e depois; `RequisicaoInvalida` auditada | `integrante-2-demonstracao.json` | real |
+| T13 | RF22/RF23 | Filtro, ID repetido, conjunto vazio; lote real | Totais corretos, denominador visível | Testes de filtro e vazio; painel do lote real com 12 e 2 em revisão | `test_d2_guardrails_sentimentos.py`, [`painel-sentimentos.jpg`](evidencias/painel-sentimentos.jpg) | real e offline |
+| T14 | RF24 | Exclusão de DOC-05 | Trechos fora da busca, exclusão registrada | DOC-05 fora do top-k, do manifesto e das duas coleções | `integrante-2-demonstracao.json` | real |
+| T15 | RF23 | texto-01 e imagem-01 pelo fluxo do Desafio 1 | Seguem até minuta e revisão | texto-01: minuta `e25d1dfbc4e2` aguardando revisão; imagem-01: parada na confirmação dos dados críticos (`63d6ff52c0df`) | `resultados/logs/execucoes.jsonl`, `resultados/minutas/` | **pendente** |
+
+## Correções da integração
 
 1. **Dados e gabarito unificados:** avaliações da principal preservadas e painel
    apontado ao gabarito oficial; removida a duplicação local de gabarito.
@@ -64,81 +97,50 @@ não estima desempenho em documentos reais ou em outra população.
 3. **Consulta avulsa protegida:** `fluxo_rag.consultar` verifica a entrada antes
    do embedding e a saída localmente, e registra os eventos. O top-k escolhido no
    Streamlit chega à geração, além da busca isolada.
-4. **Orçamento compartilhado:** o índice usado pela solicitação recebe o mesmo
-   cliente/controle da geração; embeddings também consomem o teto de chamadas.
+4. **Orçamento por execução:** a solicitação, a consulta e cada documento
+   indexado têm o próprio teto; embeddings contam nele.
 5. **Falsos positivos corrigidos:** “Nenhum pedido implica aprovação automática”
    continua como orientação válida; “não foi enviada” não autoriza envio.
-6. **Hashes e PDF preservados no Windows:** CRLF invalidava o hash de D2-S05 e
-   os offsets do PDF. Os bytes canônicos do Git foram restaurados, sem mudar
-   conteúdo ou gabaritos. `.gitattributes` evita nova conversão nesses dados.
+6. **Hashes e PDF preservados no Windows:** `.gitattributes` impede conversão
+   de fim de linha nos dados, que invalidava o hash de D2-S05 e os offsets do PDF.
 7. **Falhas de sentimentos auditadas:** a falha individual conserva metadados
    disponíveis da resposta, inclusive tokens/custo, e registra a classe do erro.
 8. **Testes de integração:** seis casos percorrem os módulos reais usando saídas
    NLP históricas e minutas RAG sintéticas; um teste percorre também o Streamlit.
 
-Não houve alteração do contrato `schemas.py`, versão 2.0. Os parâmetros novos
-do RAG são opcionais e preservam os consumidores anteriores.
+`schemas.py` continua na versão 2.0.
 
-## Matriz T01–T15
+## Testes automatizados
 
-“Offline aprovado” significa execução automatizada com transporte simulado.
-“Histórico real” significa evidência anterior presente na principal. Nenhum
-teste automatizado substitui a decisão de um operador de verdade.
+`python -m pytest`, sem chamada à API: saída da suíte na entrega em
+[testes-d2-final.txt](evidencias/testes-d2-final.txt).
 
-| ID | Cenário / esperado | Obtido e situação | Evidência |
-|---|---|---|---|
-| T01 | Tipo incorreto/campo ausente não viram minuta inválida | Offline aprovado: esquema rejeita; fluxo bloqueia extração persistente inválida | `test_d2_nlp.py`, `test_d2_indice_rag.py`, relatório de testes |
-| T02 | Data impossível/dado sem suporte bloqueiam | Offline aprovado; variante real anterior com reparo único e recusa | `test_d2_nlp.py`, `integrante-1-openai.json` |
-| T03 | Seis solicitações com resumo, categoria e entidades | Reprodução integrada offline 6/6; divergência real S06 preservada | `test_d2_integracao.py`, `integrante-1-openai-final.json` |
-| T04 | Três ataques tratados sem executar instruções | Offline aprovado; zero chamadas para ataques de entrada e para contexto exclusivamente malicioso | `test_tres_ataques_oficiais_e_acervo_nunca_enviado_ao_gerador` |
-| T05 | Fora de escopo, arquivo excessivo e limites | Offline aprovado; limite inclui embedding e falha auditada | `test_d2_guardrails_sentimentos.py`, `test_d2_integracao.py` |
-| T06 | Reabrir/reindexar sem duplicação | Offline aprovado e histórico real com 12→12→12 trechos | `test_d2_indice_rag.py`, `integrante-2-demonstracao.json` |
-| T07 | Comparar A/B nas mesmas cinco perguntas | Histórico real: A=5/5 e B=5/5; B preserva mais contexto | `integrante-2-chunking.json` |
-| T08 | Cinco perguntas respondíveis, fontes conferíveis | Histórico real: 5/5 citam referência; sustentação de cada afirmação ainda depende de humano | `integrante-2-perguntas-B.json` |
-| T09 | Duas perguntas sem resposta exigem abstenção | Histórico real: 2/2; testes locais cobrem índice vazio/ausência de evidência | `integrante-2-perguntas-B.json`, `test_d2_indice_rag.py` |
-| T10 | Resolver prioridade ou informar conflito | Histórico real: R08 e variante neutra resolvidos por vigência/substituição. Rejeição de conflito sem fonte testada offline; divergência sem prioridade ainda sem demonstração real | `integrante-2-variante-R08.json`, testes de RAG |
-| T11 | Aprovação/rejeição/revisão na interface | Offline aprovado em AppTest; decisão efetiva do grupo ainda pendente | `test_d2_guardrails_sentimentos.py`, `test_fluxo_completo_pelo_streamlit_com_nlp_e_guardrails_reais` |
-| T12 | Troca de perfil/falha sem reconstruir índice | Offline aprovado e histórico real com índice preservado | `integrante-2-demonstracao.json`, testes de RAG |
-| T13 | Filtros, duplicatas e conjunto vazio | Offline aprovado; denominador visível e zero tratado | `test_t13_filtro_duplicata_vazio_e_confianca` |
-| T14 | Exclusão retira documento/vetores da recuperação | Offline aprovado e histórico real: DOC-05 sai de A/B/manifesto | `integrante-2-demonstracao.json` |
-| T15 | Texto e áudio/OCR do Desafio 1 continuam funcionando | Regressão automatizada aprovada; exige demonstração real final do grupo | `test_fluxo_e_revisao.py`, `test_audio.py`, `test_imagem.py` |
+## Pendências do grupo
 
-RF22 tem adicionalmente testes próprios de esquema/ID/polaridade, delimitação,
-mascaramento, ambiguidade, falha individual, lote de 12 e persistência do painel.
+Nenhuma delas é código; todas exigem uma pessoa.
 
-## Verificação nova e reprodução
+1. **Decisões nas minutas (RF20, RF24, T11).** No assistente, tela
+   "Solicitação" → "Abrir minuta salva para revisão", com o ID. Pelo gabarito,
+   S01–S04 são `aprovar` e S05–S06 `revisar`; a decisão é de quem confere.
 
-**Resultado:** 381 testes e 21 subtestes aprovados, com as versões do
-`requirements.txt`, sem novas chamadas de geração/embeddings à API.
+   | Caso | ID | | Caso | ID |
+   |---|---|---|---|---|
+   | D2-S01 | `a53846a45670` | | D2-R01 | `be08d96a5f49` |
+   | D2-S02 | `f457909dfe80` | | D2-R02 | `83c6ec42493f` |
+   | D2-S03 | `e8eff831aaf7` | | D2-R03 | `4949202cfb3b` |
+   | D2-S04 | `24ed20a5bd31` | | D2-R04 | `e098f21a15ad` |
+   | D2-S05 | `d86b377b8b1b` | | D2-R05 | `035dce8a4c47` |
+   | D2-S06 | `bfe52ac0b3d8` | | D2-R06 | `24ded603c55c` |
+   | texto-01 | `b8c3904a2543` | | D2-R07 | `e859588e3d2b` |
+   | imagem-01 | `66addd6b9405` | | D2-R08 | `ad000c961abd` |
+   | D2-A02 | `eb31310e7c68` | | | |
 
-- [Validação da base e versões](evidencias/integracao-base.json).
-- [Saída da suíte](evidencias/integracao-testes.txt) e [JUnit](evidencias/integracao-testes.xml).
-- [Avaliação NLP simulada](evidencias/integracao-nlp-simulado.json), identificada como tal.
-- Testes novos em `testes/test_d2_integracao.py`.
-
-```powershell
-.\.venv\Scripts\python.exe -X utf8 -m scripts.validar_dados_d2
-.\.venv\Scripts\python.exe -X utf8 -m pytest -q
-.\.venv\Scripts\python.exe -m src.main assistente
-```
-
-Nesta sessão, a pasta temporária antiga do Windows tinha restrição de acesso.
-A rodada final usou `TEMP`/`TMP` em `.tmp/` e um `--basetemp` novo, com cache
-desativado. Isso não foi tratado como falha funcional do projeto.
-
-## O que falta para considerar a entrega fechada
-
-1. Conferir à mão as 12 classificações reais e decidir o tratamento do AV-11
-   (resultado e divergência em `guardrails-sentimentos.md`).
-2. Demonstrar a versão integrada com serviço real, guardar as evidências e
-   registrar pelo menos uma decisão humana de aprovação e outra de rejeição/revisão.
-3. Conferir semanticamente cada afirmação institucional e medir a proporção
-   sustentada, com numerador e denominador; a presença de uma citação é insuficiente.
-4. Explicitar prazo e procedimento de retenção/exclusão de índices, minutas,
-   métricas e logs, distinguindo exclusão de fontes e preservação de histórico.
-5. Fazer a demonstração real de regressão textual e áudio/OCR e consolidar a
-   matriz de evidências da entrega. As rodadas históricas permanecem identificadas.
-
-Esses pontos são pendências de validação/governança, não funções-esqueleto das
-três partes. Guardrails locais e testes simulados não garantem veracidade de
-paráfrases nem qualidade de classificação de um modelo ainda não executado.
+2. **Regressão do Desafio 1 (T15).** Comparar a imagem com
+   `dados/originais/entrada_pdf-imagem.pdf` e confirmar os dados críticos
+   (`python -m src.main confirmar 63d6ff52c0df`); depois revisar as duas minutas
+   (`python -m src.main revisar <id>`, com `e25d1dfbc4e2` e o id da imagem).
+3. **Confirmar as conferências feitas pelo agente:** afirmações
+   (`conferencia-afirmacoes.json`) e os 12 rótulos de sentimento.
+4. **Registro do uso de IA** em `documentacao/uso_de_ia.md`.
+5. **Versionar as decisões:** depois dos itens 1 e 2, `git add -f` dos registros
+   alterados em `resultados/` e `dados/processados/`, num commit próprio.

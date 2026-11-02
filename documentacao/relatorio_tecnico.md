@@ -89,3 +89,61 @@ Fora do log ficaram oito sínteses curtas de teste da leitura do protocolo, cada
 - A amostragem não é fixada no experimento de prompts: não verificamos se `gpt-6.1-terra` aceita `temperature`.
 - Imagem e áudio vão inteiros ao provedor, sem mascaramento possível; leitura parcial de CPF pelo OCR escapa do mascaramento.
 - Quando uma chamada falha, o evento do log registra o erro e a duração, mas não o modelo nem os tokens (`fluxo._etapa` só anota o modelo a partir de uma resposta).
+
+# Desafio 2 — assistente de documentos
+
+A mesma central passa a fundamentar a minuta num acervo fictício indexado. Estado da entrega, métricas com numerador e denominador, matriz T01–T15 e pendências: [`desafio-2/integracao.md`](desafio-2/integracao.md). Decisões e resultados de cada parte: [`integrante-1.md`](desafio-2/integrante-1.md) (dados, RF14, RF15), [`integrante-2.md`](desafio-2/integrante-2.md) (índice, RAG, RF17–RF19, RF21, retenção) e [`guardrails-sentimentos.md`](desafio-2/guardrails-sentimentos.md) (RF16, RF20, RF22).
+
+## Arquitetura
+
+```
+solicitação (texto, ou áudio/imagem do Desafio 1 via transcrição/OCR)
+  → guardrails.verificar_entrada            permitir | revisar | bloquear
+  → nlp: extração validada por esquema (RF14) e ficha de compreensão (RF15)
+  → rag.recuperar: top-k no índice Chroma (embeddings, chunking B)
+  → rag.separar_trechos: trecho com instrução embutida tira o documento do contexto
+  → rag.gerar_minuta: fatos do caso e trechos delimitados em blocos separados
+  → conferência por código (fontes, status, números) + guardrails.verificar_saida
+  → RegistroMinutaRAG "pendente" ou "bloqueada" em resultados/minutas_rag/
+  → decisão do operador no Streamlit (revisao.registrar_decisao_rag)
+avaliações → sentiment.classificar_lote → metrics.agregar_sentimentos → painel
+```
+
+Toda chamada ao provedor passa por `ClienteLLM` (timeout, uma repetição em falha transitória, teto de chamadas e tokens por execução via `guardrails.ControleRecursos`). Cada etapa vira evento em `resultados/logs/execucoes.jsonl` com o `id_execucao`, versão do esquema e do prompt, consulta minimizada, ids recuperados e enviados ao modelo, versão do índice, tokens, custo, duração, erro e decisão humana.
+
+## Provedor configurável
+
+Provedor, modelos e parâmetros ficam em `config.json`; a geração tem perfis (`principal`: `gpt-6.1-terra`; `alternativo`: `gpt-6-luna`) e o embedding tem modelo próprio (`text-embedding-3-small`, 1536 dimensões). Trocar o perfil não toca o índice: demonstrado com o `alternativo` sobre o mesmo índice, 1 texto embedado (a consulta) e 12 trechos antes e depois. Os dois perfis são do mesmo provedor; não há alegação de qualidade equivalente entre eles. Mudar o modelo de embedding exige reindexar, e o índice recusa abrir com outro modelo ou chunking.
+
+## Métricas e custos medidos
+
+Resumo das rodadas reais; detalhes e evidências em `desafio-2/integracao.md`.
+
+| Rodada | Resultado | Custo estimado |
+|---|---|---|
+| NLP, seis solicitações (Integrante 1) | categoria 5/6 contra o gabarito original | US$ 0,0454 |
+| Chunking A × B, cinco perguntas | acerto 5/5 e 5/5 | não registrado (só embeddings) |
+| Oito perguntas, B, `principal` | status 8/8, abstenção 2/2 | US$ 0,0199 |
+| Oito perguntas, B, `alternativo` | status 8/8, abstenção 2/2 | US$ 0,0025 |
+| Sentimentos, 12 avaliações | 11/12; ambíguas com revisão 2/3 | US$ 0,0107 |
+| Fluxo integrado: seis solicitações, três ataques, dois casos do Desafio 1 | S01–S04 fundamentadas com a fonte esperada; S05/S06 em revisão; A01/A03 bloqueados; DOC-06 fora do contexto | US$ 0,0986 |
+| Oito perguntas pelo fluxo, com registro para decisão | status 8/8; 11/11 respostas com todas as afirmações sustentadas | US$ 0,0217 |
+| Regressão do Desafio 1 (texto-01, imagem-01) | texto até a minuta; imagem parada na confirmação humana | US$ 0,0179 |
+
+Preços e fonte como no Desafio 1 (`precos_usd_por_milhao_tokens`). Embeddings entram no custo quando a resposta traz `usage`.
+
+## Privacidade e retenção
+
+Só dados fictícios; os editais reais de `enunciado/desafio-2/arquivos/` não são indexados. Todo texto enviado ao provedor passa por `rag.minimizar` (mascaramento de CPF, RG, e-mail e telefone e ocultação de formato de credencial), e a Responses API recebe `store=False`. O log guarda referências e a consulta minimizada, nunca o texto dos trechos. Retenção e exclusão de documentos, vetores, minutas e logs: tabela em [`integrante-2.md`](desafio-2/integrante-2.md#retenção-e-exclusão-rf24); a exclusão de DOC-05 foi demonstrada (sai da busca, do manifesto e das duas coleções, com evento de auditoria). A minuta é sempre marcada como texto gerado por IA, com o modelo lido da auditoria.
+
+## Limitações do Desafio 2
+
+- Acervo de 12 trechos: os acertos não estimam desempenho em documentos reais.
+- Guardrails por regras locais: ataque parafraseado ou ofuscado pode passar; pedido legítimo pode cair em revisão.
+- A conferência automática da resposta compara fontes e algarismos; paráfrase errada sem número fica para a revisão humana. A conferência das 20 afirmações institucionais foi feita pelo agente de codificação e aguarda confirmação do grupo.
+- AV-11 (avaliação mista) saiu negativa sem revisão; mantido o `sentimento_v1` e registrado o limite.
+- Decisões do operador sobre as minutas da rodada final e a confirmação dos dados críticos da imagem na regressão estão pendentes (lista em `desafio-2/integracao.md`).
+
+## Uso de IA no desenvolvimento
+
+Registro em [`uso_de_ia.md`](uso_de_ia.md).
