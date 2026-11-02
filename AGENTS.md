@@ -30,7 +30,7 @@ src/              # base compartilhada + uma parte por modalidade (tabela no REA
 prompts/          # <nome>_v<N>.md; prompt alterado é versão nova, nunca edição
 dados/originais/  # entradas do desafio; nunca alterar (o hash vai para o log)
 dados/gabaritos/  # resultado esperado, escrito antes de executar o caso
-dados/acervo/     # acervo do Desafio 2; acervo.json é o manifesto (id, título, versão)
+dados/acervo/     # acervo fictício do Desafio 2; acervo.json é o manifesto (id, título, versão)
 indice/           # índice Chroma, fora do git; recria-se a partir do acervo
 interface/        # front-end Vite/React; dist/ é versionado e servido por src/web.py
 ```
@@ -84,10 +84,9 @@ Desafio 2 em andamento: base, contratos e divisão por estudante em
 - RF07 depois de 06/01/2027 → todos os modelos da Speech API desligam nessa
   data; o substituto indicado só roda pela Realtime API. Trocar de modelo
   dentro da Speech API não resolve.
-
-## Decisões em aberto
-
-- Desafio 2, acervo: usar os editais reais de `enunciado/desafio-2/arquivos/` ou
-  escrever um acervo fictício. Bloqueia os dados do Estudante 1.
-- Desafio 2, categorias: acrescentar "outros" ou "revisão" (RF15) às de
-  `config.json`; `nlp.validar_regras` bloqueia categoria fora da lista.
+- Agente indexa os editais de `enunciado/desafio-2/arquivos/` → são documentos
+  públicos reais, e a seção 16 pede acervo criado para o exercício. Eles ficam
+  fora de `dados/acervo/`.
+- `categorias` do `config.json` inclui `revisao` (RF15, intenção ambígua) e é a
+  mesma lista do enum de `extracao.esquema_extracao` → a regressão do Desafio 1
+  (T15) também pode devolver `revisao`, que os gabaritos do Desafio 1 não preveem.

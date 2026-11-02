@@ -73,6 +73,10 @@ Até os dados do Estudante 1 chegarem, dá para desenvolver com documentos de te
 - Gabarito antes da chamada ao modelo (seção 11); resultado baixo é relatado, nunca ajustado (seção 15).
 - Só dados fictícios; nada de chave fora do `.env`; o índice (`indice/`) fica fora do git e se recria pelo assistente.
 
-## Decisões em aberto do grupo
+## Decisões do grupo
 
-Acervo (editais reais ou acervo fictício) e categorias "outros" ou "revisão": ver "Decisões em aberto" no `AGENTS.md`. Os editais são documentos públicos reais, e a seção 16 pede documentos criados para o exercício; vale confirmar com o professor. A decisão do acervo trava o primeiro passo do Estudante 1: até ela sair, os Estudantes 2 e 3 seguem com dados de teste.
+- Acervo fictício, escrito para o exercício; os editais reais de
+  `enunciado/desafio-2/arquivos/` não são indexados (seção 16).
+- Categoria `revisao` em `config.json` para intenção ambígua (RF15).
+- Chunking A 250/50 e B 500/100 caracteres; B ativo (justificativa em
+  `integrante-2.md`).
