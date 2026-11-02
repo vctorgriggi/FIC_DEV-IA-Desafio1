@@ -15,13 +15,17 @@ def _normalizar(texto: str) -> str:
     return ''.join(c for c in unicodedata.normalize('NFKD', texto.casefold()) if not unicodedata.combining(c))
 
 
+# Só imperativo e infinitivo: "esqueci as orientações" e "o atendente ignorou as regras" são relato do cidadão.
+# Senha comum ("podem me fornecer uma nova senha?") vai para _SENHA; aqui só segredo do sistema.
 _INJECAO = re.compile(
-    r'(ignor\w*|desconsider\w*|esquec\w*).{0,60}(instruc|regr|prompt|orientac)|'
-    r'(revel|mostr|exib|imprim|fornec|retorn).{0,60}(segredo|credencia|senha|chave|api.key|prompt.{0,10}sistema)|'
+    r'\b(ignor(e|em|ar)|desconsider(e|em|ar)|esquec(a|am|er))\b.{0,60}(instruc|regr|prompt|orientac)|'
+    r'(revel|mostr|exib|imprim|fornec|retorn).{0,60}(segredo|credencia|chave|api.key|\.env|variave|'
+    r'prompt.{0,10}sistema|senha.{0,20}(admin|intern|sistema|servidor))|'
     r'(envie|enviar|envio|aprove|aprovar|aprovad[ao]).{0,50}(automatic|sem revis|sem aprov)|'
     r'(system\s*:|\[inst\]|<\|im_start\|>|voce agora e)|'
     r'ignore.{0,60}(instructions|rules)|reveal.{0,60}(secret|credential|password|api.key)|'
     r'send.{0,40}(automatically|without.review)', re.DOTALL)
+_SENHA = re.compile(r'\bsenha')
 _ABUSO = re.compile(r'\b(idiota|imbecil|incompetente|matar|ameaca|ameacar)\b')
 _ESCOPO = re.compile(r'matricul|inscri|edital|curso|escol|aluno|estud|document|certific|historico|'
                      r'atendimento|secretari|protocolo|cancel|reclam|informac|seciteci|etec|vaga|prazo|selec|recurso|resultado')
@@ -45,6 +49,8 @@ def verificar_entrada(texto: str, *, config: Config) -> DecisaoGuardrail:
     normalizado = _normalizar(texto)
     if _segredo(texto) or _INJECAO.search(normalizado):
         return _decisao('entrada', 'bloquear', 'instrucao_ou_segredo', 'Possível mudança de regras ou exposição de credenciais.')
+    if _SENHA.search(normalizado):
+        return _decisao('entrada', 'revisar', 'senha', 'Pedido envolve senha ou acesso; o servidor confere antes de responder.')
     if _ABUSO.search(normalizado):
         return _decisao('entrada', 'revisar', 'moderacao', 'Linguagem potencialmente abusiva ou ameaça; conferir contexto.')
     if not _ESCOPO.search(normalizado):
@@ -78,13 +84,17 @@ def verificar_saida(resposta: RespostaRAG, *, config: Config) -> DecisaoGuardrai
     ids = {t.trecho.id for t in resposta.trechos}
     if any(f not in ids for f in resposta.fontes()):
         return _decisao('saida', 'bloquear', 'citacao_invalida', 'Fonte citada não pertence aos trechos recuperados.')
-    if resposta.status == 'fundamentada' and (not resposta.afirmacoes or any(not a.fontes for a in resposta.afirmacoes)):
-        return _decisao('saida', 'bloquear', 'sem_fonte', 'Resposta fundamentada exige fonte em cada afirmação.')
+    # Fato do caso na minuta não tem fonte de acervo (prompt minuta_rag_d2); a exigência por afirmação na
+    # pergunta avulsa fica em rag._problemas, que conhece o modo.
+    if resposta.status == 'fundamentada' and not any(a.fontes for a in resposta.afirmacoes):
+        return _decisao('saida', 'bloquear', 'sem_fonte', 'Resposta fundamentada exige ao menos uma fonte citada.')
     texto = '\n'.join([resposta.resposta, *(a.texto for a in resposta.afirmacoes)])
     if _segredo(texto) or any(p.search(texto) for p in PADROES_PESSOAIS.values()):
         return _decisao('saida', 'bloquear', 'dado_indevido', 'Saída contém possível credencial ou identificador pessoal.')
     sem_negacoes = re.sub(r'\b(?:nao|nunca)\s+(?:(?:foi|sera|esta|e|deve ser|pode ser)\s+)?enviad[ao]\b', '', _normalizar(texto))
-    if re.search(r'(enviad[ao]|envio autorizado|aprovad[ao] automaticamente)', sem_negacoes):
+    # "Documentos enviados" e "a declaração será enviada" são orientação; o que bloqueia é a minuta dizer que saiu.
+    if re.search(r'\b(resposta|minuta|mensagem)\b[^.\n]{0,40}\benviad[ao]\b|envio (autorizado|automatico)|'
+                 r'aprovad[ao] (automaticamente|sem revis)', sem_negacoes):
         return _decisao('saida', 'bloquear', 'envio', 'Saída não pode autorizar envio ou declarar aprovação automática.')
     if resposta.necessita_revisao or resposta.status != 'fundamentada' or any(
         d.decisao != 'permitir' for d in verificar_trechos(resposta.trechos, config=config)

@@ -342,6 +342,17 @@ def test_minuta_separa_caso_e_acervo_e_nao_envia_o_original(config, indice):
     assert resultado.prompt.identificador == "minuta_rag_d2_v1"
 
 
+def test_minuta_com_fato_do_caso_sem_fonte_passa_sem_correcao(config, indice):
+    todos_no_top_k(config, indice)
+    alvo = id_de(indice, "DOC-02")
+    orientacao = "Apresente documento de identificação e histórico escolar."
+    cliente, sdk = gerador(config, {"status": "fundamentada", "resposta": "Recebemos seu pedido de matrícula. " + orientacao,
+                                    "afirmacoes": [{"texto": "O pedido é de matrícula.", "fontes": []},
+                                                   {"texto": orientacao, "fontes": [alvo]}]})
+    resultado = rag.minuta_fundamentada(exemplos.solicitacao(), "x", indice=indice, cliente=cliente, config=config)
+    assert resultado.valor.status == "fundamentada" and len(resultado.respostas) == 1
+
+
 def test_minuta_sem_assunto_nem_pedido_nao_consulta_nem_gera(config, sdk, indice):
     antes = len(sdk.chamadas)
     cliente, gerado = gerador(config)

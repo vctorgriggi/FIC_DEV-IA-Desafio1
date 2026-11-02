@@ -7,9 +7,11 @@ de `schemas.py` foram preservados.
 
 Regras locais, sem serviço de moderação externo:
 
-- Entrada vazia ou acima de 8.000 caracteres: bloquear. Tentativa de ignorar
-  regras, revelar credenciais, mudar papel ou enviar automaticamente: bloquear.
+- Entrada vazia ou acima de 8.000 caracteres: bloquear. Ordem para ignorar
+  regras (imperativo ou infinitivo: "esqueci as orientações" é relato e passa),
+  revelar segredo do sistema, mudar papel ou enviar automaticamente: bloquear.
   Credencial com formato reconhecido: bloquear, sem repetir o valor no motivo.
+  Pedido do cidadão que menciona senha: revisar.
 - Linguagem potencialmente abusiva/ameaça: revisar. Ausência de termos do
   atendimento educacional/administrativo: revisar. Os padrões estão em
   `src/guardrails.py`; são heurísticas conservadoras, podem gerar falsos
@@ -19,9 +21,12 @@ Regras locais, sem serviço de moderação externo:
 - Trechos: uma decisão por trecho, preservando a ordem. Instruções embutidas ou
   segredos levam a revisar; o consumidor deve excluir esses trechos do prompt.
   Todo conteúdo permitido continua sujeito à delimitação por `prompts.delimitar`.
-- Saída: bloquear fonte fora dos trechos recuperados, afirmação sem fonte em
-  resposta fundamentada, identificadores pessoais reconhecidos, credenciais e
-  declaração de envio/aprovação automática. Ausência de evidência, conflito e
+- Saída: bloquear fonte fora dos trechos recuperados, resposta fundamentada sem
+  nenhuma citação, identificadores pessoais reconhecidos, credenciais e
+  declaração de que a minuta foi enviada ou aprovada automaticamente
+  ("documentos enviados" é orientação e passa). Fato do caso na minuta fica
+  sem fonte; na pergunta avulsa, toda afirmação precisa de fonte
+  (`rag._problemas`, que conhece o modo). Ausência de evidência, conflito e
   trecho suspeito pedem revisão. A presença de uma citação não prova suporte
   semântico: o operador precisa conferir a passagem original.
 - Controle por execução: no máximo 8 tentativas e nenhuma nova chamada depois
