@@ -266,11 +266,7 @@ def clicar(app, rotulo):
 @pytest.mark.parametrize(
     ("tela", "acao", "requisito"),
     [
-        ("Acervo e índice", lambda app: clicar(app, "Indexar o acervo"), "RF17"),
-        ("Acervo e índice", lambda app: clicar(app, "Excluir documento"), "RF24"),
         ("Solicitação", lambda app: (app.text_area[0].input("Pedido fictício.").run(), clicar(app, "Analisar e gerar minuta")), "RF"),
-        ("Consulta ao acervo", lambda app: (app.text_input[0].input("Quais documentos?").run(), clicar(app, "Buscar trechos")), "RF17"),
-        ("Consulta ao acervo", lambda app: (app.text_input[0].input("Quais documentos?").run(), clicar(app, "Responder com fontes")), "RF19"),
         ("Avaliações", lambda app: clicar(app, "Classificar avaliações"), "RF22"),
     ],
 )

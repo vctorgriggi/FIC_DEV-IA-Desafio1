@@ -46,7 +46,16 @@ def acerto_recuperacao(recuperados: dict[str, list[str]], referencias: dict[str,
     Esperado: pergunta conta como acerto se ao menos um id de trecho de referência está no top-k recuperado;
     proporção sobre as perguntas respondíveis (cinco), com o resultado de cada pergunta.
     """
-    raise PendenteDeImplementacao("RF18", "índice")
+    por_pergunta = []
+    for pergunta, esperados in sorted(referencias.items()):
+        obtidos = recuperados.get(pergunta, [])
+        encontrados = [identificador for identificador in obtidos if identificador in esperados]
+        por_pergunta.append({"id": pergunta, "acerto": bool(encontrados), "referencias_no_top_k": encontrados,
+                             "recuperados": list(obtidos)})
+    return {
+        **proporcao(sum(p["acerto"] for p in por_pergunta), len(por_pergunta)),
+        "por_pergunta": por_pergunta,
+    }
 
 
 def agregar_sentimentos(avaliacoes: list[AvaliacaoSentimento], *, polaridades: list[str] | None = None) -> dict:
