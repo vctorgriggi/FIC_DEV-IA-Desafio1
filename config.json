@@ -61,8 +61,8 @@
     "top_k": 4,
     "chunking_ativo": "A",
     "chunking": {
-      "A": { "unidade": "caracteres", "tamanho": 800, "sobreposicao": 100 },
-      "B": { "unidade": "caracteres", "tamanho": 1600, "sobreposicao": 200 }
+      "A": { "unidade": "caracteres", "tamanho": 250, "sobreposicao": 50 },
+      "B": { "unidade": "caracteres", "tamanho": 500, "sobreposicao": 100 }
     }
   },
   "limites": {
