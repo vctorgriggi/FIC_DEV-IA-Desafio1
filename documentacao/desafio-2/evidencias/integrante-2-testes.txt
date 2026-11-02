@@ -1,4 +1,4 @@
-314 passed, 1 warning, 21 subtests passed in 4.85s
+315 passed, 1 warning, 21 subtests passed in 5.07s
 testes/test_d2_indice_rag.py::test_extrai_txt_em_um_bloco_e_pdf_por_pagina PASSED
 testes/test_d2_indice_rag.py::test_extracao_recusa_arquivo_excessivo_e_pdf_sem_texto PASSED
 testes/test_d2_indice_rag.py::test_divisao_respeita_tamanho_sobreposicao_secao_e_ids_deterministicos PASSED

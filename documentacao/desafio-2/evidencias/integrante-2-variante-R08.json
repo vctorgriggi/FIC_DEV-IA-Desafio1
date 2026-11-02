@@ -1,0 +1,116 @@
+{
+  "perfil": {
+    "nome": "principal",
+    "provedor": "openai",
+    "modelo": "gpt-6.1-terra"
+  },
+  "indice": {
+    "colecao": "acervo_B",
+    "modelo_embedding": "text-embedding-3-small",
+    "dimensao": 1536,
+    "chunking": "B",
+    "parametros_chunking": {
+      "unidade": "caracteres",
+      "tamanho": 500,
+      "sobreposicao": 100
+    },
+    "distancia": "cosseno",
+    "total_trechos": 12,
+    "documentos": {
+      "DOC-01": {
+        "versao": "1.0",
+        "hash": "4cf44a695a2cc167b036f2fda0f5937f3646509f0c1cd13ee0f9bf6ae2fde100"
+      },
+      "DOC-02": {
+        "versao": "2.0",
+        "hash": "31c674497c0727f3597cfaf07f7eeb19b328a8e4370cfc24b4d9c98a94c65942"
+      },
+      "DOC-03": {
+        "versao": "1.0",
+        "hash": "fee096744e024f38945d312fdf89193220756bea9269317f6c7fa934a4b9e71e"
+      },
+      "DOC-04": {
+        "versao": "1.0",
+        "hash": "22fc941bb5c51b6351f88bd4b2e1a20892eb3fee59ad4e000552187483fc1766"
+      },
+      "DOC-05": {
+        "versao": "1.0",
+        "hash": "c7e6dd7ecc2b8ad47e1ba4ccdd507d37d989265607fb8788caddf4918ec1cf2d"
+      },
+      "DOC-06": {
+        "versao": "1.0",
+        "hash": "a5310d8b5e9b438e4b4fef4ee2bdc2f8cde5e295b15edf3b61321799567e58fc"
+      }
+    },
+    "versao_indice": "652bc7c9e779"
+  },
+  "prompt": "rag_d2_v1",
+  "hash_prompt": "77badd2d7dc0",
+  "perguntas": [
+    {
+      "id": "D2-R08-neutra",
+      "tipo": "contraditoria",
+      "status_esperado": "fundamentada",
+      "referencias": [
+        "DOC-01:4cf44a695a2c:B:0",
+        "DOC-01:4cf44a695a2c:B:1",
+        "DOC-02:31c674497c07:B:0"
+      ],
+      "situacao": "obtido",
+      "status": "fundamentada",
+      "resposta": "Para a data de 15/10/2026, o prazo de matrícula termina em 30/10/2026. O prazo anterior foi substituído.",
+      "afirmacoes": [
+        {
+          "texto": "O prazo de matrícula vigente termina em 30/10/2026.",
+          "fontes": [
+            "DOC-02:31c674497c07:B:0"
+          ]
+        },
+        {
+          "texto": "O prazo anterior terminava em 20/10/2026; o DOC-02 substituiu integralmente o DOC-01 a partir de 10/10/2026.",
+          "fontes": [
+            "DOC-01:4cf44a695a2c:B:1",
+            "DOC-02:31c674497c07:B:0"
+          ]
+        }
+      ],
+      "recuperados": [
+        "DOC-01:4cf44a695a2c:B:1",
+        "DOC-02:31c674497c07:B:0",
+        "DOC-01:4cf44a695a2c:B:0",
+        "DOC-03:fee096744e02:B:0"
+      ],
+      "status_confere": true,
+      "cita_referencia": true,
+      "tokens_entrada": 1745,
+      "tokens_saida": 208,
+      "custo_estimado_usd": 0.002785,
+      "chamadas": 1
+    }
+  ],
+  "metricas": {
+    "status_confere": {
+      "numerador": 1,
+      "denominador": 1,
+      "valor": 1.0
+    },
+    "abstencao_correta": {
+      "numerador": 0,
+      "denominador": 0,
+      "valor": null
+    },
+    "respondiveis_citando_referencia": {
+      "numerador": 0,
+      "denominador": 0,
+      "valor": null
+    },
+    "contraditoria": [
+      {
+        "id": "D2-R08-neutra",
+        "status": "fundamentada",
+        "status_confere": true,
+        "cita_referencia": true
+      }
+    ]
+  }
+}

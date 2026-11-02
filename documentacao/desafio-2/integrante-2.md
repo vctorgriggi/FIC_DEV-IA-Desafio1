@@ -80,6 +80,13 @@ Evidências: `evidencias/integrante-2-perguntas-{A,B,B-alternativo}.json`
 | Tokens entrada / saída | 11.791 / 1.284 | 13.593 / 1.562 | 13.593 / 2.615 |
 | Custo estimado | US$ 0,0182 | US$ 0,0214 | US$ 0,0027 |
 
+**T10 sem pistas na pergunta.** O D2-R08 cita os dois documentos e as duas
+datas. A variante `D2-R08-neutra` ("Qual é o prazo de matrícula para quem se
+matricula em 15/10/2026?"), com gabarito registrado em commit anterior à
+execução, também saiu `fundamentada` no índice B: 30/10/2026, citando o prazo
+do DOC-02 e a regra de substituição (`evidencias/integrante-2-variante-R08.json`).
+Ela fica fora da lista oficial de oito perguntas do `casos.json`.
+
 "Cita o trecho de referência" é verificação por código; a conferência de que
 **cada afirmação** é sustentada pela passagem (RF23) é humana e está pendente.
 No `alternativo`, R06 respondeu "os valores das bolsas não estão definidos",
@@ -103,7 +110,7 @@ Evidência: `evidencias/integrante-2-demonstracao.json`.
 ## Testes
 
 `testes/test_d2_indice_rag.py`, 35 testes sem rede (embedding falso por saco
-de palavras); suíte completa 314 aprovados. Lista em
+de palavras); suíte completa 315 aprovados. Lista em
 `evidencias/integrante-2-testes.txt`. Os testes não dependem dos valores de
 chunking do `config.json`.
 
@@ -131,6 +138,7 @@ python -m scripts.avaliar_rag_d2 chunking
 python -m scripts.avaliar_rag_d2 perguntas --chunking A
 python -m scripts.avaliar_rag_d2 perguntas --chunking B
 python -m scripts.avaliar_rag_d2 perguntas --chunking B --perfil alternativo
+python -m scripts.avaliar_rag_d2 variante
 python -m scripts.demonstrar_indice_d2
 ```
 

@@ -3,6 +3,7 @@
 python -m scripts.avaliar_rag_d2 chunking    # RF18/T07: A contra B nas cinco perguntas respondíveis
 python -m scripts.avaliar_rag_d2 perguntas   # RF19/T08-T10: as oito perguntas no chunking ativo
 python -m scripts.avaliar_rag_d2 perguntas --chunking B --perfil alternativo
+python -m scripts.avaliar_rag_d2 variante    # D2-R08-neutra: o conflito sem as datas na pergunta
 
 Os ids de referência de cada pergunta são os trechos indexados que contêm o trecho literal do
 gabarito (espaços normalizados); não são escritos à mão, porque mudam com o hash e o chunking.
@@ -27,7 +28,9 @@ def _normal(texto: str) -> str:
 
 
 def _gabaritos(config) -> list[dict]:
-    return [json.loads(c.read_text(encoding="utf-8")) for c in sorted(config.caminho("gabaritos").glob("D2-R*.json"))]
+    """As oito perguntas oficiais, na lista do catálogo do Integrante 1 (variantes ficam fora)."""
+    catalogo = json.loads((config.caminho("originais") / "desafio-2" / "casos.json").read_text(encoding="utf-8"))
+    return [json.loads((config.raiz / caminho).read_text(encoding="utf-8")) for caminho in catalogo["perguntas"]]
 
 
 def _indexar(config, cliente, chunking: str) -> IndiceVetorial:
@@ -77,12 +80,12 @@ def _por_documento(indice: IndiceVetorial) -> dict:
     return dict(sorted(contagem.items()))
 
 
-def perguntas(config, cliente, perfil: str | None, chunking_nome: str | None = None) -> dict:
+def perguntas(config, cliente, perfil: str | None, chunking_nome: str | None = None, gabaritos: list[dict] | None = None) -> dict:
     indice = _indexar(config, cliente, chunking_nome or config.dados["indice"]["chunking_ativo"])
     prompt = carregar_prompt(config, "rag_d2", 1)
     resultado = {"perfil": config.perfil_geracao(perfil), "indice": indice.info(), "prompt": prompt.identificador,
                  "hash_prompt": prompt.hash, "perguntas": []}
-    for gabarito in _gabaritos(config):
+    for gabarito in gabaritos or _gabaritos(config):
         item = {"id": gabarito["id"], "tipo": gabarito["tipo"], "status_esperado": gabarito["status_esperado"],
                 "referencias": _referencias(indice, gabarito)}
         try:
@@ -122,13 +125,17 @@ def perguntas(config, cliente, perfil: str | None, chunking_nome: str | None = N
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("etapa", choices=["chunking", "perguntas"])
+    parser.add_argument("etapa", choices=["chunking", "perguntas", "variante"])
     parser.add_argument("--perfil", default=None, help="perfil de geração (perguntas); padrão: o ativo")
     parser.add_argument("--chunking", default=None, help="índice A ou B (perguntas); padrão: o ativo")
     args = parser.parse_args(argv)
     config = carregar_config()
     cliente = ClienteLLM(config)
-    resultado = chunking(config, cliente) if args.etapa == "chunking" else perguntas(config, cliente, args.perfil, args.chunking)
+    if args.etapa == "chunking":
+        resultado = chunking(config, cliente)
+    else:
+        variante = [json.loads((config.caminho("gabaritos") / "D2-R08-neutra.json").read_text(encoding="utf-8"))]
+        resultado = perguntas(config, cliente, args.perfil, args.chunking, variante if args.etapa == "variante" else None)
     sufixo = "".join(f"-{v}" for v in (args.chunking, args.perfil) if v)
     destino = config.caminho("metricas") / f"rag-d2-{args.etapa}{sufixo}.json"
     destino.parent.mkdir(parents=True, exist_ok=True)
