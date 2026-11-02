@@ -1,7 +1,7 @@
 # Análise de integração dos três cenários — 01/11/2026
 
 Os três cenários estão contemplados no código e integrados localmente à
-principal `2728ddd`. A entrega ainda exige validação real da parte 3 e do fluxo
+principal `9258998`. A entrega ainda exige validação real da parte 3 e do fluxo
 integrado, conferência humana e fechamento de RF23/RF24. Não se deve declarar
 100% de atendimento apenas porque os testes automatizados passaram.
 
@@ -11,10 +11,13 @@ O canvas visual está em [canvas-integracao.html](canvas-integracao.html) e no
 ## Base conferida
 
 `git fetch origin` confirmou os uploads de dados/NLP e índice/RAG. Foi feito
-fast-forward de `c2c9f03` para `2728ddd`, preservando a parte 3 em stash antes
-da integração. Os conflitos em avaliações e testes foram resolvidos. O stash
+fast-forward inicial de `c2c9f03` para `2728ddd`, preservando a parte 3 em stash antes
+da integração. Antes do PR, a principal `9258998` foi incorporada por merge,
+incluindo as novas correções de índice, RAG, exclusão e consultas com revisão.
+Os conflitos em avaliações, testes e fluxo foram resolvidos. O stash
 `salvaguarda-parte3-antes-integracao-2026-11-01` permanece como salvaguarda.
-As mudanças de integração estão locais; não houve publicação no GitHub.
+As mudanças ficam na branch `feat/desafio2-guardrails-sentimentos-integracao`,
+preparada para revisão por pull request.
 
 | Conjunto oficial do grupo | Quantidade conferida |
 |---|---|
@@ -104,7 +107,7 @@ mascaramento, ambiguidade, falha individual, lote de 12 e persistência do paine
 
 ## Verificação nova e reprodução
 
-**Resultado:** 367 testes e 21 subtestes aprovados, com as versões do
+**Resultado:** 381 testes e 21 subtestes aprovados, com as versões do
 `requirements.txt`, sem novas chamadas de geração/embeddings à API.
 
 - [Validação da base e versões](evidencias/integracao-base.json).

@@ -1,7 +1,7 @@
 # Desafio 2 — base e divisão de tarefas
 
 Atualização em 01/11/2026: as três partes estão implementadas e integradas à
-principal `2728ddd`. Este documento preserva a divisão original de trabalho;
+principal `9258998`. Este documento preserva a divisão original de trabalho;
 o estado atual, as evidências e as pendências finais estão em [integração](integracao.md).
 
 Entrega: **02/11/2026, 23h59** (ver `enunciado/desafio-2/README.md`). Enunciado por seção em `enunciado/desafio-2/`.

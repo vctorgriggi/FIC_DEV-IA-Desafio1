@@ -7,7 +7,9 @@ python -m scripts.avaliar_rag_d2 variante    # D2-R08-neutra: o conflito sem as 
 
 Os ids de referência de cada pergunta são os trechos indexados que contêm o trecho literal do
 gabarito (espaços normalizados); não são escritos à mão, porque mudam com o hash e o chunking.
-Saída em resultados/metricas/, fora do git até a rodada final.
+Saída em resultados/metricas/, fora do git até a rodada final. Cada pergunta vira um evento
+"d2_consulta" em resultados/logs/execucoes.jsonl (RF21), com o id_execucao gravado na saída.
+As perguntas vão direto ao rag, sem guardrails: a avaliação mede a recuperação e a geração.
 """
 
 from __future__ import annotations
@@ -17,10 +19,23 @@ import json
 import sys
 
 from src import ingestion, metrics, rag
+from src.audit import Auditoria, agora_iso, novo_id
 from src.config import carregar_config
 from src.embeddings import IndiceVetorial
+from src.fluxo import _etapa
+from src.fluxo_rag import _anotar
 from src.llm_client import ClienteLLM, ErroLLM
 from src.prompts import carregar_prompt
+
+
+class ClienteContado(ClienteLLM):
+    """Conta os textos enviados ao embedding: zero na indexação prova que o índice foi reaproveitado."""
+
+    textos_embedding = 0
+
+    def gerar_embeddings(self, *, modelo, textos):
+        self.textos_embedding += len(textos)
+        return super().gerar_embeddings(modelo=modelo, textos=textos)
 
 
 def _normal(texto: str) -> str:
@@ -81,15 +96,29 @@ def _por_documento(indice: IndiceVetorial) -> dict:
 
 
 def perguntas(config, cliente, perfil: str | None, chunking_nome: str | None = None, gabaritos: list[dict] | None = None) -> dict:
+    antes = getattr(cliente, "textos_embedding", None)
     indice = _indexar(config, cliente, chunking_nome or config.dados["indice"]["chunking_ativo"])
     prompt = carregar_prompt(config, "rag_d2", 1)
+    auditoria = Auditoria(config)
     resultado = {"perfil": config.perfil_geracao(perfil), "indice": indice.info(), "prompt": prompt.identificador,
-                 "hash_prompt": prompt.hash, "perguntas": []}
+                 "hash_prompt": prompt.hash, "perguntas": [],
+                 "textos_embedados_na_indexacao": None if antes is None else cliente.textos_embedding - antes}
     for gabarito in gabaritos or _gabaritos(config):
         item = {"id": gabarito["id"], "tipo": gabarito["tipo"], "status_esperado": gabarito["status_esperado"],
-                "referencias": _referencias(indice, gabarito)}
+                "referencias": _referencias(indice, gabarito), "id_execucao": novo_id(), "executado_em": agora_iso()}
+        base = {"id_execucao": item["id_execucao"], "caso_id": gabarito["id"], "modalidade": "pergunta_d2"}
         try:
-            obtido = rag.responder(gabarito["pergunta"], indice=indice, cliente=cliente, config=config, perfil=perfil)
+            with _etapa(auditoria, base, "d2_consulta") as evento:
+                evento.extra = {"consulta": rag.minimizar(gabarito["pergunta"], config), "perfil_geracao": resultado["perfil"]["nome"],
+                                "versao_indice": resultado["indice"]["versao_indice"], "chunking": indice.chunking}
+                try:
+                    obtido = rag.responder(gabarito["pergunta"], indice=indice, cliente=cliente, config=config, perfil=perfil)
+                except ErroLLM as erro:
+                    _anotar(evento, getattr(erro, "respostas", []), getattr(erro, "prompt", None))
+                    raise
+                _anotar(evento, obtido.respostas, obtido.prompt)
+                evento.extra.update(ids_recuperados=[t.trecho.id for t in obtido.valor.trechos],
+                                    status_resposta=obtido.valor.status, fontes=obtido.valor.fontes())
         except ErroLLM as erro:
             item.update(situacao="erro", erro=f"{type(erro).__name__}: {erro}", detalhe=erro.detalhe)
         else:
@@ -130,7 +159,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--chunking", default=None, help="índice A ou B (perguntas); padrão: o ativo")
     args = parser.parse_args(argv)
     config = carregar_config()
-    cliente = ClienteLLM(config)
+    cliente = ClienteContado(config)
     if args.etapa == "chunking":
         resultado = chunking(config, cliente)
     else:

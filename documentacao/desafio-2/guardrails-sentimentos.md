@@ -71,7 +71,7 @@ As respostas simuladas verificam integração e contratos, não qualidade do mod
 A classificação real e a conferência humana dos 12 rótulos continuam necessárias
 para a evidência final da entrega.
 
-As partes de NLP, índice e RAG da principal `2728ddd` estão integradas. O RAG
+As partes de NLP, índice e RAG da principal `9258998` estão integradas. O RAG
 valida contexto antes da geração, exclui documentos suspeitos, audita IDs e
 decisões, e protege também a consulta avulsa. O fluxo compartilha o controle de
 recursos entre geração e embeddings. A reprodução offline das seis solicitações

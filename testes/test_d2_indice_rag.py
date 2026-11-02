@@ -400,8 +400,8 @@ def test_fluxo_grava_minuta_pendente_e_audita_cada_etapa(config, indice, auditor
     assert "123.456.789-00" not in registro.entrada
     assert revisao.ler_registro_rag(config, registro.id_execucao) == registro
     eventos = auditoria.eventos(id_execucao=registro.id_execucao)
-    assert [e["etapa"] for e in eventos] == ["d2_entrada", "d2_extracao", "d2_compreensao", "d2_contexto", "d2_recuperacao_geracao", "d2_registro"]
-    extracao, geracao = eventos[1], eventos[4]
+    assert [e["etapa"] for e in eventos] == ["d2_entrada", "d2_extracao", "d2_compreensao", "d2_recuperacao_geracao", "d2_registro"]
+    extracao, geracao = eventos[1], eventos[3]
     assert extracao["tokens_entrada"] == 200 and extracao["parametros"]["chamadas"] == 2
     assert geracao["versao_prompt"] == "minuta_rag_d2_v1" and geracao["extra"]["esquema_versao"] == "2.0"
     assert geracao["extra"]["ids_recuperados"] and geracao["extra"]["indice"]["versao_indice"] == indice.info()["versao_indice"]
@@ -500,3 +500,190 @@ def test_botao_de_exclusao_remove_pela_interface(app_indice, config):
     clicar(app, "Excluir documento")
     assert not app.exception and any("DOC-06 excluído" in s.value for s in app.success)
     assert "DOC-06" not in {d.id for d in ingestion.ler_manifesto(config)}
+
+
+# --- Correções da revisão: checagem de números, chunking, exclusão, consulta e casos do Desafio 1 --------
+
+
+def _recuperado(id_trecho, documento_id, texto):
+    trecho = exemplos.trecho(id=id_trecho, documento_id=documento_id, hash_documento="c7e6dd7ecc2b", texto=texto)
+    return TrechoRecuperado(trecho=trecho, distancia=0.3)
+
+
+SEM_PRAZO = _recuperado("DOC-05:c7e6dd7ecc2b:B:0", "DOC-05", "O prazo de resposta de reclamações não está definido.")
+PRAZO_ANTIGO = _recuperado("DOC-01:4cf44a695a2c:B:1", "DOC-01", "O prazo de matrícula termina em 20/10/2026.")
+
+
+@pytest.mark.parametrize(
+    ("resposta", "afirmacao", "caso"),
+    [
+        ("É de 7 dias.", "O prazo é de 7 dias.", "Qual o prazo?"),  # dígito do hash no id do trecho
+        ("São 45 dias.", "O prazo é de 45 dias.", "Ouvi que são 45 dias?"),  # número plantado na pergunta
+        ("Termina em 20/10/2026.", "Reclamações têm regra própria.", "Qual o prazo?"),  # número de trecho não citado
+    ],
+    ids=["hash_do_id", "numero_da_pergunta", "trecho_nao_citado"],
+)
+def test_prazo_sem_fonte_citada_e_rejeitado(resposta, afirmacao, caso):
+    gerada = rag.RespostaGerada(status="fundamentada", resposta=resposta,
+                                afirmacoes=[{"texto": afirmacao, "fontes": [SEM_PRAZO.trecho.id]}])
+    assert rag._problemas(gerada, [SEM_PRAZO, PRAZO_ANTIGO], caso=caso, modo="pergunta")
+
+
+def test_data_da_pergunta_e_numero_citado_passam():
+    gerada = rag.RespostaGerada(status="fundamentada", resposta="Em 15/10/2026, o prazo termina em 20/10/2026.",
+                                afirmacoes=[{"texto": "O prazo termina em 20/10/2026.", "fontes": [PRAZO_ANTIGO.trecho.id]}])
+    assert rag._problemas(gerada, [PRAZO_ANTIGO], caso="Qual o prazo em 15/10/2026?", modo="pergunta") == []
+
+
+def test_minuta_aceita_numero_do_caso_so_fora_das_afirmacoes_institucionais():
+    caso = '{"pedido": "curso de 1200 horas", "protocolo": "2026-000142"} texto original'
+    fato = rag.RespostaGerada(status="fundamentada", resposta="Seu curso de 1200 horas, protocolo 2026-000142.",
+                              afirmacoes=[{"texto": "O curso tem 1200 horas.", "fontes": []},
+                                          {"texto": "O prazo termina em 20/10/2026.", "fontes": [PRAZO_ANTIGO.trecho.id]}])
+    assert rag._problemas(fato, [PRAZO_ANTIGO], caso=caso, modo="minuta") == []
+    regra = rag.RespostaGerada(status="fundamentada", resposta="O prazo é de 1200 horas.",
+                               afirmacoes=[{"texto": "O prazo é de 1200 horas.", "fontes": [PRAZO_ANTIGO.trecho.id]}])
+    assert any("afirmação 1" in p for p in rag._problemas(regra, [PRAZO_ANTIGO], caso=caso, modo="minuta"))
+
+
+def test_mudar_parametros_do_chunking_exige_reindexar(config, indice):
+    config.dados["indice"]["chunking"][indice.chunking]["tamanho"] += 20
+    with pytest.raises(IndiceIncompativel, match="chunking"):
+        IndiceVetorial(config, indice.cliente)
+
+
+def test_falha_do_provedor_na_reindexacao_mantem_os_trechos_antigos(config, acervo, indice):
+    antes = [i for i, m in zip(*_tudo(indice)) if m["documento_id"] == "DOC-05"]
+    caminho = config.caminho("acervo") / "doc-05.txt"
+    caminho.write_text(caminho.read_text(encoding="utf-8") + "\nNovo parágrafo.", encoding="utf-8")
+    erro = type("APIConnectionError", (Exception,), {})("sem rede")
+    quebrado = IndiceVetorial(config, ClienteLLM(config, chave="c", sdk=falsos.SDKFalso(erro=erro)))
+    from src.llm_client import ServicoIndisponivel
+
+    with pytest.raises(ServicoIndisponivel):
+        quebrado.indexar(acervo["DOC-05"])
+    assert [i for i, m in zip(*_tudo(indice)) if m["documento_id"] == "DOC-05"] == antes
+
+
+def test_indice_persiste_em_outro_processo(config, indice):
+    import subprocess
+    import sys
+
+    codigo = (
+        "import json, sys; from pathlib import Path; from src.config import Config; "
+        "from src.embeddings import IndiceVetorial; "
+        "i = IndiceVetorial(Config(json.loads(sys.argv[2]), Path(sys.argv[1])), None); "
+        "print(json.dumps([i.contar(), i.info()['versao_indice']]))"
+    )
+    saida = subprocess.run([sys.executable, "-c", codigo, str(config.raiz), json.dumps(config.dados)],
+                           cwd=RAIZ, capture_output=True, text=True, check=True).stdout
+    assert json.loads(saida.strip().splitlines()[-1]) == [indice.contar(), indice.info()["versao_indice"]]
+
+
+def test_exclusao_conta_so_quem_cita_tira_o_texto_e_tolera_minuta_ilegivel(config, acervo, indice, auditoria):
+    do_doc = TrechoRecuperado(trecho=exemplos.trecho(id="DOC-05:x:B:0", documento_id="DOC-05", texto="Horário fictício."), distancia=0.1)
+    citada = exemplos.resposta_rag(trechos=[do_doc], afirmacoes=[{"texto": "Atende de dia.", "fontes": ["DOC-05:x:B:0"]}])
+    so_recuperada = exemplos.resposta_rag(trechos=[do_doc, TrechoRecuperado(trecho=exemplos.trecho(), distancia=0.2)])
+    revisao.gravar_registro_rag(config, exemplos.registro("aprovada", id_execucao="citada000001", resposta=citada))
+    revisao.gravar_registro_rag(config, exemplos.registro("pendente", id_execucao="recuperada01", resposta=so_recuperada))
+    (config.caminho("minutas_rag") / "quebrada.json").write_text("{", encoding="utf-8")
+    removido = ingestion.excluir_documento(config, "DOC-05", indice=indice, auditoria=auditoria)
+    assert removido["minutas_que_citam"] == 1 and removido["minutas_com_texto_removido"] == 2
+    assert removido["minutas_ilegiveis"] == ["resultados/minutas_rag/quebrada.json"]
+    registro = revisao.ler_registro_rag(config, "citada000001")
+    assert registro.status == "aprovada" and registro.resposta.afirmacoes[0].fontes == ["DOC-05:x:B:0"]
+    assert registro.resposta.trechos[0].trecho.texto.startswith("[texto removido: DOC-05")
+    assert "Horário fictício" not in (config.caminho("minutas_rag") / "recuperada01.json").read_text(encoding="utf-8")
+    assert auditoria.eventos(etapa="acervo_exclusao")
+
+
+def test_trecho_bloqueado_nao_chega_ao_modelo(config, indice, auditoria, partes, monkeypatch):
+    todos_no_top_k(config, indice)
+    monkeypatch.setattr(guardrails, "verificar_trechos", lambda trechos, *, config: [
+        DecisaoGuardrail(decisao="bloquear" if t.trecho.documento_id == "DOC-06" else "permitir", camada="trechos",
+                         regra="instrucao_no_acervo", motivo="teste") for t in trechos])
+    cliente, sdk = gerador(config, fundamentada(id_de(indice, "DOC-02")))
+    registro = processar(config, indice, auditoria, cliente)
+    assert registro.status == "pendente" and registro.resposta.necessita_revisao
+    assert "DOC-06" not in sdk.operacoes('responses.create')[0]["input"]
+    assert all(t.trecho.documento_id != "DOC-06" for t in registro.resposta.trechos)
+    [evento] = auditoria.eventos(id_execucao=registro.id_execucao, etapa="d2_recuperacao_geracao")
+    assert any(i.startswith("DOC-06") for i in evento["extra"]["ids_recuperados"])
+    assert not any(i.startswith("DOC-06") for i in evento["extra"]["ids_enviados_ao_modelo"])
+
+
+def test_falha_do_provedor_no_meio_da_etapa_guarda_tokens_na_auditoria(config, indice, auditoria, partes, monkeypatch):
+    from src.llm_client import RespostaLLM, ServicoIndisponivel
+
+    def falha(texto, **_):
+        erro = ServicoIndisponivel()
+        erro.respostas = [RespostaLLM(texto="{}", modelo="gpt-6.1-terra", duracao_s=0.1, tokens_entrada=70,
+                                      tokens_saida=5, custo_estimado_usd=0.0001)]
+        erro.prompt = None
+        raise erro
+
+    monkeypatch.setattr(nlp, "extrair_solicitacao", falha)
+    cliente, _ = gerador(config)
+    with pytest.raises(ServicoIndisponivel):
+        processar(config, indice, auditoria, cliente)
+    [evento] = auditoria.eventos(etapa="d2_extracao")
+    assert evento["tokens_entrada"] == 70 and evento["erro"].startswith("ServicoIndisponivel")
+
+
+def test_consulta_vira_registro_pendente_auditado_com_modelo(config, indice, auditoria, partes):
+    todos_no_top_k(config, indice)
+    cliente, _ = gerador(config, fundamentada(id_de(indice, "DOC-02")))
+    registro = fluxo_rag.consultar("Quais documentos levo na matrícula? CPF 123.456.789-00", config=config,
+                                   cliente=cliente, indice=indice, auditoria=auditoria)
+    assert registro.status == "pendente" and registro.origem == "consulta" and registro.solicitacao is None
+    assert "123.456.789-00" not in registro.entrada and revisao.ler_registro_rag(config, registro.id_execucao) == registro
+    assert [e["etapa"] for e in auditoria.eventos(id_execucao=registro.id_execucao)] == [
+        "d2_entrada", "d2_recuperacao_geracao", "d2_registro"]
+    assert fluxo_rag.modelo_da_minuta(auditoria, registro.id_execucao) == config.perfil_geracao()["modelo"]
+
+
+def test_caso_de_audio_do_desafio_1_entra_no_mesmo_fluxo_e_marca_incerteza(config, indice, auditoria, partes, monkeypatch):
+    from src import audio
+    from src.tipos import TextoExtraido
+
+    todos_no_top_k(config, indice)
+    vistos = []
+
+    def transcrever(arquivo, *, cliente, config):
+        vistos.append(arquivo.modalidade)
+        return TextoExtraido(texto_bruto="bruto", texto_revisado="Quero saber os documentos da matrícula.",
+                             trechos_incertos=["2026-000142 — número pouco audível"])
+
+    monkeypatch.setattr(audio, "transcrever", transcrever)
+    cliente, _ = gerador(config, fundamentada(id_de(indice, "DOC-02")))
+    registro = fluxo_rag.processar_caso("audio-01", config=config, cliente=cliente, indice=indice, auditoria=auditoria)
+    assert vistos == ["audio"] and registro.origem == "audio-01" and registro.status == "pendente"
+    assert registro.entrada == "Quero saber os documentos da matrícula." and registro.resposta.necessita_revisao
+    assert any(d.regra == "transcricao_incerta" and d.decisao == "revisar" for d in registro.guardrails)
+    etapas = [e["etapa"] for e in auditoria.eventos(id_execucao=registro.id_execucao)]
+    assert etapas[0] == "d2_extracao_texto" and etapas[-1] == "d2_registro"
+
+
+def test_consulta_pela_interface_mostra_passagens_marca_de_ia_e_decisao(app_indice, monkeypatch):
+    monkeypatch.setattr(guardrails, "verificar_entrada", lambda texto, *, config: permitir("entrada"))
+    monkeypatch.setattr(guardrails, "verificar_trechos", lambda trechos, *, config: [permitir("trechos") for _ in trechos])
+    monkeypatch.setattr(guardrails, "verificar_saida", lambda resposta, *, config: permitir("saida"))
+    monkeypatch.setattr(guardrails.ControleRecursos, "antes_da_chamada", lambda self: None)
+    monkeypatch.setattr(guardrails.ControleRecursos, "registrar", lambda self, tokens: None)
+    app = app_indice.run()
+    app.sidebar.radio[0].set_value("Acervo e índice").run()
+    clicar(app, "Indexar o acervo")
+    app.sidebar.radio[0].set_value("Consulta ao acervo").run()
+    app.text_input[0].input("Qual o valor da bolsa?").run()
+    app.slider[0].set_value(1).run()
+    clicar(app, "Responder com fontes")
+    assert not app.exception and not app.error
+    assert len(app.session_state['consulta'].resposta.trechos) == 1
+    assert any("Texto gerado por IA" in c.value for c in app.caption)
+    assert any(b.label == "Registrar decisão" for b in app.button)
+    next(r for r in app.radio if r.label == 'Decisão').set_value('rejeitar')
+    next(t for t in app.text_area if t.label == 'Justificativa').input('Conferência simulada da consulta.')
+    next(t for t in app.text_input if t.label == 'Revisor').input('Operador fictício')
+    clicar(app, 'Registrar decisão')
+    assert not app.exception and app.session_state['consulta'].status == 'rejeitada'
+    assert not any(b.label == 'Registrar decisão' for b in app.button)

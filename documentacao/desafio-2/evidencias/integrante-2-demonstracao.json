@@ -13,18 +13,28 @@
   },
   "T06": {
     "trechos_antes": 12,
+    "processo": "novo (subprocess)",
     "trechos_apos_reabrir": 12,
     "trechos_apos_reindexar": 12,
     "chamadas_ao_provedor_na_reindexacao": 0,
-    "versao_indice_igual": true,
-    "desatualizados": []
+    "desatualizados": [],
+    "versao_indice_igual": true
+  },
+  "T12_troca": {
+    "modelo": "gpt-6-luna",
+    "status": "fundamentada",
+    "textos_embedados": 1,
+    "trechos_no_indice_antes_e_depois": [
+      12,
+      12
+    ]
   },
   "T12_falha": {
     "erro_tratado": "RequisicaoInvalida: O provedor recusou a requisição. Confira o nome do modelo e os parâmetros no config.json.",
     "evento_auditoria": {
       "etapa": "d2_resposta",
       "erro": "RequisicaoInvalida: O provedor recusou a requisição. Confira o nome do modelo e os parâmetros no config.json.",
-      "duracao_s": 1.348
+      "duracao_s": 0.831
     },
     "versao_indice_igual": true
   },
@@ -40,14 +50,16 @@
       "DOC-02",
       "DOC-02",
       "DOC-01",
-      "DOC-03"
+      "DOC-04"
     ],
     "removido": {
       "documento_id": "DOC-05",
       "versao": "1.0",
       "arquivo": "dados/acervo/doc-05.txt",
       "trechos_removidos": 6,
-      "minutas_que_citam": 0
+      "minutas_que_citam": 0,
+      "minutas_com_texto_removido": 0,
+      "minutas_ilegiveis": []
     },
     "DOC-05_no_manifesto": false,
     "DOC-05_em_A": false,
@@ -57,7 +69,9 @@
       "versao": "1.0",
       "arquivo": "dados/acervo/doc-05.txt",
       "trechos_removidos": 6,
-      "minutas_que_citam": 0
+      "minutas_que_citam": 0,
+      "minutas_com_texto_removido": 0,
+      "minutas_ilegiveis": []
     }
   }
 }

@@ -22,14 +22,14 @@ from .schemas import DocumentoAcervo, Trecho, TrechoRecuperado
 
 
 class IndiceIncompativel(ValueError):
-    """Índice gravado com outro modelo de embedding: vetores de espaços diferentes não se comparam."""
+    """Índice gravado com outro modelo de embedding ou outro chunking: reaproveitá-lo misturaria trechos incompatíveis."""
 
 
 class IndiceVetorial:
     """Uma coleção Chroma por chunking (A ou B), com distância de cosseno.
 
     `chunking` é uma chave de config["indice"]["chunking"], não o perfil de geração.
-    Os metadados da coleção guardam modelo e dimensão do embedding.
+    Os metadados da coleção guardam modelo e dimensão do embedding e os parâmetros do chunking.
     """
 
     def __init__(self, config: Config, cliente: ClienteLLM, *, chunking: str | None = None):
@@ -40,6 +40,10 @@ class IndiceVetorial:
         self.cliente = cliente
         self.chunking = chunking
         self.modelo = config.modelo("embeddings")
+        parametros = config.dados["indice"]["chunking"][chunking]
+        # Os ids não mudam com o tamanho do trecho (500 e 520 dão os mesmos dois por documento);
+        # sem guardar os parâmetros, indexar pularia o documento e manteria trechos do chunking antigo.
+        self._assinatura_chunking = json.dumps(parametros, sort_keys=True)
         # Última chamada de embeddings (indexação ou busca), para a auditoria do fluxo (RF21).
         self.ultima_resposta: RespostaEmbeddings | None = None
         self._cliente_chroma = chromadb.PersistentClient(
@@ -49,14 +53,19 @@ class IndiceVetorial:
             self._nome(chunking),
             # O espaço vai em configuration: no Chroma 1.x, "hnsw:space" em metadata impede modify() depois.
             configuration={"hnsw": {"space": "cosine"}},
-            metadata={"modelo_embedding": self.modelo},
+            metadata={"modelo_embedding": self.modelo, "chunking": self._assinatura_chunking},
             embedding_function=None,
         )
-        gravado = (self._colecao.metadata or {}).get("modelo_embedding")
-        if gravado != self.modelo:
+        metadados = self._colecao.metadata or {}
+        apagar = f"Apague a pasta {config.relativo(config.caminho('indice'))} e indexe o acervo de novo."
+        if metadados.get("modelo_embedding") != self.modelo:
             raise IndiceIncompativel(
-                f"Índice {self._colecao.name} foi gerado com {gravado} e o config pede {self.modelo}. "
-                f"Apague a pasta {config.relativo(config.caminho('indice'))} e indexe o acervo de novo."
+                f"Índice {self._colecao.name} foi gerado com {metadados.get('modelo_embedding')} e o config pede {self.modelo}. {apagar}"
+            )
+        if metadados.get("chunking") != self._assinatura_chunking:
+            raise IndiceIncompativel(
+                f"Índice {self._colecao.name} foi gerado com chunking {metadados.get('chunking')} e o config pede "
+                f"{self._assinatura_chunking}. {apagar}"
             )
 
     def com_cliente(self, cliente: ClienteLLM) -> IndiceVetorial:
@@ -77,12 +86,13 @@ class IndiceVetorial:
         versoes = {m.get("versao") for m in gravados["metadatas"]}
         if set(gravados["ids"]) == novos and versoes == {documento.versao}:
             return len(novos)
-        orfaos = [i for i in gravados["ids"] if i not in novos]
-        if orfaos:
-            self._colecao.delete(ids=orfaos)
+        # Embeddings antes de apagar: se o provedor falhar, o documento fica com os trechos antigos, não sem nenhum.
         resposta = self.cliente.gerar_embeddings(modelo=self.modelo, textos=[self._seguro(t.texto) for t in trechos])
         self.ultima_resposta = resposta
         self._registrar_dimensao(resposta.dimensao)
+        orfaos = [i for i in gravados["ids"] if i not in novos]
+        if orfaos:
+            self._colecao.delete(ids=orfaos)
         self._colecao.upsert(
             ids=[t.id for t in trechos],
             embeddings=resposta.vetores,

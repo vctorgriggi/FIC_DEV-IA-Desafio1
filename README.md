@@ -152,7 +152,7 @@ abrir uma minuta salva pelo ID.
 
 Regras, testes e dependências de integração em
 [guardrails e sentimentos](documentacao/desafio-2/guardrails-sentimentos.md).
-As três partes estão integradas à principal `2728ddd`. Cobertura, correções e
+As três partes estão integradas à principal `9258998`. Cobertura, correções e
 pendências de validação final em [análise da integração](documentacao/desafio-2/integracao.md).
 
 ## Áudio (RF06 e RF07)

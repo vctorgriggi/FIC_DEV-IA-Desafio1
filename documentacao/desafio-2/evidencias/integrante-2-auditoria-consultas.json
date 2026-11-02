@@ -1,0 +1,776 @@
+[
+  {
+    "id_evento": "825eec11a3c2",
+    "data_hora": "2026-11-01T21:27:18-04:00",
+    "id_execucao": "cadf3ea3ca4b",
+    "caso_id": "D2-R08-neutra",
+    "etapa": "d2_consulta",
+    "modelo": "gpt-6.1-terra",
+    "versao_prompt": "rag_d2_v1",
+    "hash_prompt": "77badd2d7dc0",
+    "duracao_s": 6.504,
+    "tokens_entrada": 1745,
+    "tokens_saida": 253,
+    "custo_estimado_usd": 0.00301,
+    "erro": null,
+    "extra": {
+      "consulta": "Qual é o prazo de matrícula para quem se matricula em 15/10/2026?",
+      "perfil_geracao": "principal",
+      "versao_indice": "652bc7c9e779",
+      "chunking": "B",
+      "ids_recuperados": [
+        "DOC-01:4cf44a695a2c:B:1",
+        "DOC-02:31c674497c07:B:0",
+        "DOC-01:4cf44a695a2c:B:0",
+        "DOC-03:fee096744e02:B:0"
+      ],
+      "status_resposta": "fundamentada",
+      "fontes": [
+        "DOC-01:4cf44a695a2c:B:1",
+        "DOC-02:31c674497c07:B:0"
+      ]
+    }
+  },
+  {
+    "id_evento": "aa3b3c617b84",
+    "data_hora": "2026-11-01T21:27:32-04:00",
+    "id_execucao": "904dd1aa6454",
+    "caso_id": "D2-R01",
+    "etapa": "d2_consulta",
+    "modelo": "gpt-6.1-terra",
+    "versao_prompt": "rag_d2_v1",
+    "hash_prompt": "77badd2d7dc0",
+    "duracao_s": 3.068,
+    "tokens_entrada": 1517,
+    "tokens_saida": 106,
+    "custo_estimado_usd": 0.002047,
+    "erro": null,
+    "extra": {
+      "consulta": "Quais documentos devo apresentar para matrícula em 15/10/2026?",
+      "perfil_geracao": "principal",
+      "versao_indice": "07d93e048fb3",
+      "chunking": "A",
+      "ids_recuperados": [
+        "DOC-02:31c674497c07:A:1",
+        "DOC-01:4cf44a695a2c:A:2",
+        "DOC-01:4cf44a695a2c:A:1",
+        "DOC-03:fee096744e02:A:0"
+      ],
+      "status_resposta": "fundamentada",
+      "fontes": [
+        "DOC-02:31c674497c07:A:1"
+      ]
+    }
+  },
+  {
+    "id_evento": "242415002de2",
+    "data_hora": "2026-11-01T21:27:36-04:00",
+    "id_execucao": "96969facaac3",
+    "caso_id": "D2-R02",
+    "etapa": "d2_consulta",
+    "modelo": "gpt-6.1-terra",
+    "versao_prompt": "rag_d2_v1",
+    "hash_prompt": "77badd2d7dc0",
+    "duracao_s": 3.228,
+    "tokens_entrada": 1452,
+    "tokens_saida": 113,
+    "custo_estimado_usd": 0.002017,
+    "erro": null,
+    "extra": {
+      "consulta": "Onde solicitar declaração de matrícula?",
+      "perfil_geracao": "principal",
+      "versao_indice": "07d93e048fb3",
+      "chunking": "A",
+      "ids_recuperados": [
+        "DOC-03:fee096744e02:A:0",
+        "DOC-03:fee096744e02:A:1",
+        "DOC-04:22fc941bb5c5:A:1",
+        "DOC-01:4cf44a695a2c:A:1"
+      ],
+      "status_resposta": "fundamentada",
+      "fontes": [
+        "DOC-03:fee096744e02:A:0"
+      ]
+    }
+  },
+  {
+    "id_evento": "49a9b0518ed6",
+    "data_hora": "2026-11-01T21:27:38-04:00",
+    "id_execucao": "eec8645d3599",
+    "caso_id": "D2-R03",
+    "etapa": "d2_consulta",
+    "modelo": "gpt-6.1-terra",
+    "versao_prompt": "rag_d2_v1",
+    "hash_prompt": "77badd2d7dc0",
+    "duracao_s": 2.409,
+    "tokens_entrada": 1508,
+    "tokens_saida": 81,
+    "custo_estimado_usd": 0.001913,
+    "erro": null,
+    "extra": {
+      "consulta": "Qual o prazo de emissão da declaração?",
+      "perfil_geracao": "principal",
+      "versao_indice": "07d93e048fb3",
+      "chunking": "A",
+      "ids_recuperados": [
+        "DOC-03:fee096744e02:A:1",
+        "DOC-03:fee096744e02:A:0",
+        "DOC-02:31c674497c07:A:1",
+        "DOC-01:4cf44a695a2c:A:2"
+      ],
+      "status_resposta": "fundamentada",
+      "fontes": [
+        "DOC-03:fee096744e02:A:1"
+      ]
+    }
+  },
+  {
+    "id_evento": "d52641c68228",
+    "data_hora": "2026-11-01T21:27:43-04:00",
+    "id_execucao": "f1051a98813c",
+    "caso_id": "D2-R04",
+    "etapa": "d2_consulta",
+    "modelo": "gpt-6.1-terra",
+    "versao_prompt": "rag_d2_v1",
+    "hash_prompt": "77badd2d7dc0",
+    "duracao_s": 4.779,
+    "tokens_entrada": 1454,
+    "tokens_saida": 270,
+    "custo_estimado_usd": 0.002804,
+    "erro": null,
+    "extra": {
+      "consulta": "Como solicitar cancelamento?",
+      "perfil_geracao": "principal",
+      "versao_indice": "07d93e048fb3",
+      "chunking": "A",
+      "ids_recuperados": [
+        "DOC-04:22fc941bb5c5:A:0",
+        "DOC-04:22fc941bb5c5:A:1",
+        "DOC-01:4cf44a695a2c:A:2",
+        "DOC-01:4cf44a695a2c:A:3"
+      ],
+      "status_resposta": "fundamentada",
+      "fontes": [
+        "DOC-04:22fc941bb5c5:A:0",
+        "DOC-04:22fc941bb5c5:A:1"
+      ]
+    }
+  },
+  {
+    "id_evento": "d2edff85a0e2",
+    "data_hora": "2026-11-01T21:27:46-04:00",
+    "id_execucao": "f31cb223ef71",
+    "caso_id": "D2-R05",
+    "etapa": "d2_consulta",
+    "modelo": "gpt-6.1-terra",
+    "versao_prompt": "rag_d2_v1",
+    "hash_prompt": "77badd2d7dc0",
+    "duracao_s": 3.03,
+    "tokens_entrada": 1474,
+    "tokens_saida": 90,
+    "custo_estimado_usd": 0.001924,
+    "erro": null,
+    "extra": {
+      "consulta": "Qual o horário do balcão acadêmico?",
+      "perfil_geracao": "principal",
+      "versao_indice": "07d93e048fb3",
+      "chunking": "A",
+      "ids_recuperados": [
+        "DOC-05:c7e6dd7ecc2b:A:1",
+        "DOC-05:c7e6dd7ecc2b:A:0",
+        "DOC-04:22fc941bb5c5:A:1",
+        "DOC-02:31c674497c07:A:2"
+      ],
+      "status_resposta": "fundamentada",
+      "fontes": [
+        "DOC-05:c7e6dd7ecc2b:A:0"
+      ]
+    }
+  },
+  {
+    "id_evento": "5c6c30cd5b26",
+    "data_hora": "2026-11-01T21:27:49-04:00",
+    "id_execucao": "4547b416f47f",
+    "caso_id": "D2-R06",
+    "etapa": "d2_consulta",
+    "modelo": "gpt-6.1-terra",
+    "versao_prompt": "rag_d2_v1",
+    "hash_prompt": "77badd2d7dc0",
+    "duracao_s": 2.755,
+    "tokens_entrada": 1362,
+    "tokens_saida": 100,
+    "custo_estimado_usd": 0.001862,
+    "erro": null,
+    "extra": {
+      "consulta": "Qual é o valor mensal da bolsa estudantil?",
+      "perfil_geracao": "principal",
+      "versao_indice": "07d93e048fb3",
+      "chunking": "A",
+      "ids_recuperados": [
+        "DOC-02:31c674497c07:A:3",
+        "DOC-02:31c674497c07:A:2",
+        "DOC-05:c7e6dd7ecc2b:A:3",
+        "DOC-03:fee096744e02:A:3"
+      ],
+      "status_resposta": "sem_evidencia",
+      "fontes": []
+    }
+  },
+  {
+    "id_evento": "d6d392ef2cee",
+    "data_hora": "2026-11-01T21:27:51-04:00",
+    "id_execucao": "03aec3a05adc",
+    "caso_id": "D2-R07",
+    "etapa": "d2_consulta",
+    "modelo": "gpt-6.1-terra",
+    "versao_prompt": "rag_d2_v1",
+    "hash_prompt": "77badd2d7dc0",
+    "duracao_s": 2.394,
+    "tokens_entrada": 1453,
+    "tokens_saida": 75,
+    "custo_estimado_usd": 0.001828,
+    "erro": null,
+    "extra": {
+      "consulta": "Minha declaração individual já foi emitida?",
+      "perfil_geracao": "principal",
+      "versao_indice": "07d93e048fb3",
+      "chunking": "A",
+      "ids_recuperados": [
+        "DOC-03:fee096744e02:A:1",
+        "DOC-03:fee096744e02:A:0",
+        "DOC-01:4cf44a695a2c:A:1",
+        "DOC-03:fee096744e02:A:2"
+      ],
+      "status_resposta": "sem_evidencia",
+      "fontes": []
+    }
+  },
+  {
+    "id_evento": "cded68a4c665",
+    "data_hora": "2026-11-01T21:27:56-04:00",
+    "id_execucao": "2d3e8ba72c74",
+    "caso_id": "D2-R08",
+    "etapa": "d2_consulta",
+    "modelo": "gpt-6.1-terra",
+    "versao_prompt": "rag_d2_v1",
+    "hash_prompt": "77badd2d7dc0",
+    "duracao_s": 4.678,
+    "tokens_entrada": 1571,
+    "tokens_saida": 289,
+    "custo_estimado_usd": 0.003016,
+    "erro": null,
+    "extra": {
+      "consulta": "DOC-01 diz 20/10 e DOC-02 diz 30/10: qual prazo de matrícula vale em 15/10/2026?",
+      "perfil_geracao": "principal",
+      "versao_indice": "07d93e048fb3",
+      "chunking": "A",
+      "ids_recuperados": [
+        "DOC-01:4cf44a695a2c:A:2",
+        "DOC-02:31c674497c07:A:0",
+        "DOC-03:fee096744e02:A:0",
+        "DOC-02:31c674497c07:A:1"
+      ],
+      "status_resposta": "fundamentada",
+      "fontes": [
+        "DOC-01:4cf44a695a2c:A:2",
+        "DOC-02:31c674497c07:A:0",
+        "DOC-02:31c674497c07:A:1"
+      ]
+    }
+  },
+  {
+    "id_evento": "8ca74fac2f9b",
+    "data_hora": "2026-11-01T21:28:12-04:00",
+    "id_execucao": "64080029c2c2",
+    "caso_id": "D2-R01",
+    "etapa": "d2_consulta",
+    "modelo": "gpt-6.1-terra",
+    "versao_prompt": "rag_d2_v1",
+    "hash_prompt": "77badd2d7dc0",
+    "duracao_s": 3.952,
+    "tokens_entrada": 1741,
+    "tokens_saida": 134,
+    "custo_estimado_usd": 0.002411,
+    "erro": null,
+    "extra": {
+      "consulta": "Quais documentos devo apresentar para matrícula em 15/10/2026?",
+      "perfil_geracao": "principal",
+      "versao_indice": "652bc7c9e779",
+      "chunking": "B",
+      "ids_recuperados": [
+        "DOC-01:4cf44a695a2c:B:1",
+        "DOC-02:31c674497c07:B:0",
+        "DOC-01:4cf44a695a2c:B:0",
+        "DOC-03:fee096744e02:B:0"
+      ],
+      "status_resposta": "fundamentada",
+      "fontes": [
+        "DOC-02:31c674497c07:B:0"
+      ]
+    }
+  },
+  {
+    "id_evento": "c02dbe59c59d",
+    "data_hora": "2026-11-01T21:28:14-04:00",
+    "id_execucao": "39f85cd9ae6d",
+    "caso_id": "D2-R02",
+    "etapa": "d2_consulta",
+    "modelo": "gpt-6.1-terra",
+    "versao_prompt": "rag_d2_v1",
+    "hash_prompt": "77badd2d7dc0",
+    "duracao_s": 2.402,
+    "tokens_entrada": 1731,
+    "tokens_saida": 73,
+    "custo_estimado_usd": 0.002096,
+    "erro": null,
+    "extra": {
+      "consulta": "Onde solicitar declaração de matrícula?",
+      "perfil_geracao": "principal",
+      "versao_indice": "652bc7c9e779",
+      "chunking": "B",
+      "ids_recuperados": [
+        "DOC-03:fee096744e02:B:0",
+        "DOC-01:4cf44a695a2c:B:1",
+        "DOC-02:31c674497c07:B:0",
+        "DOC-01:4cf44a695a2c:B:0"
+      ],
+      "status_resposta": "fundamentada",
+      "fontes": [
+        "DOC-03:fee096744e02:B:0"
+      ]
+    }
+  },
+  {
+    "id_evento": "0b0c57e9e569",
+    "data_hora": "2026-11-01T21:28:17-04:00",
+    "id_execucao": "b0446c46d5df",
+    "caso_id": "D2-R03",
+    "etapa": "d2_consulta",
+    "modelo": "gpt-6.1-terra",
+    "versao_prompt": "rag_d2_v1",
+    "hash_prompt": "77badd2d7dc0",
+    "duracao_s": 2.966,
+    "tokens_entrada": 1707,
+    "tokens_saida": 135,
+    "custo_estimado_usd": 0.002382,
+    "erro": null,
+    "extra": {
+      "consulta": "Qual o prazo de emissão da declaração?",
+      "perfil_geracao": "principal",
+      "versao_indice": "652bc7c9e779",
+      "chunking": "B",
+      "ids_recuperados": [
+        "DOC-03:fee096744e02:B:0",
+        "DOC-01:4cf44a695a2c:B:1",
+        "DOC-03:fee096744e02:B:1",
+        "DOC-02:31c674497c07:B:0"
+      ],
+      "status_resposta": "fundamentada",
+      "fontes": [
+        "DOC-03:fee096744e02:B:0"
+      ]
+    }
+  },
+  {
+    "id_evento": "61b5214397d1",
+    "data_hora": "2026-11-01T21:28:23-04:00",
+    "id_execucao": "8e4f5e9b022e",
+    "caso_id": "D2-R04",
+    "etapa": "d2_consulta",
+    "modelo": "gpt-6.1-terra",
+    "versao_prompt": "rag_d2_v1",
+    "hash_prompt": "77badd2d7dc0",
+    "duracao_s": 5.324,
+    "tokens_entrada": 1682,
+    "tokens_saida": 311,
+    "custo_estimado_usd": 0.003237,
+    "erro": null,
+    "extra": {
+      "consulta": "Como solicitar cancelamento?",
+      "perfil_geracao": "principal",
+      "versao_indice": "652bc7c9e779",
+      "chunking": "B",
+      "ids_recuperados": [
+        "DOC-04:22fc941bb5c5:B:0",
+        "DOC-01:4cf44a695a2c:B:1",
+        "DOC-03:fee096744e02:B:1",
+        "DOC-05:c7e6dd7ecc2b:B:0"
+      ],
+      "status_resposta": "fundamentada",
+      "fontes": [
+        "DOC-04:22fc941bb5c5:B:0"
+      ]
+    }
+  },
+  {
+    "id_evento": "5dc0153c1f2a",
+    "data_hora": "2026-11-01T21:28:26-04:00",
+    "id_execucao": "7d430c010a46",
+    "caso_id": "D2-R05",
+    "etapa": "d2_consulta",
+    "modelo": "gpt-6.1-terra",
+    "versao_prompt": "rag_d2_v1",
+    "hash_prompt": "77badd2d7dc0",
+    "duracao_s": 3.188,
+    "tokens_entrada": 1672,
+    "tokens_saida": 170,
+    "custo_estimado_usd": 0.002522,
+    "erro": null,
+    "extra": {
+      "consulta": "Qual o horário do balcão acadêmico?",
+      "perfil_geracao": "principal",
+      "versao_indice": "652bc7c9e779",
+      "chunking": "B",
+      "ids_recuperados": [
+        "DOC-05:c7e6dd7ecc2b:B:0",
+        "DOC-02:31c674497c07:B:1",
+        "DOC-02:31c674497c07:B:0",
+        "DOC-01:4cf44a695a2c:B:1"
+      ],
+      "status_resposta": "fundamentada",
+      "fontes": [
+        "DOC-05:c7e6dd7ecc2b:B:0"
+      ]
+    }
+  },
+  {
+    "id_evento": "f955071d7d26",
+    "data_hora": "2026-11-01T21:28:28-04:00",
+    "id_execucao": "d4516bc78aed",
+    "caso_id": "D2-R06",
+    "etapa": "d2_consulta",
+    "modelo": "gpt-6.1-terra",
+    "versao_prompt": "rag_d2_v1",
+    "hash_prompt": "77badd2d7dc0",
+    "duracao_s": 2.519,
+    "tokens_entrada": 1672,
+    "tokens_saida": 101,
+    "custo_estimado_usd": 0.002177,
+    "erro": null,
+    "extra": {
+      "consulta": "Qual é o valor mensal da bolsa estudantil?",
+      "perfil_geracao": "principal",
+      "versao_indice": "652bc7c9e779",
+      "chunking": "B",
+      "ids_recuperados": [
+        "DOC-02:31c674497c07:B:1",
+        "DOC-01:4cf44a695a2c:B:1",
+        "DOC-02:31c674497c07:B:0",
+        "DOC-03:fee096744e02:B:0"
+      ],
+      "status_resposta": "sem_evidencia",
+      "fontes": []
+    }
+  },
+  {
+    "id_evento": "beeb5446d31d",
+    "data_hora": "2026-11-01T21:28:31-04:00",
+    "id_execucao": "bbebb29b6ab2",
+    "caso_id": "D2-R07",
+    "etapa": "d2_consulta",
+    "modelo": "gpt-6.1-terra",
+    "versao_prompt": "rag_d2_v1",
+    "hash_prompt": "77badd2d7dc0",
+    "duracao_s": 2.909,
+    "tokens_entrada": 1631,
+    "tokens_saida": 146,
+    "custo_estimado_usd": 0.002361,
+    "erro": null,
+    "extra": {
+      "consulta": "Minha declaração individual já foi emitida?",
+      "perfil_geracao": "principal",
+      "versao_indice": "652bc7c9e779",
+      "chunking": "B",
+      "ids_recuperados": [
+        "DOC-03:fee096744e02:B:0",
+        "DOC-03:fee096744e02:B:1",
+        "DOC-05:c7e6dd7ecc2b:B:1",
+        "DOC-05:c7e6dd7ecc2b:B:0"
+      ],
+      "status_resposta": "sem_evidencia",
+      "fontes": []
+    }
+  },
+  {
+    "id_evento": "a4ab1517da79",
+    "data_hora": "2026-11-01T21:28:35-04:00",
+    "id_execucao": "208412a3d728",
+    "caso_id": "D2-R08",
+    "etapa": "d2_consulta",
+    "modelo": "gpt-6.1-terra",
+    "versao_prompt": "rag_d2_v1",
+    "hash_prompt": "77badd2d7dc0",
+    "duracao_s": 3.506,
+    "tokens_entrada": 1757,
+    "tokens_saida": 185,
+    "custo_estimado_usd": 0.002682,
+    "erro": null,
+    "extra": {
+      "consulta": "DOC-01 diz 20/10 e DOC-02 diz 30/10: qual prazo de matrícula vale em 15/10/2026?",
+      "perfil_geracao": "principal",
+      "versao_indice": "652bc7c9e779",
+      "chunking": "B",
+      "ids_recuperados": [
+        "DOC-01:4cf44a695a2c:B:1",
+        "DOC-02:31c674497c07:B:0",
+        "DOC-01:4cf44a695a2c:B:0",
+        "DOC-03:fee096744e02:B:0"
+      ],
+      "status_resposta": "fundamentada",
+      "fontes": [
+        "DOC-01:4cf44a695a2c:B:1",
+        "DOC-02:31c674497c07:B:0"
+      ]
+    }
+  },
+  {
+    "id_evento": "b96b2efcbfdd",
+    "data_hora": "2026-11-01T21:28:41-04:00",
+    "id_execucao": "705662ffcf2b",
+    "caso_id": "D2-R01",
+    "etapa": "d2_consulta",
+    "modelo": "gpt-6-luna",
+    "versao_prompt": "rag_d2_v1",
+    "hash_prompt": "77badd2d7dc0",
+    "duracao_s": 5.507,
+    "tokens_entrada": 1741,
+    "tokens_saida": 482,
+    "custo_estimado_usd": 0.000415,
+    "erro": null,
+    "extra": {
+      "consulta": "Quais documentos devo apresentar para matrícula em 15/10/2026?",
+      "perfil_geracao": "alternativo",
+      "versao_indice": "652bc7c9e779",
+      "chunking": "B",
+      "ids_recuperados": [
+        "DOC-01:4cf44a695a2c:B:1",
+        "DOC-02:31c674497c07:B:0",
+        "DOC-01:4cf44a695a2c:B:0",
+        "DOC-03:fee096744e02:B:0"
+      ],
+      "status_resposta": "fundamentada",
+      "fontes": [
+        "DOC-01:4cf44a695a2c:B:1",
+        "DOC-02:31c674497c07:B:0"
+      ]
+    }
+  },
+  {
+    "id_evento": "9a6f9e0e9d52",
+    "data_hora": "2026-11-01T21:28:45-04:00",
+    "id_execucao": "1d01d57fb0af",
+    "caso_id": "D2-R02",
+    "etapa": "d2_consulta",
+    "modelo": "gpt-6-luna",
+    "versao_prompt": "rag_d2_v1",
+    "hash_prompt": "77badd2d7dc0",
+    "duracao_s": 3.724,
+    "tokens_entrada": 1731,
+    "tokens_saida": 259,
+    "custo_estimado_usd": 0.000303,
+    "erro": null,
+    "extra": {
+      "consulta": "Onde solicitar declaração de matrícula?",
+      "perfil_geracao": "alternativo",
+      "versao_indice": "652bc7c9e779",
+      "chunking": "B",
+      "ids_recuperados": [
+        "DOC-03:fee096744e02:B:0",
+        "DOC-01:4cf44a695a2c:B:1",
+        "DOC-02:31c674497c07:B:0",
+        "DOC-01:4cf44a695a2c:B:0"
+      ],
+      "status_resposta": "fundamentada",
+      "fontes": [
+        "DOC-03:fee096744e02:B:0"
+      ]
+    }
+  },
+  {
+    "id_evento": "662dee17440f",
+    "data_hora": "2026-11-01T21:28:48-04:00",
+    "id_execucao": "3c849def8da9",
+    "caso_id": "D2-R03",
+    "etapa": "d2_consulta",
+    "modelo": "gpt-6-luna",
+    "versao_prompt": "rag_d2_v1",
+    "hash_prompt": "77badd2d7dc0",
+    "duracao_s": 3.069,
+    "tokens_entrada": 1707,
+    "tokens_saida": 215,
+    "custo_estimado_usd": 0.000278,
+    "erro": null,
+    "extra": {
+      "consulta": "Qual o prazo de emissão da declaração?",
+      "perfil_geracao": "alternativo",
+      "versao_indice": "652bc7c9e779",
+      "chunking": "B",
+      "ids_recuperados": [
+        "DOC-03:fee096744e02:B:0",
+        "DOC-01:4cf44a695a2c:B:1",
+        "DOC-03:fee096744e02:B:1",
+        "DOC-02:31c674497c07:B:0"
+      ],
+      "status_resposta": "fundamentada",
+      "fontes": [
+        "DOC-03:fee096744e02:B:0"
+      ]
+    }
+  },
+  {
+    "id_evento": "ecda74ed6e96",
+    "data_hora": "2026-11-01T21:28:51-04:00",
+    "id_execucao": "3915dfe960fd",
+    "caso_id": "D2-R04",
+    "etapa": "d2_consulta",
+    "modelo": "gpt-6-luna",
+    "versao_prompt": "rag_d2_v1",
+    "hash_prompt": "77badd2d7dc0",
+    "duracao_s": 3.325,
+    "tokens_entrada": 1682,
+    "tokens_saida": 263,
+    "custo_estimado_usd": 0.0003,
+    "erro": null,
+    "extra": {
+      "consulta": "Como solicitar cancelamento?",
+      "perfil_geracao": "alternativo",
+      "versao_indice": "652bc7c9e779",
+      "chunking": "B",
+      "ids_recuperados": [
+        "DOC-04:22fc941bb5c5:B:0",
+        "DOC-01:4cf44a695a2c:B:1",
+        "DOC-03:fee096744e02:B:1",
+        "DOC-05:c7e6dd7ecc2b:B:0"
+      ],
+      "status_resposta": "fundamentada",
+      "fontes": [
+        "DOC-04:22fc941bb5c5:B:0"
+      ]
+    }
+  },
+  {
+    "id_evento": "085c00f3ca9b",
+    "data_hora": "2026-11-01T21:28:53-04:00",
+    "id_execucao": "45def939975f",
+    "caso_id": "D2-R05",
+    "etapa": "d2_consulta",
+    "modelo": "gpt-6-luna",
+    "versao_prompt": "rag_d2_v1",
+    "hash_prompt": "77badd2d7dc0",
+    "duracao_s": 2.116,
+    "tokens_entrada": 1672,
+    "tokens_saida": 144,
+    "custo_estimado_usd": 0.000239,
+    "erro": null,
+    "extra": {
+      "consulta": "Qual o horário do balcão acadêmico?",
+      "perfil_geracao": "alternativo",
+      "versao_indice": "652bc7c9e779",
+      "chunking": "B",
+      "ids_recuperados": [
+        "DOC-05:c7e6dd7ecc2b:B:0",
+        "DOC-02:31c674497c07:B:1",
+        "DOC-02:31c674497c07:B:0",
+        "DOC-01:4cf44a695a2c:B:1"
+      ],
+      "status_resposta": "fundamentada",
+      "fontes": [
+        "DOC-05:c7e6dd7ecc2b:B:0"
+      ]
+    }
+  },
+  {
+    "id_evento": "2195b4554d6c",
+    "data_hora": "2026-11-01T21:28:58-04:00",
+    "id_execucao": "de3feb3cf238",
+    "caso_id": "D2-R06",
+    "etapa": "d2_consulta",
+    "modelo": "gpt-6-luna",
+    "versao_prompt": "rag_d2_v1",
+    "hash_prompt": "77badd2d7dc0",
+    "duracao_s": 4.465,
+    "tokens_entrada": 1672,
+    "tokens_saida": 338,
+    "custo_estimado_usd": 0.000336,
+    "erro": null,
+    "extra": {
+      "consulta": "Qual é o valor mensal da bolsa estudantil?",
+      "perfil_geracao": "alternativo",
+      "versao_indice": "652bc7c9e779",
+      "chunking": "B",
+      "ids_recuperados": [
+        "DOC-02:31c674497c07:B:1",
+        "DOC-01:4cf44a695a2c:B:1",
+        "DOC-02:31c674497c07:B:0",
+        "DOC-03:fee096744e02:B:0"
+      ],
+      "status_resposta": "sem_evidencia",
+      "fontes": [
+        "DOC-02:31c674497c07:B:1"
+      ]
+    }
+  },
+  {
+    "id_evento": "fc108e0ebfc9",
+    "data_hora": "2026-11-01T21:29:02-04:00",
+    "id_execucao": "c9fec04efcec",
+    "caso_id": "D2-R07",
+    "etapa": "d2_consulta",
+    "modelo": "gpt-6-luna",
+    "versao_prompt": "rag_d2_v1",
+    "hash_prompt": "77badd2d7dc0",
+    "duracao_s": 3.973,
+    "tokens_entrada": 1631,
+    "tokens_saida": 279,
+    "custo_estimado_usd": 0.000303,
+    "erro": null,
+    "extra": {
+      "consulta": "Minha declaração individual já foi emitida?",
+      "perfil_geracao": "alternativo",
+      "versao_indice": "652bc7c9e779",
+      "chunking": "B",
+      "ids_recuperados": [
+        "DOC-03:fee096744e02:B:0",
+        "DOC-03:fee096744e02:B:1",
+        "DOC-05:c7e6dd7ecc2b:B:1",
+        "DOC-05:c7e6dd7ecc2b:B:0"
+      ],
+      "status_resposta": "sem_evidencia",
+      "fontes": [
+        "DOC-03:fee096744e02:B:1"
+      ]
+    }
+  },
+  {
+    "id_evento": "475097f3cdcc",
+    "data_hora": "2026-11-01T21:29:05-04:00",
+    "id_execucao": "baaec9300bf0",
+    "caso_id": "D2-R08",
+    "etapa": "d2_consulta",
+    "modelo": "gpt-6-luna",
+    "versao_prompt": "rag_d2_v1",
+    "hash_prompt": "77badd2d7dc0",
+    "duracao_s": 3.611,
+    "tokens_entrada": 1757,
+    "tokens_saida": 297,
+    "custo_estimado_usd": 0.000324,
+    "erro": null,
+    "extra": {
+      "consulta": "DOC-01 diz 20/10 e DOC-02 diz 30/10: qual prazo de matrícula vale em 15/10/2026?",
+      "perfil_geracao": "alternativo",
+      "versao_indice": "652bc7c9e779",
+      "chunking": "B",
+      "ids_recuperados": [
+        "DOC-01:4cf44a695a2c:B:1",
+        "DOC-02:31c674497c07:B:0",
+        "DOC-01:4cf44a695a2c:B:0",
+        "DOC-03:fee096744e02:B:0"
+      ],
+      "status_resposta": "fundamentada",
+      "fontes": [
+        "DOC-01:4cf44a695a2c:B:1",
+        "DOC-02:31c674497c07:B:0"
+      ]
+    }
+  }
+]
