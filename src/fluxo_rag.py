@@ -45,6 +45,7 @@ def processar_solicitacao(
     com status "bloqueada", guardando entrada, problemas e decisões. Falha do provedor é auditada e levantada.
     O `cliente` chega com guardrails.ControleRecursos e o limite vale para a execução.
     """
+    cliente, indice = _preparar_execucao(config, cliente, indice)
     return _processar(texto, origem=origem, config=config, cliente=cliente, indice=indice, auditoria=auditoria,
                       perfil=perfil, id_execucao=novo_id(), previas=[])
 
@@ -63,6 +64,7 @@ def processar_caso(
     Áudio e imagem passam pela transcrição (RF06) ou pelo OCR (RF08) e o texto revisado segue como solicitação.
     Trecho incerto na transcrição vira decisão "revisar": a minuta sai marcada para conferência.
     """
+    cliente, indice = _preparar_execucao(config, cliente, indice)
     caso = config.caso(caso_id)
     id_execucao = novo_id()
     base = {"id_execucao": id_execucao, "caso_id": caso_id, "modalidade": caso["modalidade"], "arquivo_origem": caso["arquivo"]}
@@ -97,11 +99,13 @@ def consultar(
     indice: IndiceVetorial,
     auditoria: Auditoria,
     perfil: str | None = None,
+    top_k: int | None = None,
 ) -> RegistroMinutaRAG:
     """Pergunta avulsa ao acervo com as mesmas camadas da solicitação e o mesmo registro para decisão humana.
 
     Sem extração nem ficha: `solicitacao` e `ficha` ficam None e `entrada` guarda a pergunta minimizada.
     """
+    cliente, indice = _preparar_execucao(config, cliente, indice)
     id_execucao = novo_id()
     base = {"id_execucao": id_execucao, "caso_id": "consulta", "modalidade": "consulta_d2"}
     registro = _registro_inicial(pergunta, origem="consulta", config=config, perfil=perfil, id_execucao=id_execucao)
@@ -116,7 +120,14 @@ def consultar(
         rag.minimizar(pergunta, config),
         lambda trechos: rag.gerar_resposta(pergunta, trechos, cliente=cliente, config=config, perfil=perfil),
         config=config, indice=indice, auditoria=auditoria, base=base, registro=registro, comum=comum,
+        top_k=top_k,
     )
+
+
+def _preparar_execucao(config, cliente, indice):
+    if cliente.controle is None:
+        cliente = cliente.nova_execucao(guardrails.ControleRecursos(config))
+    return cliente, indice.com_cliente(cliente)
 
 
 def modelo_da_minuta(auditoria: Auditoria, id_execucao: str) -> str | None:
@@ -205,6 +216,7 @@ def _recuperar_gerar_e_encerrar(
     base: dict,
     registro: dict,
     comum: dict,
+    top_k: int | None = None,
 ) -> RegistroMinutaRAG:
     """Recupera, aplica o guardrail de trechos ANTES da geração (trecho bloqueado não vai ao modelo), gera e confere a saída."""
     with _etapa(auditoria, base, ETAPA_GERACAO) as evento:
@@ -214,10 +226,11 @@ def _recuperar_gerar_e_encerrar(
             "consulta": consulta,
             "indice": {chave: info[chave] for chave in ("colecao", "modelo_embedding", "dimensao", "chunking", "versao_indice")},
         }
-        recuperados = rag.recuperar(consulta, indice=indice, config=config) if consulta else []
+        recuperados = rag.recuperar(consulta, indice=indice, config=config, top_k=top_k) if consulta else []
         decisoes_trechos = guardrails.verificar_trechos(recuperados, config=config) if recuperados else []
         registro["guardrails"].extend(decisoes_trechos)
-        usados = [t for t, d in zip(recuperados, decisoes_trechos) if d.decisao != "bloquear"]
+        suspeitos = {t.trecho.documento_id for t, d in zip(recuperados, decisoes_trechos) if d.decisao != 'permitir'}
+        usados = [t for t in recuperados if t.trecho.documento_id not in suspeitos]
         embeddings = indice.ultima_resposta
         evento.extra.update({
             "ids_recuperados": [t.trecho.id for t in recuperados],

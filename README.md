@@ -141,6 +141,20 @@ Cada caso tem um resultado esperado escrito antes da execução (seção 6 do en
 - **Comparação com gabarito (RF06, RF08):** para áudio e imagem, quando o gabarito do caso tem `texto_referencia`, o fluxo grava `comparacao_gabarito.json` com similaridade, acertos por palavra, erros e dados críticos não encontrados.
 - **Resposta vazia (RF04):** a checagem vale para o tipo de saída pedido. TTS sem áudio ou geração sem imagem também é erro, mesmo que venha texto.
 
+## Guardrails, revisão e sentimentos (Desafio 2)
+
+Execute `python -m src.main assistente` e abra a tela **Avaliações** para
+classificar os 12 exemplos fictícios, filtrar polaridades e consultar o gráfico
+com contagens, proporções e conferência contra gabarito. O último lote é salvo e
+pode ser consultado após reiniciar. Em **Solicitação**, minutas pendentes aceitam
+aprovação, rejeição ou revisão com justificativa e revisor; também é possível
+abrir uma minuta salva pelo ID.
+
+Regras, testes e dependências de integração em
+[guardrails e sentimentos](documentacao/desafio-2/guardrails-sentimentos.md).
+As três partes estão integradas à principal `9258998`. Cobertura, correções e
+pendências de validação final em [análise da integração](documentacao/desafio-2/integracao.md).
+
 ## Áudio (RF06 e RF07)
 
 Requer o FFmpeg (`ffprobe`), como em Instalação. O arquivo é inspecionado inteiro pelo `ffprobe` antes de qualquer envio; a duração registrada vem dele. A versão revisada da transcrição só ajusta espaços, inclusive juntando dígitos ditados um a um, para que CPF, RG e protocolo sejam mascarados e comparados.

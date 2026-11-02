@@ -15,6 +15,9 @@ PADROES_PESSOAIS = {
 
 # Formato das chaves da API da OpenAI (sk-..., sk-proj-...); cobre a chave que não veio do .env.
 PADRAO_CHAVE_OPENAI = re.compile(r"\bsk-[0-9A-Za-z_\-]{20,}")
+PADRAO_CREDENCIAL = re.compile(
+    r'''\b(?:api[_ -]?key|senha|password|token|segredo)\s*[:=]\s*[^\s"'\\,;<>]+''', re.IGNORECASE
+)
 
 
 def mascarar(texto: str, tipos: list[str]) -> tuple[str, dict[str, int]]:
@@ -35,4 +38,5 @@ def ocultar_segredos(texto: str, segredos: list[str]) -> str:
     for segredo in segredos:
         if segredo:
             texto = texto.replace(segredo, "[SEGREDO OCULTADO]")
-    return PADRAO_CHAVE_OPENAI.sub("[SEGREDO OCULTADO]", texto)
+    texto = PADRAO_CHAVE_OPENAI.sub("[SEGREDO OCULTADO]", texto)
+    return PADRAO_CREDENCIAL.sub('[SEGREDO OCULTADO]', texto)

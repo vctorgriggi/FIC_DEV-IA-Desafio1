@@ -64,7 +64,7 @@ def indice(config, sdk, acervo):
 
 def gerador(config, *saidas):
     """Cliente de geração separado do índice: as respostas JSON são escritas depois de saber os ids dos trechos."""
-    sdk = falsos.SDKFalso(respostas=[falsos.resposta(json.dumps(s, ensure_ascii=False)) for s in saidas])
+    sdk = SDKComEmbeddings(respostas=[falsos.resposta(json.dumps(s, ensure_ascii=False)) for s in saidas])
     return ClienteLLM(config, chave="c", sdk=sdk), sdk
 
 
@@ -274,8 +274,9 @@ def test_resposta_fundamentada_cita_trechos_delimitados(config, indice):
     alvo = id_de(indice, "DOC-02")
     cliente, sdk = gerador(config, fundamentada(alvo))
     resultado = rag.responder("Quais documentos levo na matrícula? CPF 123.456.789-00", indice=indice, cliente=cliente, config=config)
-    assert resultado.valor.status == "fundamentada" and not resultado.valor.necessita_revisao
-    assert resultado.valor.fontes() == [alvo] and len(resultado.valor.trechos) == indice.contar()
+    assert resultado.valor.status == "fundamentada" and resultado.valor.necessita_revisao
+    assert resultado.valor.fontes() == [alvo] and len(resultado.valor.trechos) < indice.contar()
+    assert all(t.trecho.documento_id != 'DOC-06' for t in resultado.valor.trechos)
     assert resultado.prompt.identificador == "rag_d2_v1" and len(resultado.respostas) == 1
     [chamada] = sdk.chamadas
     assert chamada["model"] == config.perfil_geracao()["modelo"] and chamada["text"]["format"]["strict"] is True
@@ -604,7 +605,7 @@ def test_trecho_bloqueado_nao_chega_ao_modelo(config, indice, auditoria, partes,
     cliente, sdk = gerador(config, fundamentada(id_de(indice, "DOC-02")))
     registro = processar(config, indice, auditoria, cliente)
     assert registro.status == "pendente" and registro.resposta.necessita_revisao
-    assert "DOC-06" not in sdk.chamadas[0]["input"]
+    assert "DOC-06" not in sdk.operacoes('responses.create')[0]["input"]
     assert all(t.trecho.documento_id != "DOC-06" for t in registro.resposta.trechos)
     [evento] = auditoria.eventos(id_execucao=registro.id_execucao, etapa="d2_recuperacao_geracao")
     assert any(i.startswith("DOC-06") for i in evento["extra"]["ids_recuperados"])
@@ -674,7 +675,15 @@ def test_consulta_pela_interface_mostra_passagens_marca_de_ia_e_decisao(app_indi
     clicar(app, "Indexar o acervo")
     app.sidebar.radio[0].set_value("Consulta ao acervo").run()
     app.text_input[0].input("Qual o valor da bolsa?").run()
+    app.slider[0].set_value(1).run()
     clicar(app, "Responder com fontes")
     assert not app.exception and not app.error
+    assert len(app.session_state['consulta'].resposta.trechos) == 1
     assert any("Texto gerado por IA" in c.value for c in app.caption)
     assert any(b.label == "Registrar decisão" for b in app.button)
+    next(r for r in app.radio if r.label == 'Decisão').set_value('rejeitar')
+    next(t for t in app.text_area if t.label == 'Justificativa').input('Conferência simulada da consulta.')
+    next(t for t in app.text_input if t.label == 'Revisor').input('Operador fictício')
+    clicar(app, 'Registrar decisão')
+    assert not app.exception and app.session_state['consulta'].status == 'rejeitada'
+    assert not any(b.label == 'Registrar decisão' for b in app.button)

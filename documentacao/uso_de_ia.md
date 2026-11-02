@@ -33,8 +33,29 @@ decisões são da equipe.
 
 ## 6. Responsabilidade
 
+Em 01/11/2026, Codex auxiliou na implementação da parte 3 do Desafio 2
+(RF16/RF20/RF22), incluindo regras locais de guardrail, prompt de sentimentos,
+painel Streamlit, revisão persistida e testes sem API. A solicitação foi
+implementar essas RFs no projeto existente. Foram adotados filtros com contagem
+determinística e classificação indeterminada com revisão em falhas individuais.
+As 12 avaliações e seu gabarito foram criados como exemplos fictícios antes de
+qualquer classificação real. A conferência humana dos rótulos e a validação com
+o provedor ainda precisam ser feitas pela equipe; testes simulados não medem
+qualidade do modelo.
+
 A equipe revisou e entende todo o código, prompts e documentação, e assume
 responsabilidade integral pela solução entregue.
+
+Na integração da principal `2728ddd` em 01/11/2026, Codex ajudou a resolver
+conflitos, antecipar a verificação de contexto RAG, compartilhar o orçamento
+com embeddings, corrigir falsos positivos em negações e preservar os bytes
+do acervo no Windows. As avaliações locais da primeira implementação foram
+substituídas pelas doze avaliações oficiais do Integrante 1, mantendo seu
+gabarito `D2-sentimentos.json`. A validação nova executa módulos reais com
+transporte simulado; saídas NLP históricas são reproduzidas e as minutas de
+integração são sintéticas. Nenhuma nova execução real ou aprovação humana é
+alegada. A análise e o canvas distinguem essas evidências das rodadas reais
+anteriores presentes no repositório.
 
 ## Desafio 2 — Integrante 1 (31/10/2026)
 
