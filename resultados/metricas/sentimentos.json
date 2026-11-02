@@ -1,0 +1,86 @@
+[
+  {
+    "id": "AV-01",
+    "polaridade": "positiva",
+    "justificativa": "O texto elogia o atendimento e expressa satisfação.",
+    "necessita_revisao": false,
+    "confianca_declarada": null
+  },
+  {
+    "id": "AV-02",
+    "polaridade": "positiva",
+    "justificativa": "O texto elogia o atendimento e a clareza da orientação.",
+    "necessita_revisao": false,
+    "confianca_declarada": null
+  },
+  {
+    "id": "AV-03",
+    "polaridade": "positiva",
+    "justificativa": "A avaliação elogia a agilidade e expressa satisfação.",
+    "necessita_revisao": false,
+    "confianca_declarada": null
+  },
+  {
+    "id": "AV-04",
+    "polaridade": "negativa",
+    "justificativa": "O texto critica o atendimento e a falta de explicações.",
+    "necessita_revisao": false,
+    "confianca_declarada": null
+  },
+  {
+    "id": "AV-05",
+    "polaridade": "negativa",
+    "justificativa": "Relata longa espera, falta de orientação e insatisfação.",
+    "necessita_revisao": false,
+    "confianca_declarada": null
+  },
+  {
+    "id": "AV-06",
+    "polaridade": "negativa",
+    "justificativa": "O texto critica o serviço e relata prejuízo pela demora.",
+    "necessita_revisao": false,
+    "confianca_declarada": null
+  },
+  {
+    "id": "AV-07",
+    "polaridade": "neutra",
+    "justificativa": "O texto relata apenas o horário do atendimento, sem expressar satisfação ou insatisfação.",
+    "necessita_revisao": false,
+    "confianca_declarada": null
+  },
+  {
+    "id": "AV-08",
+    "polaridade": "neutra",
+    "justificativa": "Relato factual sem expressão de satisfação ou insatisfação.",
+    "necessita_revisao": false,
+    "confianca_declarada": null
+  },
+  {
+    "id": "AV-09",
+    "polaridade": "neutra",
+    "justificativa": "Relato factual, sem elogio ou crítica.",
+    "necessita_revisao": false,
+    "confianca_declarada": null
+  },
+  {
+    "id": "AV-10",
+    "polaridade": "indeterminada",
+    "justificativa": "O elogio contrasta ironicamente com a necessidade de voltar quatro vezes.",
+    "necessita_revisao": true,
+    "confianca_declarada": null
+  },
+  {
+    "id": "AV-11",
+    "polaridade": "negativa",
+    "justificativa": "Apesar do elogio à gentileza, o pedido ficou sem solução.",
+    "necessita_revisao": false,
+    "confianca_declarada": null
+  },
+  {
+    "id": "AV-12",
+    "polaridade": "indeterminada",
+    "justificativa": "O texto não fornece contexto suficiente para identificar o sentimento.",
+    "necessita_revisao": true,
+    "confianca_declarada": null
+  }
+]

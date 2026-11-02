@@ -1,0 +1,81 @@
+{
+  "bruto": {
+    "similaridade": 0.955,
+    "palavras_referencia": 132,
+    "palavras_corretas": 128,
+    "taxa_acerto_palavras": 0.97,
+    "erros": [
+      {
+        "tipo": "substituicao",
+        "esperado": "2026-000142",
+        "obtido": "202 ilegivel 000142"
+      },
+      {
+        "tipo": "substituicao",
+        "esperado": "123.456.789-00",
+        "obtido": "123.456 ilegivel 00"
+      },
+      {
+        "tipo": "substituicao",
+        "esperado": "marcos.almeida.teste@examplo.com",
+        "obtido": "marcos.almeida.teste@exemplo.com"
+      },
+      {
+        "tipo": "omissao",
+        "esperado": "assinatura",
+        "obtido": ""
+      },
+      {
+        "tipo": "insercao",
+        "esperado": "",
+        "obtido": "assinatura"
+      }
+    ]
+  },
+  "revisado": {
+    "similaridade": 0.955,
+    "palavras_referencia": 132,
+    "palavras_corretas": 128,
+    "taxa_acerto_palavras": 0.97,
+    "erros": [
+      {
+        "tipo": "substituicao",
+        "esperado": "2026-000142",
+        "obtido": "202 ilegivel 000142"
+      },
+      {
+        "tipo": "substituicao",
+        "esperado": "123.456.789-00",
+        "obtido": "123.456 ilegivel 00"
+      },
+      {
+        "tipo": "substituicao",
+        "esperado": "marcos.almeida.teste@examplo.com",
+        "obtido": "marcos.almeida.teste@exemplo.com"
+      },
+      {
+        "tipo": "omissao",
+        "esperado": "assinatura",
+        "obtido": ""
+      },
+      {
+        "tipo": "insercao",
+        "esperado": "",
+        "obtido": "assinatura"
+      }
+    ]
+  },
+  "dados_criticos": {
+    "encontrados": [
+      "MARCOS VINICIUS DE ALMEIDA SANTOS",
+      "12/08/2008",
+      "1234567-8",
+      "01/02/2027",
+      "14/10/2026"
+    ],
+    "nao_encontrados": [
+      "2026-000142",
+      "123.456.789-00"
+    ]
+  }
+}

@@ -1,0 +1,174 @@
+{
+  "id_execucao": "24ed20a5bd31",
+  "status": "pendente",
+  "criado_em": "2026-11-01T23:20:31-04:00",
+  "origem": "D2-S04",
+  "esquema_versao": "2.0",
+  "perfil_geracao": "principal",
+  "entrada": "CASO FICTÍCIO\nProtocolo: 2026-000203\nData: 15/10/2026\nSolicitante: Bia Exemplo\nÓrgão: Escola Técnica Fictícia Horizonte\nLocal: Vila Exemplo\nAssunto: reclamação\nReclamo da demora no atendimento e peço registro da reclamação.",
+  "guardrails": [
+    {
+      "decisao": "permitir",
+      "camada": "entrada",
+      "regra": "entrada_valida",
+      "motivo": "Entrada aceita pelas regras locais."
+    },
+    {
+      "decisao": "permitir",
+      "camada": "trechos",
+      "regra": "conteudo_externo",
+      "motivo": "Trecho deve permanecer delimitado como dado externo."
+    },
+    {
+      "decisao": "permitir",
+      "camada": "trechos",
+      "regra": "conteudo_externo",
+      "motivo": "Trecho deve permanecer delimitado como dado externo."
+    },
+    {
+      "decisao": "permitir",
+      "camada": "trechos",
+      "regra": "conteudo_externo",
+      "motivo": "Trecho deve permanecer delimitado como dado externo."
+    },
+    {
+      "decisao": "permitir",
+      "camada": "trechos",
+      "regra": "conteudo_externo",
+      "motivo": "Trecho deve permanecer delimitado como dado externo."
+    },
+    {
+      "decisao": "permitir",
+      "camada": "saida",
+      "regra": "saida_validada",
+      "motivo": "Citações válidas; minuta continua sujeita à decisão humana."
+    }
+  ],
+  "problemas_validacao": [],
+  "solicitacao": {
+    "protocolo": "2026-000203",
+    "data": "15/10/2026",
+    "solicitante": "Bia Exemplo",
+    "assunto": "reclamação",
+    "pedido": "Reclamo da demora no atendimento e peço registro da reclamação.",
+    "categoria": "reclamacao",
+    "entidades": {
+      "pessoas": [
+        "Bia Exemplo"
+      ],
+      "orgaos": [
+        "Escola Técnica Fictícia Horizonte"
+      ],
+      "locais": [
+        "Vila Exemplo"
+      ],
+      "datas": [
+        "15/10/2026"
+      ],
+      "protocolos": [
+        "2026-000203"
+      ]
+    },
+    "campos_ausentes": [],
+    "necessita_revisao": false,
+    "motivo_revisao": ""
+  },
+  "ficha": {
+    "resumo": "Bia Exemplo, protocolo 2026-000203, reclama da demora no atendimento da Escola Técnica Fictícia Horizonte, em Vila Exemplo, e pede o registro da reclamação.",
+    "inferencias": []
+  },
+  "resposta": {
+    "status": "fundamentada",
+    "resposta": "Prezada Bia Exemplo,\n\nEm atenção à sua manifestação sobre a demora no atendimento, identificada pelo protocolo 2026-000203, informamos que reclamações podem ser registradas no balcão acadêmico, mediante descrição do ocorrido. O atendimento ocorre de segunda a sexta-feira, das 8h às 16h. O prazo de resposta para reclamações não está definido na carta de atendimento.\n\nEsta minuta permanece pendente de decisão do servidor.",
+    "afirmacoes": [
+      {
+        "texto": "Bia Exemplo reclama da demora no atendimento e solicita o registro da reclamação, sob o protocolo 2026-000203.",
+        "fontes": []
+      },
+      {
+        "texto": "Reclamações podem ser registradas no balcão acadêmico, com descrição do ocorrido.",
+        "fontes": [
+          "DOC-05:c7e6dd7ecc2b:B:0"
+        ]
+      },
+      {
+        "texto": "O balcão acadêmico atende de segunda a sexta-feira, das 8h às 16h.",
+        "fontes": [
+          "DOC-05:c7e6dd7ecc2b:B:0"
+        ]
+      },
+      {
+        "texto": "O prazo de resposta de reclamações não está definido na carta de atendimento.",
+        "fontes": [
+          "DOC-05:c7e6dd7ecc2b:B:0"
+        ]
+      },
+      {
+        "texto": "A minuta permanece pendente de decisão humana.",
+        "fontes": [
+          "DOC-05:c7e6dd7ecc2b:B:0"
+        ]
+      }
+    ],
+    "trechos": [
+      {
+        "trecho": {
+          "id": "DOC-05:c7e6dd7ecc2b:B:0",
+          "documento_id": "DOC-05",
+          "titulo": "Carta fictícia de atendimento",
+          "versao": "1.0",
+          "hash_documento": "c7e6dd7ecc2b8ad47e1ba4ccdd507d37d989265607fb8788caddf4918ec1cf2d",
+          "chunking": "B",
+          "texto": "DOC-05 | Carta fictícia de atendimento | versão 1.0\nDOCUMENTO FICTÍCIO - SOMENTE EXERCÍCIO; NÃO É REGRA OFICIAL.\nPublicado em 2026-09-01.\n1. Horário e manifestações\nO balcão acadêmico atende de segunda a sexta-feira, das 8h às 16h.\nReclamações podem ser registradas no balcão acadêmico, com descrição do ocorrido.\nO prazo de resposta de reclamações não está definido neste documento.\n2. Revisão\nToda resposta institucional exige decisão humana registrada. O assistente prepara somente minutas.",
+          "pagina": null,
+          "secao": "1. Horário e manifestações / 2. Revisão"
+        },
+        "distancia": 0.522168755531311
+      },
+      {
+        "trecho": {
+          "id": "DOC-03:fee096744e02:B:1",
+          "documento_id": "DOC-03",
+          "titulo": "Manual fictício de documentos escolares",
+          "versao": "1.0",
+          "hash_documento": "fee096744e024f38945d312fdf89193220756bea9269317f6c7fa934a4b9e71e",
+          "chunking": "B",
+          "texto": "ertificado exigem\nanálise específica; não há prazo definido aqui para esses documentos.\n2. Entrega e controle\nA retirada exige conferência por servidor. Uma minuta do assistente não comprova emissão.\nA Escola Técnica Fictícia Horizonte mantém a decisão com o operador.\n3. Dados mínimos\nNão solicite senha, chave de API ou dados bancários. Se houver lacunas, registre a\npendência e peça revisão humana.",
+          "pagina": 1,
+          "secao": "1. Emissão de declaração / 2. Entrega e controle / 3. Dados mínimos"
+        },
+        "distancia": 0.5846307277679443
+      },
+      {
+        "trecho": {
+          "id": "DOC-05:c7e6dd7ecc2b:B:1",
+          "documento_id": "DOC-05",
+          "titulo": "Carta fictícia de atendimento",
+          "versao": "1.0",
+          "hash_documento": "c7e6dd7ecc2b8ad47e1ba4ccdd507d37d989265607fb8788caddf4918ec1cf2d",
+          "chunking": "B",
+          "texto": "o\nToda resposta institucional exige decisão humana registrada. O assistente prepara somente minutas. Avaliações de atendimento não permitem inferir características pessoais de quem escreve.\n3. Limites\nNão há informação sobre transporte, bolsas ou credenciais no acervo.",
+          "pagina": null,
+          "secao": "2. Revisão / 3. Limites"
+        },
+        "distancia": 0.5921322107315063
+      },
+      {
+        "trecho": {
+          "id": "DOC-04:22fc941bb5c5:B:1",
+          "documento_id": "DOC-04",
+          "titulo": "Orientação fictícia de cancelamento",
+          "versao": "1.0",
+          "hash_documento": "22fc941bb5c51b6351f88bd4b2e1a20892eb3fee59ad4e000552187483fc1766",
+          "chunking": "B",
+          "texto": "consecutivos exigem análise da secretaria.\nO registro de faltas não autoriza o assistente a declarar cancelamento. Casos com dúvida devem ser encaminhados à revisão.\n3. Abrangência\nOrientação criada para a Escola Técnica Fictícia Horizonte, sem efeito sobre instituições reais.",
+          "pagina": null,
+          "secao": "2. Faltas / 3. Abrangência"
+        },
+        "distancia": 0.6154793500900269
+      }
+    ],
+    "necessita_revisao": false
+  },
+  "decisao": null
+}

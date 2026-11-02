@@ -1,0 +1,15 @@
+{
+  "id_execucao": "e25d1dfbc4e2",
+  "caso_id": "texto-01",
+  "modalidade": "texto",
+  "arquivo_origem": "dados/originais/entrada_texto.txt",
+  "extracao": "dados/processados/texto-01/e25d1dfbc4e2/extracao.json",
+  "arquivo_minuta": "resultados/minutas/e25d1dfbc4e2.md",
+  "arquivo_renderizado": null,
+  "campos_ausentes": [],
+  "fontes": [
+    "dados/originais/entrada_texto.txt"
+  ],
+  "gerada_em": "2026-11-01T23:23:03-04:00",
+  "status": "aguardando_revisao"
+}

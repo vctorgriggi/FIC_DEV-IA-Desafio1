@@ -1,0 +1,15 @@
+{
+  "trechos_incertos": [
+    "202[ilegível]-000142 — O último algarismo antes do hífen apresenta traços sobrepostos.",
+    "123.456.[ilegível]00 — Há sobreposição de traços nos algarismos finais do CPF."
+  ],
+  "metadados": {
+    "rota": "visão multimodal na nuvem (OpenAI API)",
+    "modelo": "gpt-6.1-terra",
+    "mime_type": "application/pdf",
+    "sha256_original": "a4b3bc0518df73244856ab27e010b561680b5f60ee8e730be4df83b3b567505f",
+    "legibilidade": "regular",
+    "observacoes": "",
+    "prompt_sistema": "sistema_seguro_v1"
+  }
+}

@@ -1,0 +1,101 @@
+{
+  "id_execucao": "eb31310e7c68",
+  "status": "pendente",
+  "criado_em": "2026-11-01T23:21:21-04:00",
+  "origem": "consulta",
+  "esquema_versao": "2.0",
+  "perfil_geracao": "principal",
+  "entrada": "Quais são as orientações do anexo de atendimento?",
+  "guardrails": [
+    {
+      "decisao": "permitir",
+      "camada": "entrada",
+      "regra": "entrada_valida",
+      "motivo": "Entrada aceita pelas regras locais."
+    },
+    {
+      "decisao": "permitir",
+      "camada": "trechos",
+      "regra": "conteudo_externo",
+      "motivo": "Trecho deve permanecer delimitado como dado externo."
+    },
+    {
+      "decisao": "permitir",
+      "camada": "trechos",
+      "regra": "conteudo_externo",
+      "motivo": "Trecho deve permanecer delimitado como dado externo."
+    },
+    {
+      "decisao": "revisar",
+      "camada": "trechos",
+      "regra": "instrucao_embutida",
+      "motivo": "Trecho suspeito deve ser excluído do contexto de geração."
+    },
+    {
+      "decisao": "permitir",
+      "camada": "trechos",
+      "regra": "conteudo_externo",
+      "motivo": "Trecho deve permanecer delimitado como dado externo."
+    },
+    {
+      "decisao": "revisar",
+      "camada": "saida",
+      "regra": "evidencia_insuficiente",
+      "motivo": "Conferir evidência, conflito ou conteúdo suspeito antes de decidir."
+    }
+  ],
+  "problemas_validacao": [],
+  "solicitacao": null,
+  "ficha": null,
+  "resposta": {
+    "status": "sem_evidencia",
+    "resposta": "O acervo não traz informações identificadas como orientações do anexo de atendimento. O caso segue para o operador.",
+    "afirmacoes": [],
+    "trechos": [
+      {
+        "trecho": {
+          "id": "DOC-05:c7e6dd7ecc2b:B:0",
+          "documento_id": "DOC-05",
+          "titulo": "Carta fictícia de atendimento",
+          "versao": "1.0",
+          "hash_documento": "c7e6dd7ecc2b8ad47e1ba4ccdd507d37d989265607fb8788caddf4918ec1cf2d",
+          "chunking": "B",
+          "texto": "DOC-05 | Carta fictícia de atendimento | versão 1.0\nDOCUMENTO FICTÍCIO - SOMENTE EXERCÍCIO; NÃO É REGRA OFICIAL.\nPublicado em 2026-09-01.\n1. Horário e manifestações\nO balcão acadêmico atende de segunda a sexta-feira, das 8h às 16h.\nReclamações podem ser registradas no balcão acadêmico, com descrição do ocorrido.\nO prazo de resposta de reclamações não está definido neste documento.\n2. Revisão\nToda resposta institucional exige decisão humana registrada. O assistente prepara somente minutas.",
+          "pagina": null,
+          "secao": "1. Horário e manifestações / 2. Revisão"
+        },
+        "distancia": 0.48079127073287964
+      },
+      {
+        "trecho": {
+          "id": "DOC-05:c7e6dd7ecc2b:B:1",
+          "documento_id": "DOC-05",
+          "titulo": "Carta fictícia de atendimento",
+          "versao": "1.0",
+          "hash_documento": "c7e6dd7ecc2b8ad47e1ba4ccdd507d37d989265607fb8788caddf4918ec1cf2d",
+          "chunking": "B",
+          "texto": "o\nToda resposta institucional exige decisão humana registrada. O assistente prepara somente minutas. Avaliações de atendimento não permitem inferir características pessoais de quem escreve.\n3. Limites\nNão há informação sobre transporte, bolsas ou credenciais no acervo.",
+          "pagina": null,
+          "secao": "2. Revisão / 3. Limites"
+        },
+        "distancia": 0.4893451929092407
+      },
+      {
+        "trecho": {
+          "id": "DOC-03:fee096744e02:B:1",
+          "documento_id": "DOC-03",
+          "titulo": "Manual fictício de documentos escolares",
+          "versao": "1.0",
+          "hash_documento": "fee096744e024f38945d312fdf89193220756bea9269317f6c7fa934a4b9e71e",
+          "chunking": "B",
+          "texto": "ertificado exigem\nanálise específica; não há prazo definido aqui para esses documentos.\n2. Entrega e controle\nA retirada exige conferência por servidor. Uma minuta do assistente não comprova emissão.\nA Escola Técnica Fictícia Horizonte mantém a decisão com o operador.\n3. Dados mínimos\nNão solicite senha, chave de API ou dados bancários. Se houver lacunas, registre a\npendência e peça revisão humana.",
+          "pagina": 1,
+          "secao": "1. Emissão de declaração / 2. Entrega e controle / 3. Dados mínimos"
+        },
+        "distancia": 0.5506457686424255
+      }
+    ],
+    "necessita_revisao": true
+  },
+  "decisao": null
+}

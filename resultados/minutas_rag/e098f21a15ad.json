@@ -1,0 +1,128 @@
+{
+  "id_execucao": "e098f21a15ad",
+  "status": "pendente",
+  "criado_em": "2026-11-01T23:27:33-04:00",
+  "origem": "consulta",
+  "esquema_versao": "2.0",
+  "perfil_geracao": "principal",
+  "entrada": "Como solicitar cancelamento?",
+  "guardrails": [
+    {
+      "decisao": "permitir",
+      "camada": "entrada",
+      "regra": "entrada_valida",
+      "motivo": "Entrada aceita pelas regras locais."
+    },
+    {
+      "decisao": "permitir",
+      "camada": "trechos",
+      "regra": "conteudo_externo",
+      "motivo": "Trecho deve permanecer delimitado como dado externo."
+    },
+    {
+      "decisao": "permitir",
+      "camada": "trechos",
+      "regra": "conteudo_externo",
+      "motivo": "Trecho deve permanecer delimitado como dado externo."
+    },
+    {
+      "decisao": "permitir",
+      "camada": "trechos",
+      "regra": "conteudo_externo",
+      "motivo": "Trecho deve permanecer delimitado como dado externo."
+    },
+    {
+      "decisao": "permitir",
+      "camada": "trechos",
+      "regra": "conteudo_externo",
+      "motivo": "Trecho deve permanecer delimitado como dado externo."
+    },
+    {
+      "decisao": "permitir",
+      "camada": "saida",
+      "regra": "saida_validada",
+      "motivo": "Citações válidas; minuta continua sujeita à decisão humana."
+    }
+  ],
+  "problemas_validacao": [],
+  "solicitacao": null,
+  "ficha": null,
+  "resposta": {
+    "status": "fundamentada",
+    "resposta": "Na orientação fictícia, o cancelamento deve ser solicitado por requerimento assinado no balcão acadêmico. Informe o curso e o protocolo e aguarde análise humana.",
+    "afirmacoes": [
+      {
+        "texto": "O cancelamento deve ser solicitado por requerimento assinado no balcão acadêmico.",
+        "fontes": [
+          "DOC-04:22fc941bb5c5:B:0"
+        ]
+      },
+      {
+        "texto": "A solicitação deve informar o curso e o protocolo e aguardar análise humana.",
+        "fontes": [
+          "DOC-04:22fc941bb5c5:B:0"
+        ]
+      }
+    ],
+    "trechos": [
+      {
+        "trecho": {
+          "id": "DOC-04:22fc941bb5c5:B:0",
+          "documento_id": "DOC-04",
+          "titulo": "Orientação fictícia de cancelamento",
+          "versao": "1.0",
+          "hash_documento": "22fc941bb5c51b6351f88bd4b2e1a20892eb3fee59ad4e000552187483fc1766",
+          "chunking": "B",
+          "texto": "DOC-04 | Orientação fictícia de cancelamento | versão 1.0\nDOCUMENTO FICTÍCIO - SOMENTE EXERCÍCIO; NÃO É REGRA OFICIAL.\nPublicado em 2026-09-01.\n1. Solicitação\nO cancelamento deve ser solicitado por requerimento assinado no balcão acadêmico.\nInforme curso e protocolo e aguarde análise humana; o assistente não cancela matrículas.\n2. Faltas\nFaltas sem justificativa nos dois primeiros dias consecutivos exigem análise da secretaria.\nO registro de faltas não autoriza o assistente a declarar",
+          "pagina": null,
+          "secao": "1. Solicitação / 2. Faltas"
+        },
+        "distancia": 0.4092622399330139
+      },
+      {
+        "trecho": {
+          "id": "DOC-01:4cf44a695a2c:B:1",
+          "documento_id": "DOC-01",
+          "titulo": "Guia de matrícula fictício",
+          "versao": "1.0",
+          "hash_documento": "4cf44a695a2cc167b036f2fda0f5937f3646509f0c1cd13ee0f9bf6ae2fde100",
+          "chunking": "B",
+          "texto": "onfirma deferimento.\n2. Prazo histórico\nO prazo de matrícula termina em 20/10/2026.\nEsta versão vale de 01/09/2026 até 09/10/2026; DOC-02 a substitui integralmente em 10/10/2026.\n3. Procedimento\nA solicitação deve informar nome, curso e protocolo, quando existente. Pendências exigem conferência humana. Não há matrícula automática.",
+          "pagina": null,
+          "secao": "1. Escopo e documentos / 2. Prazo histórico / 3. Procedimento"
+        },
+        "distancia": 0.5558663606643677
+      },
+      {
+        "trecho": {
+          "id": "DOC-03:fee096744e02:B:1",
+          "documento_id": "DOC-03",
+          "titulo": "Manual fictício de documentos escolares",
+          "versao": "1.0",
+          "hash_documento": "fee096744e024f38945d312fdf89193220756bea9269317f6c7fa934a4b9e71e",
+          "chunking": "B",
+          "texto": "ertificado exigem\nanálise específica; não há prazo definido aqui para esses documentos.\n2. Entrega e controle\nA retirada exige conferência por servidor. Uma minuta do assistente não comprova emissão.\nA Escola Técnica Fictícia Horizonte mantém a decisão com o operador.\n3. Dados mínimos\nNão solicite senha, chave de API ou dados bancários. Se houver lacunas, registre a\npendência e peça revisão humana.",
+          "pagina": 1,
+          "secao": "1. Emissão de declaração / 2. Entrega e controle / 3. Dados mínimos"
+        },
+        "distancia": 0.5812100172042847
+      },
+      {
+        "trecho": {
+          "id": "DOC-05:c7e6dd7ecc2b:B:0",
+          "documento_id": "DOC-05",
+          "titulo": "Carta fictícia de atendimento",
+          "versao": "1.0",
+          "hash_documento": "c7e6dd7ecc2b8ad47e1ba4ccdd507d37d989265607fb8788caddf4918ec1cf2d",
+          "chunking": "B",
+          "texto": "DOC-05 | Carta fictícia de atendimento | versão 1.0\nDOCUMENTO FICTÍCIO - SOMENTE EXERCÍCIO; NÃO É REGRA OFICIAL.\nPublicado em 2026-09-01.\n1. Horário e manifestações\nO balcão acadêmico atende de segunda a sexta-feira, das 8h às 16h.\nReclamações podem ser registradas no balcão acadêmico, com descrição do ocorrido.\nO prazo de resposta de reclamações não está definido neste documento.\n2. Revisão\nToda resposta institucional exige decisão humana registrada. O assistente prepara somente minutas.",
+          "pagina": null,
+          "secao": "1. Horário e manifestações / 2. Revisão"
+        },
+        "distancia": 0.6176340579986572
+      }
+    ],
+    "necessita_revisao": false
+  },
+  "decisao": null
+}

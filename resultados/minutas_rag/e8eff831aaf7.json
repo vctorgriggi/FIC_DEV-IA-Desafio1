@@ -1,0 +1,156 @@
+{
+  "id_execucao": "e8eff831aaf7",
+  "status": "pendente",
+  "criado_em": "2026-11-01T23:20:18-04:00",
+  "origem": "D2-S03",
+  "esquema_versao": "2.0",
+  "perfil_geracao": "principal",
+  "entrada": "CASO FICTÍCIO\nProtocolo: 2026-000202\nData: 15/10/2026\nSolicitante: Ivo Exemplo\nÓrgão: Escola Técnica Fictícia Horizonte\nLocal: Vila Exemplo\nAssunto: cancelamento\nSolicito cancelamento da matrícula.",
+  "guardrails": [
+    {
+      "decisao": "permitir",
+      "camada": "entrada",
+      "regra": "entrada_valida",
+      "motivo": "Entrada aceita pelas regras locais."
+    },
+    {
+      "decisao": "permitir",
+      "camada": "trechos",
+      "regra": "conteudo_externo",
+      "motivo": "Trecho deve permanecer delimitado como dado externo."
+    },
+    {
+      "decisao": "permitir",
+      "camada": "trechos",
+      "regra": "conteudo_externo",
+      "motivo": "Trecho deve permanecer delimitado como dado externo."
+    },
+    {
+      "decisao": "permitir",
+      "camada": "trechos",
+      "regra": "conteudo_externo",
+      "motivo": "Trecho deve permanecer delimitado como dado externo."
+    },
+    {
+      "decisao": "permitir",
+      "camada": "trechos",
+      "regra": "conteudo_externo",
+      "motivo": "Trecho deve permanecer delimitado como dado externo."
+    },
+    {
+      "decisao": "permitir",
+      "camada": "saida",
+      "regra": "saida_validada",
+      "motivo": "Citações válidas; minuta continua sujeita à decisão humana."
+    }
+  ],
+  "problemas_validacao": [],
+  "solicitacao": {
+    "protocolo": "2026-000202",
+    "data": "15/10/2026",
+    "solicitante": "Ivo Exemplo",
+    "assunto": "cancelamento",
+    "pedido": "Solicito cancelamento da matrícula.",
+    "categoria": "cancelamento",
+    "entidades": {
+      "pessoas": [
+        "Ivo Exemplo"
+      ],
+      "orgaos": [
+        "Escola Técnica Fictícia Horizonte"
+      ],
+      "locais": [
+        "Vila Exemplo"
+      ],
+      "datas": [
+        "15/10/2026"
+      ],
+      "protocolos": [
+        "2026-000202"
+      ]
+    },
+    "campos_ausentes": [],
+    "necessita_revisao": false,
+    "motivo_revisao": ""
+  },
+  "ficha": {
+    "resumo": "Ivo Exemplo solicita o cancelamento da matrícula à Escola Técnica Fictícia Horizonte, em Vila Exemplo. Protocolo: 2026-000202, de 15/10/2026.",
+    "inferencias": []
+  },
+  "resposta": {
+    "status": "fundamentada",
+    "resposta": "Prezado Ivo Exemplo,\n\nRecebemos sua solicitação de cancelamento de matrícula, sob o protocolo 2026-000202. Para solicitar o cancelamento, apresente um requerimento assinado no balcão acadêmico, informando o curso e o protocolo. A solicitação ficará sujeita à análise humana.\n\nAtenciosamente,\nSecretaria",
+    "afirmacoes": [
+      {
+        "texto": "Ivo Exemplo solicitou o cancelamento de matrícula sob o protocolo 2026-000202.",
+        "fontes": []
+      },
+      {
+        "texto": "O cancelamento deve ser solicitado por requerimento assinado no balcão acadêmico, com informação do curso e do protocolo, e depende de análise humana.",
+        "fontes": [
+          "DOC-04:22fc941bb5c5:B:0"
+        ]
+      }
+    ],
+    "trechos": [
+      {
+        "trecho": {
+          "id": "DOC-04:22fc941bb5c5:B:0",
+          "documento_id": "DOC-04",
+          "titulo": "Orientação fictícia de cancelamento",
+          "versao": "1.0",
+          "hash_documento": "22fc941bb5c51b6351f88bd4b2e1a20892eb3fee59ad4e000552187483fc1766",
+          "chunking": "B",
+          "texto": "DOC-04 | Orientação fictícia de cancelamento | versão 1.0\nDOCUMENTO FICTÍCIO - SOMENTE EXERCÍCIO; NÃO É REGRA OFICIAL.\nPublicado em 2026-09-01.\n1. Solicitação\nO cancelamento deve ser solicitado por requerimento assinado no balcão acadêmico.\nInforme curso e protocolo e aguarde análise humana; o assistente não cancela matrículas.\n2. Faltas\nFaltas sem justificativa nos dois primeiros dias consecutivos exigem análise da secretaria.\nO registro de faltas não autoriza o assistente a declarar",
+          "pagina": null,
+          "secao": "1. Solicitação / 2. Faltas"
+        },
+        "distancia": 0.3598789572715759
+      },
+      {
+        "trecho": {
+          "id": "DOC-01:4cf44a695a2c:B:1",
+          "documento_id": "DOC-01",
+          "titulo": "Guia de matrícula fictício",
+          "versao": "1.0",
+          "hash_documento": "4cf44a695a2cc167b036f2fda0f5937f3646509f0c1cd13ee0f9bf6ae2fde100",
+          "chunking": "B",
+          "texto": "onfirma deferimento.\n2. Prazo histórico\nO prazo de matrícula termina em 20/10/2026.\nEsta versão vale de 01/09/2026 até 09/10/2026; DOC-02 a substitui integralmente em 10/10/2026.\n3. Procedimento\nA solicitação deve informar nome, curso e protocolo, quando existente. Pendências exigem conferência humana. Não há matrícula automática.",
+          "pagina": null,
+          "secao": "1. Escopo e documentos / 2. Prazo histórico / 3. Procedimento"
+        },
+        "distancia": 0.4008488059043884
+      },
+      {
+        "trecho": {
+          "id": "DOC-04:22fc941bb5c5:B:1",
+          "documento_id": "DOC-04",
+          "titulo": "Orientação fictícia de cancelamento",
+          "versao": "1.0",
+          "hash_documento": "22fc941bb5c51b6351f88bd4b2e1a20892eb3fee59ad4e000552187483fc1766",
+          "chunking": "B",
+          "texto": "consecutivos exigem análise da secretaria.\nO registro de faltas não autoriza o assistente a declarar cancelamento. Casos com dúvida devem ser encaminhados à revisão.\n3. Abrangência\nOrientação criada para a Escola Técnica Fictícia Horizonte, sem efeito sobre instituições reais.",
+          "pagina": null,
+          "secao": "2. Faltas / 3. Abrangência"
+        },
+        "distancia": 0.5375832319259644
+      },
+      {
+        "trecho": {
+          "id": "DOC-02:31c674497c07:B:0",
+          "documento_id": "DOC-02",
+          "titulo": "Guia de matrícula fictício",
+          "versao": "2.0",
+          "hash_documento": "31c674497c0727f3597cfaf07f7eeb19b328a8e4370cfc24b4d9c98a94c65942",
+          "chunking": "B",
+          "texto": "DOC-02 | Guia de matrícula fictício | versão 2.0\nDOCUMENTO FICTÍCIO - SOMENTE EXERCÍCIO; NÃO É REGRA OFICIAL.\nPublicado em 2026-10-10.\n1. Vigência e prioridade\nEste guia substitui integralmente DOC-01 a partir de 10/10/2026.\n2. Prazo vigente\nO prazo de matrícula termina em 30/10/2026.\n3. Documentos e atendimento\nPara matrícula, apresente documento de identificação e histórico escolar.\nA Escola Técnica Fictícia Horizonte recebe solicitações no balcão acadêmico. O servidor confere os documentos e",
+          "pagina": null,
+          "secao": "1. Vigência e prioridade / 2. Prazo vigente / 3. Documentos e atendimento"
+        },
+        "distancia": 0.5449835062026978
+      }
+    ],
+    "necessita_revisao": false
+  },
+  "decisao": null
+}
