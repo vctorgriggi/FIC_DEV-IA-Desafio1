@@ -54,12 +54,14 @@
       "referencias": [
         "DOC-02:31c674497c07:A:1"
       ],
+      "id_execucao": "904dd1aa6454",
+      "executado_em": "2026-11-01T21:27:29-04:00",
       "situacao": "obtido",
       "status": "fundamentada",
       "resposta": "Para a matrícula, apresente documento de identificação e histórico escolar.",
       "afirmacoes": [
         {
-          "texto": "Para matrícula, são exigidos documento de identificação e histórico escolar.",
+          "texto": "Para matrícula, são necessários documento de identificação e histórico escolar.",
           "fontes": [
             "DOC-02:31c674497c07:A:1"
           ]
@@ -74,8 +76,8 @@
       "status_confere": true,
       "cita_referencia": true,
       "tokens_entrada": 1517,
-      "tokens_saida": 117,
-      "custo_estimado_usd": 0.002102,
+      "tokens_saida": 106,
+      "custo_estimado_usd": 0.002047,
       "chamadas": 1
     },
     {
@@ -85,6 +87,8 @@
       "referencias": [
         "DOC-03:fee096744e02:A:0"
       ],
+      "id_execucao": "96969facaac3",
+      "executado_em": "2026-11-01T21:27:32-04:00",
       "situacao": "obtido",
       "status": "fundamentada",
       "resposta": "A declaração de matrícula pode ser solicitada no balcão acadêmico.",
@@ -105,8 +109,8 @@
       "status_confere": true,
       "cita_referencia": true,
       "tokens_entrada": 1452,
-      "tokens_saida": 127,
-      "custo_estimado_usd": 0.002087,
+      "tokens_saida": 113,
+      "custo_estimado_usd": 0.002017,
       "chamadas": 1
     },
     {
@@ -116,6 +120,8 @@
       "referencias": [
         "DOC-03:fee096744e02:A:1"
       ],
+      "id_execucao": "eec8645d3599",
+      "executado_em": "2026-11-01T21:27:36-04:00",
       "situacao": "obtido",
       "status": "fundamentada",
       "resposta": "O prazo de emissão da declaração é de cinco dias úteis após a conferência dos dados.",
@@ -147,16 +153,12 @@
       "referencias": [
         "DOC-04:22fc941bb5c5:A:0"
       ],
+      "id_execucao": "f1051a98813c",
+      "executado_em": "2026-11-01T21:27:38-04:00",
       "situacao": "obtido",
       "status": "fundamentada",
-      "resposta": "Conforme a orientação fictícia, solicite o cancelamento por requerimento assinado no balcão acadêmico. Informe curso e protocolo e aguarde análise humana. O assistente não cancela matrículas.",
+      "resposta": "Segundo a orientação fictícia, solicite o cancelamento por requerimento assinado no balcão acadêmico. Informe o curso e o protocolo e aguarde análise humana.",
       "afirmacoes": [
-        {
-          "texto": "A orientação é fictícia e não é regra oficial.",
-          "fontes": [
-            "DOC-04:22fc941bb5c5:A:0"
-          ]
-        },
         {
           "texto": "O cancelamento deve ser solicitado por requerimento assinado no balcão acadêmico.",
           "fontes": [
@@ -164,15 +166,15 @@
           ]
         },
         {
-          "texto": "Informe curso e protocolo e aguarde análise humana.",
+          "texto": "Informe o curso e o protocolo e aguarde análise humana.",
           "fontes": [
             "DOC-04:22fc941bb5c5:A:1"
           ]
         },
         {
-          "texto": "O assistente não cancela matrículas.",
+          "texto": "A orientação é fictícia e não é regra oficial.",
           "fontes": [
-            "DOC-04:22fc941bb5c5:A:1"
+            "DOC-04:22fc941bb5c5:A:0"
           ]
         }
       ],
@@ -185,8 +187,8 @@
       "status_confere": true,
       "cita_referencia": true,
       "tokens_entrada": 1454,
-      "tokens_saida": 292,
-      "custo_estimado_usd": 0.002914,
+      "tokens_saida": 270,
+      "custo_estimado_usd": 0.002804,
       "chamadas": 1
     },
     {
@@ -196,6 +198,8 @@
       "referencias": [
         "DOC-05:c7e6dd7ecc2b:A:0"
       ],
+      "id_execucao": "f31cb223ef71",
+      "executado_em": "2026-11-01T21:27:43-04:00",
       "situacao": "obtido",
       "status": "fundamentada",
       "resposta": "O balcão acadêmico atende de segunda a sexta-feira, das 8h às 16h.",
@@ -216,8 +220,8 @@
       "status_confere": true,
       "cita_referencia": true,
       "tokens_entrada": 1474,
-      "tokens_saida": 141,
-      "custo_estimado_usd": 0.002179,
+      "tokens_saida": 90,
+      "custo_estimado_usd": 0.001924,
       "chamadas": 1
     },
     {
@@ -225,6 +229,8 @@
       "tipo": "sem_resposta",
       "status_esperado": "sem_evidencia",
       "referencias": [],
+      "id_execucao": "4547b416f47f",
+      "executado_em": "2026-11-01T21:27:46-04:00",
       "situacao": "obtido",
       "status": "sem_evidencia",
       "resposta": "O acervo não informa o valor mensal da bolsa estudantil. O caso segue para o operador.",
@@ -238,8 +244,8 @@
       "status_confere": true,
       "cita_referencia": false,
       "tokens_entrada": 1362,
-      "tokens_saida": 158,
-      "custo_estimado_usd": 0.002152,
+      "tokens_saida": 100,
+      "custo_estimado_usd": 0.001862,
       "chamadas": 1
     },
     {
@@ -247,6 +253,8 @@
       "tipo": "sem_resposta",
       "status_esperado": "sem_evidencia",
       "referencias": [],
+      "id_execucao": "03aec3a05adc",
+      "executado_em": "2026-11-01T21:27:49-04:00",
       "situacao": "obtido",
       "status": "sem_evidencia",
       "resposta": "O acervo não informa se sua declaração individual já foi emitida. O caso segue para o operador.",
@@ -260,8 +268,8 @@
       "status_confere": true,
       "cita_referencia": false,
       "tokens_entrada": 1453,
-      "tokens_saida": 86,
-      "custo_estimado_usd": 0.001883,
+      "tokens_saida": 75,
+      "custo_estimado_usd": 0.001828,
       "chamadas": 1
     },
     {
@@ -273,12 +281,14 @@
         "DOC-02:31c674497c07:A:0",
         "DOC-02:31c674497c07:A:1"
       ],
+      "id_execucao": "2d3e8ba72c74",
+      "executado_em": "2026-11-01T21:27:51-04:00",
       "situacao": "obtido",
       "status": "fundamentada",
-      "resposta": "Em 15/10/2026, vale o prazo de matrícula até 30/10/2026. O DOC-02 substituiu o DOC-01, que previa o prazo anterior de 20/10/2026.",
+      "resposta": "Em 15/10/2026, vale o prazo de matrícula até 30/10/2026. O DOC-02 substituiu integralmente o DOC-01, que previa o prazo anterior de 20/10/2026.",
       "afirmacoes": [
         {
-          "texto": "O DOC-01 previa o término do prazo em 20/10/2026.",
+          "texto": "O DOC-01 previa o prazo de matrícula até 20/10/2026.",
           "fontes": [
             "DOC-01:4cf44a695a2c:A:2"
           ]
@@ -286,12 +296,12 @@
         {
           "texto": "O DOC-02 substituiu integralmente o DOC-01 a partir de 10/10/2026.",
           "fontes": [
-            "DOC-02:31c674497c07:A:0",
-            "DOC-01:4cf44a695a2c:A:2"
+            "DOC-01:4cf44a695a2c:A:2",
+            "DOC-02:31c674497c07:A:0"
           ]
         },
         {
-          "texto": "O prazo de matrícula vigente termina em 30/10/2026.",
+          "texto": "O prazo vigente de matrícula termina em 30/10/2026.",
           "fontes": [
             "DOC-02:31c674497c07:A:1"
           ]
@@ -306,11 +316,12 @@
       "status_confere": true,
       "cita_referencia": true,
       "tokens_entrada": 1571,
-      "tokens_saida": 282,
-      "custo_estimado_usd": 0.002981,
+      "tokens_saida": 289,
+      "custo_estimado_usd": 0.003016,
       "chamadas": 1
     }
   ],
+  "textos_embedados_na_indexacao": 0,
   "metricas": {
     "status_confere": {
       "numerador": 8,

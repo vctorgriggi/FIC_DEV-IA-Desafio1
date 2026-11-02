@@ -56,20 +56,27 @@
         "DOC-01:4cf44a695a2c:B:1",
         "DOC-02:31c674497c07:B:0"
       ],
+      "id_execucao": "cadf3ea3ca4b",
+      "executado_em": "2026-11-01T21:27:11-04:00",
       "situacao": "obtido",
       "status": "fundamentada",
-      "resposta": "Para a data de 15/10/2026, o prazo de matrícula termina em 30/10/2026. O prazo anterior foi substituído.",
+      "resposta": "Em 15/10/2026, o prazo de matrícula vigente termina em 30/10/2026. O prazo anterior era 20/10/2026, mas o DOC-02 substituiu integralmente o DOC-01 a partir de 10/10/2026.",
       "afirmacoes": [
         {
-          "texto": "O prazo de matrícula vigente termina em 30/10/2026.",
+          "texto": "O DOC-01 previa que o prazo terminaria em 20/10/2026.",
+          "fontes": [
+            "DOC-01:4cf44a695a2c:B:1"
+          ]
+        },
+        {
+          "texto": "O DOC-02 substituiu integralmente o DOC-01 a partir de 10/10/2026.",
           "fontes": [
             "DOC-02:31c674497c07:B:0"
           ]
         },
         {
-          "texto": "O prazo anterior terminava em 20/10/2026; o DOC-02 substituiu integralmente o DOC-01 a partir de 10/10/2026.",
+          "texto": "O prazo vigente no DOC-02 termina em 30/10/2026.",
           "fontes": [
-            "DOC-01:4cf44a695a2c:B:1",
             "DOC-02:31c674497c07:B:0"
           ]
         }
@@ -83,11 +90,12 @@
       "status_confere": true,
       "cita_referencia": true,
       "tokens_entrada": 1745,
-      "tokens_saida": 208,
-      "custo_estimado_usd": 0.002785,
+      "tokens_saida": 253,
+      "custo_estimado_usd": 0.00301,
       "chamadas": 1
     }
   ],
+  "textos_embedados_na_indexacao": 0,
   "metricas": {
     "status_confere": {
       "numerador": 1,
