@@ -490,6 +490,15 @@ def clicar(app, rotulo):
     next(b for b in app.button if b.label == rotulo).click().run()
 
 
+def test_indexar_pela_interface_nao_soma_o_teto_entre_documentos(config, app_indice):
+    config.dados["limites"]["max_chamadas_por_execucao"] = 1
+    app = app_indice.run()
+    app.sidebar.radio[0].set_value("Acervo e índice").run()
+    clicar(app, "Indexar o acervo")
+    assert not app.exception and not app.error
+    assert sum("trechos no índice" in m.value for m in app.markdown) == len(ingestion.ler_manifesto(config))
+
+
 def test_botoes_de_indice_e_consulta_funcionam_pela_interface(app_indice):
     app = app_indice.run()
     app.sidebar.radio[0].set_value("Acervo e índice").run()

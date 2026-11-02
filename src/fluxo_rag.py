@@ -227,10 +227,8 @@ def _recuperar_gerar_e_encerrar(
             "indice": {chave: info[chave] for chave in ("colecao", "modelo_embedding", "dimensao", "chunking", "versao_indice")},
         }
         recuperados = rag.recuperar(consulta, indice=indice, config=config, top_k=top_k) if consulta else []
-        decisoes_trechos = guardrails.verificar_trechos(recuperados, config=config) if recuperados else []
+        usados, decisoes_trechos = rag.separar_trechos(recuperados, config=config)
         registro["guardrails"].extend(decisoes_trechos)
-        suspeitos = {t.trecho.documento_id for t, d in zip(recuperados, decisoes_trechos) if d.decisao != 'permitir'}
-        usados = [t for t in recuperados if t.trecho.documento_id not in suspeitos]
         embeddings = indice.ultima_resposta
         evento.extra.update({
             "ids_recuperados": [t.trecho.id for t in recuperados],

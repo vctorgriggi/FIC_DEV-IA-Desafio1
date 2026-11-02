@@ -16,8 +16,6 @@ from typing import Literal
 from pydantic import ValidationError
 
 from . import guardrails
-from .audit import Auditoria, Evento, novo_id
-from .fluxo import _etapa
 from .config import Config
 from .embeddings import IndiceVetorial
 from .entradas import ArquivoInvalido
@@ -26,7 +24,7 @@ from .llm_client import ClienteLLM, ErroLLM, RespostaMalformada, formato_json
 from .nlp import PADRAO_DATA
 from .privacidade import mascarar, ocultar_segredos
 from .prompts import Prompt, carregar_prompt, delimitar
-from .schemas import RespostaGerada, RespostaRAG, SolicitacaoEstruturada, TrechoRecuperado
+from .schemas import DecisaoGuardrail, RespostaGerada, RespostaRAG, SolicitacaoEstruturada, TrechoRecuperado
 from .tipos import Resultado
 
 _NUMERO = re.compile(r"\d+")
@@ -58,35 +56,13 @@ def responder(
     config: Config,
     perfil: str | None = None,
     top_k: int | None = None,
-    auditoria: Auditoria | None = None,
-    id_execucao: str | None = None,
 ) -> Resultado[RespostaRAG]:
-    """Resposta a uma pergunta avulsa, com status e citação por afirmação; sem trecho, abstém-se sem chamar o modelo."""
-    prompt = carregar_prompt(config, "rag_d2", 1)
-    auditoria = auditoria or Auditoria(config)
-    id_execucao = id_execucao or novo_id()
-    decisao = guardrails.verificar_entrada(pergunta, config=config)
-    auditoria.registrar(Evento(id_execucao=id_execucao, caso_id=id_execucao, etapa='d2_consulta_entrada',
-        extra={'guardrails': [decisao.model_dump()]}))
-    if decisao.decisao == 'bloquear':
-        raise RespostaMalformada('RF16: consulta bloqueada antes da busca (' + decisao.regra + ').')
-    consulta = minimizar(pergunta, config)
-    trechos, suspeito = _recuperar(consulta, indice, config, auditoria, id_execucao, top_k=top_k)
-    if not trechos:
-        return Resultado(_sem_trechos("O acervo indexado não trouxe trecho para esta pergunta. O caso segue para o operador."), [], prompt)
-    entrada = "\n".join([prompt.texto, delimitar(consulta, "pergunta"), _contexto(trechos, config)])
-    with _etapa(auditoria, {'id_execucao': id_execucao, 'caso_id': id_execucao}, 'd2_consulta_geracao') as evento:
-        evento.extra = {'perfil': config.perfil_geracao(perfil)['nome'], 'ids_permitidos': [t.trecho.id for t in trechos]}
-        resultado = _gerar(entrada, trechos, caso=consulta, modo="pergunta", prompt=prompt,
-                      cliente=cliente, config=config, perfil=perfil)
-        evento.versao_prompt, evento.hash_prompt = prompt.identificador, prompt.hash
-        evento.extra['status'] = resultado.valor.status
-        for numero, resposta in enumerate(resultado.respostas, 1):
-            auditoria.registrar(Evento(id_execucao=id_execucao, caso_id=id_execucao, etapa='d2_consulta_chamada',
-                extra={'tentativa': numero}).com_resposta(resposta))
-    resultado.valor.necessita_revisao |= suspeito or decisao.decisao == 'revisar'
-    return resultado
+    """Resposta a uma pergunta avulsa, sem registro: usada na avaliação do RF19.
 
+    Aplica o guardrail de trechos; entrada, registro para decisão humana e auditoria ficam em fluxo_rag.consultar.
+    """
+    usados, decisoes = separar_trechos(recuperar(pergunta, indice=indice, config=config, top_k=top_k), config=config)
+    return _revisar_se_suspeito(gerar_resposta(pergunta, usados, cliente=cliente, config=config, perfil=perfil), decisoes)
 
 
 def gerar_resposta(
@@ -108,31 +84,12 @@ def minuta_fundamentada(
     cliente: ClienteLLM,
     config: Config,
     perfil: str | None = None,
-    auditoria: Auditoria | None = None,
-    id_execucao: str | None = None,
 ) -> Resultado[RespostaRAG]:
-    """Minuta para revisão humana: fatos do caso só da solicitação, orientação só do acervo, em blocos separados.
-
-    O texto original não vai ao modelo; serve só para aceitar número ou data que a minuta repete do caso.
-    """
-    prompt = carregar_prompt(config, "minuta_rag_d2", 1)
-    consulta = consulta_da_solicitacao(solicitacao, config)
-    if not consulta:
-        return Resultado(_sem_trechos(
-            "A solicitação não traz assunto nem pedido identificáveis, então não há orientação do acervo a aplicar. "
-            "O servidor precisa pedir esclarecimento ao cidadão."), [], prompt)
-    trechos, suspeito = _recuperar(consulta, indice, config, auditoria or Auditoria(config), id_execucao or novo_id())
-    if not trechos:
-        return Resultado(_sem_trechos(
-            "O acervo indexado não trouxe orientação para este pedido. O caso segue para análise do servidor."), [], prompt)
-    caso = minimizar(solicitacao.model_dump_json(), config)
-    entrada = "\n".join([prompt.texto, delimitar(caso, "solicitacao"), _contexto(trechos, config)])
-    resultado = _gerar(entrada, trechos, caso=caso + " " + minimizar(texto_original, config), modo="minuta",
-                       prompt=prompt, cliente=cliente, config=config, perfil=perfil)
-    if solicitacao.necessita_revisao or suspeito:
-        resultado.valor = resultado.valor.model_copy(update={"necessita_revisao": True})
-    return resultado
-
+    """Minuta para revisão humana: fatos do caso só da solicitação, orientação só do acervo, em blocos separados."""
+    recuperados = recuperar(consulta_da_solicitacao(solicitacao, config), indice=indice, config=config)
+    usados, decisoes = separar_trechos(recuperados, config=config)
+    resultado = gerar_minuta(solicitacao, texto_original, usados, cliente=cliente, config=config, perfil=perfil)
+    return _revisar_se_suspeito(resultado, decisoes)
 
 
 def gerar_minuta(
@@ -162,20 +119,22 @@ def gerar_minuta(
     return resultado
 
 
-def _recuperar(consulta, indice, config, auditoria, id_execucao, *, top_k=None):
-    """Valida contexto antes da geração; documento suspeito não entra no prompt."""
-    trechos = indice.buscar(consulta, **({'top_k': top_k} if top_k is not None else {}))
-    decisoes = guardrails.verificar_trechos(trechos, config=config)
-    suspeitos = {t.trecho.documento_id for t, d in zip(trechos, decisoes) if d.decisao != 'permitir'}
-    permitidos = [t for t in trechos if t.trecho.documento_id not in suspeitos]
-    auditoria.registrar(Evento(id_execucao=id_execucao, caso_id=id_execucao, etapa='d2_contexto', extra={
-        'ids_recuperados': [t.trecho.id for t in trechos],
-        'ids_excluidos': [t.trecho.id for t in trechos if t.trecho.documento_id in suspeitos],
-        'ids_permitidos': [t.trecho.id for t in permitidos],
-        'guardrails': [d.model_dump() for d in decisoes],
-    }))
-    return permitidos, bool(suspeitos)
+def separar_trechos(
+    recuperados: list[TrechoRecuperado], *, config: Config
+) -> tuple[list[TrechoRecuperado], list[DecisaoGuardrail]]:
+    """RF16 entre recuperação e geração: os trechos que podem ir ao modelo e uma decisão por trecho recuperado.
 
+    Trecho suspeito tira do contexto o documento inteiro, não só o trecho.
+    """
+    decisoes = guardrails.verificar_trechos(recuperados, config=config) if recuperados else []
+    suspeitos = {t.trecho.documento_id for t, d in zip(recuperados, decisoes) if d.decisao != "permitir"}
+    return [t for t in recuperados if t.trecho.documento_id not in suspeitos], decisoes
+
+
+def _revisar_se_suspeito(resultado: Resultado[RespostaRAG], decisoes: list[DecisaoGuardrail]) -> Resultado[RespostaRAG]:
+    if any(d.decisao != "permitir" for d in decisoes):
+        resultado.valor = resultado.valor.model_copy(update={"necessita_revisao": True})
+    return resultado
 
 
 def _sem_trechos(texto: str) -> RespostaRAG:

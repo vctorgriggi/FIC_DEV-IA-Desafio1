@@ -1,4 +1,4 @@
-﻿"""T04, T05, T11, T13 e RF22: SDK e fluxos simulados, sem rede."""
+"""T04, T05, T11, T13 e RF22: SDK e fluxos simulados, sem rede."""
 import json
 
 import pytest

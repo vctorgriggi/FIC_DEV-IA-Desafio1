@@ -57,12 +57,13 @@ não estima desempenho em documentos reais ou em outra população.
 
 1. **Dados e gabarito unificados:** avaliações da principal preservadas e painel
    apontado ao gabarito oficial; removida a duplicação local de gabarito.
-2. **Guardrail antes da geração:** `rag._recuperar` verifica os trechos, registra
-   IDs/decisões e exclui do contexto os documentos suspeitos. Sem contexto seguro,
+2. **Guardrail antes da geração:** `rag.separar_trechos` verifica os trechos e
+   exclui do contexto os documentos suspeitos, no fluxo e em `rag.responder`; o
+   fluxo registra IDs recuperados e enviados ao modelo. Sem contexto seguro,
    abstém-se sem chamar a geração. DOC-06 é coberto pelo teste D2-A02.
-3. **Consulta avulsa protegida:** entrada verificada antes do embedding, saída
-   verificada localmente e eventos de consulta/geração registrados. O top-k
-   escolhido no Streamlit agora chega à geração, além da busca isolada.
+3. **Consulta avulsa protegida:** `fluxo_rag.consultar` verifica a entrada antes
+   do embedding e a saída localmente, e registra os eventos. O top-k escolhido no
+   Streamlit chega à geração, além da busca isolada.
 4. **Orçamento compartilhado:** o índice usado pela solicitação recebe o mesmo
    cliente/controle da geração; embeddings também consomem o teto de chamadas.
 5. **Falsos positivos corrigidos:** “Nenhum pedido implica aprovação automática”

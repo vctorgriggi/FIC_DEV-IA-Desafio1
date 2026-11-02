@@ -1,4 +1,4 @@
-﻿"""RF16: guardrails locais conservadores; regras em documentacao/desafio-2/guardrails-sentimentos.md."""
+"""RF16: guardrails locais conservadores; regras em documentacao/desafio-2/guardrails-sentimentos.md."""
 from __future__ import annotations
 
 from pathlib import Path

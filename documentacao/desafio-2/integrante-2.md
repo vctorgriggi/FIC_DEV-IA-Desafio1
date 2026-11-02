@@ -23,9 +23,10 @@ assinaturas dos esqueletos não mudaram; as funções novas são acréscimos.
   vai em `prompts.delimitar`. É o cabeçalho que resolve o conflito do R08 por
   vigência sem confiar no texto do documento.
 - **Recuperação separada da geração** (`rag.recuperar`, `gerar_resposta`,
-  `gerar_minuta`): o fluxo aplica `guardrails.verificar_trechos` entre as duas,
-  e trecho bloqueado não chega ao modelo. Fica no registro como decisão e na
-  auditoria (`ids_recuperados` × `ids_enviados_ao_modelo`).
+  `gerar_minuta`): `rag.separar_trechos` aplica `guardrails.verificar_trechos`
+  entre as duas, e documento com trecho suspeito não chega ao modelo. No fluxo,
+  fica no registro como decisão e na auditoria (`ids_recuperados` ×
+  `ids_enviados_ao_modelo`).
 - **Conferência por código** (`rag._problemas`), com uma tentativa de correção:
   fonte fora dos trechos, status `fundamentada`/`conflito` sem fonte, afirmação
   sem fonte na pergunta avulsa e formato de credencial. Número numa afirmação
@@ -138,17 +139,17 @@ Evidência: `evidencias/integrante-2-demonstracao.json`.
 
 ## Testes
 
-`testes/test_d2_indice_rag.py`, 49 testes sem rede (embedding falso por saco
-de palavras), um deles abrindo o índice em outro processo; suíte completa 329
+`testes/test_d2_indice_rag.py`, 51 testes sem rede (embedding falso por saco
+de palavras), um deles abrindo o índice em outro processo; suíte completa 389
 aprovados. Os testes não dependem dos valores de chunking do `config.json`.
 
 ## Limites e riscos residuais
 
 - O fluxo completo (solicitação, caso do Desafio 1, consulta pela interface)
-  depende de `guardrails.verificar_entrada`, `verificar_trechos` e
-  `verificar_saida` (Integrante 3). Até lá, só foi testado com guardrails
-  simulados; não houve execução real de ponta a ponta. As oito perguntas foram
-  avaliadas direto no `rag`, sem guardrails.
+  com os guardrails do Integrante 3 só rodou em testes offline
+  (`test_d2_integracao.py`); não houve execução real de ponta a ponta. As oito
+  perguntas foram avaliadas com `rag.responder` antes do guardrail de trechos
+  existir; nenhuma recuperou DOC-06, então o filtro não mudaria o contexto.
 - Acervo pequeno: com 12 trechos e top-k 4, um terço do índice volta em cada
   busca. O acerto de 5/5 não indica desempenho num acervo real.
 - A conferência compara algarismos: "cinco dias úteis" por extenso não é

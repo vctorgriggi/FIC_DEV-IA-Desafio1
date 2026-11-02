@@ -118,7 +118,8 @@ with st.sidebar:
     chunking = st.selectbox("Configuração de chunking", chunkings, index=chunkings.index(config.dados["indice"]["chunking_ativo"]))
     tela = st.radio("Tela", ["Acervo e índice", "Solicitação", "Consulta ao acervo", "Avaliações"])
 
-cliente = executar("Conectando ao provedor…", ClienteLLM, config, controle=guardrails.ControleRecursos(config))
+# Sem controle aqui: o teto do RF16 vale por execução, e cada ação abaixo pede o seu com nova_execucao.
+cliente = executar("Conectando ao provedor…", ClienteLLM, config)
 indice = executar("Abrindo o índice…", IndiceVetorial, config, cliente, chunking=chunking) if cliente and tela != 'Avaliações' else None
 
 if tela == "Acervo e índice":
@@ -138,7 +139,9 @@ if tela == "Acervo e índice":
                 st.warning(f"Índice desatualizado para: {', '.join(desatualizados)}. Indexe de novo.")
         if st.button("Indexar o acervo", disabled=not documentos):
             for documento in documentos:
-                total = executar(f"Indexando {documento.id}…", indice.indexar, documento)
+                # Indexar não é uma solicitação: cada documento tem orçamento próprio, como cada avaliação.
+                por_documento = indice.com_cliente(cliente.nova_execucao(guardrails.ControleRecursos(config)))
+                total = executar(f"Indexando {documento.id}…", por_documento.indexar, documento)
                 if total is not None:
                     st.write(f"{documento.id}: {total} trechos no índice.")
         with st.form("incluir"):
@@ -179,7 +182,7 @@ elif tela == "Solicitação":
     caso = st.selectbox("Ou um caso do Desafio 1 (texto, áudio ou imagem passam pela transcrição ou OCR)", casos)
     if st.button("Processar caso do Desafio 1", disabled=not indice):
         st.session_state.pop("registro", None)
-        cliente_execucao = ClienteLLM(config, controle=guardrails.ControleRecursos(config))
+        cliente_execucao = cliente.nova_execucao(guardrails.ControleRecursos(config))
         registro = executar("Processando…", fluxo_rag.processar_caso, caso, config=config, cliente=cliente_execucao,
                             indice=indice, auditoria=auditoria, perfil=perfil)
         if registro:
@@ -204,7 +207,7 @@ elif tela == "Consulta ao acervo":
     if coluna_resposta.button("Responder com fontes", disabled=not (pergunta.strip() and indice)):
         st.session_state.pop("consulta", None)
         # Mesmas camadas e mesmo registro da solicitação: a resposta fica pendente até a decisão do operador.
-        cliente_execucao = ClienteLLM(config, controle=guardrails.ControleRecursos(config))
+        cliente_execucao = cliente.nova_execucao(guardrails.ControleRecursos(config))
         consulta = executar("Gerando…", fluxo_rag.consultar, pergunta, config=config, cliente=cliente_execucao,
                             indice=indice, auditoria=auditoria, perfil=perfil, top_k=top_k)
         if consulta:
